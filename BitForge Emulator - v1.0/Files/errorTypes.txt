@@ -1,0 +1,17 @@
+RA01AOOB - Address out of bounds on read8 request.                 Info is address.
+RA02AOOB - Address out of bounds on read16 request.                Info is address.
+RA03AOOB - Address out of bounds on read32 request.                Info is address.
+RA04AOOB - Address out of bounds on read64 request.                Info is address.
+RA05AOOB - Address out of bounds on readBytesVector request.       Info is address.
+RA06AOOB - Address out of bounds on write8 request.                Info is address.
+RA07AOOB - Address out of bounds on writeBytesVector request.      Info is address.
+
+RO01FTOF - Failed to open a file.
+RO02FTRF - Failed to read from file.
+RO03AOOB - Address out of bounds on read8 request.                 Info is address.
+RO04AOOB - Address out of bounds on read16 request.                Info is address.
+RO05AOOB - Address out of bounds on read32 request.                Info is address.
+RO06AOOB - Address out of bounds on read64 request.                Info is address.
+RO07AOOB - Address out of bounds on readBytesVector request.       Info is address.
+
+CP01CWTR - Cannot write to Read Only Memory.                       Info is address.

@@ -1,1 +1,7 @@
-g++ *.cpp -o computer.exe
+Emulator:
+    cd "C:\Users\Admin\Desktop\Prog. 2026\BitForge Emulator - v1.0"
+    g++ *.cpp -o computer.exe
+
+Testing:
+    cd "C:\Users\Admin\Desktop\Prog. 2026\BitForge Emulator - v1.0\Testing"
+    g++ Test.cpp -o Test.exe

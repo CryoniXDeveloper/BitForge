@@ -7,8 +7,22 @@
 
 struct RAM {
     std::vector<uint8_t> memory;
+    bool testing = false;
+    bool testingErrorSuccess = false;
 
-    RAM(int sizeInMB);
+    RAM();
+
+    void setTesting(bool t) {
+        testing = t;
+    }
+
+    bool getTestingErrorResult() {
+        return testingErrorSuccess;
+    }
+
+    void resetErrorResult() {
+        testingErrorSuccess = false;
+    }
 
     uint8_t  read8(uint64_t address) const;
     uint16_t read16(uint64_t start) const;
@@ -20,9 +34,7 @@ struct RAM {
     void write8(uint64_t address, uint8_t value);
     void writeBytesVector(uint64_t start, const std::vector<uint8_t>& data);
 
-    size_t size() const;
-
     void error(std::string errorType, std::string info = "") const;
 };
 
-extern RAM ram;
+extern RAM memory;

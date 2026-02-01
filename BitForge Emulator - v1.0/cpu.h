@@ -16,7 +16,7 @@ class RAM;
 struct CPU {
     Motherboard* motherboard = nullptr;
     ROM* rom = nullptr;
-    RAM* ram = nullptr;
+    RAM* memory = nullptr;
 
     uint64_t instructionPointer = 0;
     uint64_t stackPointer = 0;

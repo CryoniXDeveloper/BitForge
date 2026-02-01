@@ -187,7 +187,7 @@ uint8_t CPU::read8(uint64_t address) {
         return rom->read8(address);
 
     if (address >= motherboard->RAM_START && address <= motherboard->RAM_END)
-        return ram->read8(address - motherboard->RAM_END);
+        return memory->read8(address - motherboard->RAM_END);
 
     return 0;
 }
@@ -197,7 +197,7 @@ uint16_t CPU::read16(uint64_t address) {
         return rom->read16(address);
 
     if (address >= motherboard->RAM_START && address <= motherboard->RAM_END)
-        return ram->read16(address - motherboard->RAM_END);
+        return memory->read16(address - motherboard->RAM_END);
 
     return 0;
 }
@@ -207,7 +207,7 @@ uint32_t CPU::read32(uint64_t address) {
         return rom->read32(address);
 
     if (address >= motherboard->RAM_START && address <= motherboard->RAM_END)
-        return ram->read32(address - motherboard->RAM_END);
+        return memory->read32(address - motherboard->RAM_END);
 
     return 0;
 }
@@ -217,7 +217,7 @@ uint64_t CPU::read64(uint64_t address) {
         return rom->read64(address);
 
     if (address >= motherboard->RAM_START && address <= motherboard->RAM_END)
-        return ram->read64(address - motherboard->RAM_END);
+        return memory->read64(address - motherboard->RAM_END);
 
     return 0;
 }
@@ -227,7 +227,7 @@ void CPU::write8(uint64_t address, uint8_t value) {
         CPU::error("CP01CWTR", std::to_string(address));
 
     if (address >= motherboard->RAM_START && address <= motherboard->RAM_END)
-        ram->write8(address - motherboard->RAM_END, value);
+        memory->write8(address - motherboard->RAM_END, value);
 }
 
 std::vector<uint8_t> CPU::readBytesVector(uint64_t start, size_t length) {
@@ -235,7 +235,7 @@ std::vector<uint8_t> CPU::readBytesVector(uint64_t start, size_t length) {
         return rom->readBytesVector(start, length);
 
     if (start >= motherboard->RAM_START && start <= motherboard->RAM_END)
-        return ram->readBytesVector(start - motherboard->RAM_END, length);
+        return memory->readBytesVector(start - motherboard->RAM_END, length);
 
     std::vector<uint8_t> value;
 

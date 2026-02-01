@@ -4,4 +4,4 @@ Emulator:
 
 Testing:
     cd "C:\Users\Admin\Desktop\Prog. 2026\BitForge Emulator - v1.0\Testing"
-    g++ Test.cpp -o Test.exe
+    g++ Test.cpp ../ram.cpp -o Test.exe

@@ -10,6 +10,8 @@ class ROM {
     std::vector<uint8_t> data;
     void error(const std::string& e, const std::string& i = "") const;
 
+    ROM();
+
 public:
     void loadFromFile(const std::string& filename);
 
@@ -19,7 +21,6 @@ public:
     uint64_t read64(uint64_t address) const;
 
     std::vector<uint8_t> readBytesVector(uint64_t address, size_t length) const;
-    size_t size() const;
 };
 
 extern ROM rom;

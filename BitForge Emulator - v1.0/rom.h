@@ -9,11 +9,10 @@
 class ROM {
     std::vector<uint8_t> data;
     void error(const std::string& e, const std::string& i = "") const;
-
-    ROM();
-
+    
 public:
     void loadFromFile(const std::string& filename);
+    ROM();
 
     uint8_t read8(uint64_t address) const;
     uint16_t read16(uint64_t address) const;

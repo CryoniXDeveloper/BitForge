@@ -1,0 +1,3 @@
+coorect addressing in: test.cpp, ram.cpp, rom.cpp, cpu.cpp
+
+Estimated time 2-5h, depending on bugs along the way.

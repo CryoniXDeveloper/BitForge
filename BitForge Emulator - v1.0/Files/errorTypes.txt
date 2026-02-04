@@ -16,3 +16,4 @@ RO07AOOB - Address out of bounds on read64 request.                Info is addre
 RO08AOOB - Address out of bounds on readBytesVector request.       Info is address.
 
 CP01CWTR - Cannot write to Read Only Memory.                       Info is address.
+CP02CWTR - Cannot write to Read Only Memory.                       Info is address.

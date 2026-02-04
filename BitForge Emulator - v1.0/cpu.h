@@ -149,6 +149,7 @@ struct CPU {
 
     void write8(uint64_t address, uint8_t value);
     std::vector<uint8_t> readBytesVector(uint64_t start, size_t length);
+    void writeBytesVector(uint64_t start, const std::vector<uint8_t>& data);
 
     void start();
     void fetch();

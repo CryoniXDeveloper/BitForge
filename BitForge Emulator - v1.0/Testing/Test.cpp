@@ -195,65 +195,65 @@ int main() {
 
         memory.setTesting(true);
 
-        int RAMTestAddressStart = 0;
-        int RAMTestAddressMiddle = Motherboard::RAM_SIZE / 2;
-        int RAMTestAddressEnd = Motherboard::RAM_END - Motherboard::RAM_START + 1;
+        uint64_t RAM_SIZE = Motherboard::RAM_SIZE;
+        uint64_t RAM_START = Motherboard::RAM_START;
+        uint64_t RAM_END = Motherboard::RAM_END;
 
         // RAM WRITING
 
-        memory.write8(RAMTestAddressStart, 0x93);
-        if (memory.memory[RAMTestAddressStart] == 0x93) {
-            tests.push_back({getTimestamp(), "1/6", hex8(Motherboard::RAM_START), "0x93", "0x93", "PASS", "RAM Writing 8-bit (write8)", "~"});
+        memory.write8(RAM_START, 0x93);
+        if (memory.memory[0] == 0x93) {
+            tests.push_back({getTimestamp(), "1/6", hex8(RAM_START), "0x93", "0x93", "PASS", "RAM Writing 8-bit (write8)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "1/6", hex8(Motherboard::RAM_START), "0x93", hex2(memory.memory[RAMTestAddressStart]), "FAIL", "RAM Writing 8-bit (write8)", "~"});
+            tests.push_back({getTimestamp(), "1/6", hex8(RAM_START), "0x93", hex2(memory.memory[0]), "FAIL", "RAM Writing 8-bit (write8)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.write8(RAMTestAddressMiddle, 0x1B);
-        if (memory.memory[RAMTestAddressMiddle] == 0x1B) {
-            tests.push_back({getTimestamp(), "2/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), "0x1B", "0x1B", "PASS", "RAM Writing 8-bit (write8)", "~"});
+        memory.write8(RAM_START + RAM_SIZE / 2, 0x1B);
+        if (memory.memory[RAM_SIZE / 2] == 0x1B) {
+            tests.push_back({getTimestamp(), "2/6", hex8(RAM_START + RAM_SIZE / 2), "0x1B", "0x1B", "PASS", "RAM Writing 8-bit (write8)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "2/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), "0x1B", hex2(memory.memory[RAMTestAddressMiddle]), "FAIL", "RAM Writing 8-bit (write8)", "~"});
+            tests.push_back({getTimestamp(), "2/6", hex8(RAM_START + RAM_SIZE / 2), "0x1B", hex2(memory.memory[RAM_SIZE / 2]), "FAIL", "RAM Writing 8-bit (write8)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.write8(RAMTestAddressEnd, 0x21);
-        if (memory.memory[RAMTestAddressEnd] == 0x21) {
-            tests.push_back({getTimestamp(), "3/6", hex8(Motherboard::RAM_END), "0x21", "0x21", "PASS", "RAM Writing 8-bit (write8)", "~"});
+        memory.write8(RAM_END, 0x21);
+        if (memory.memory[RAM_END - RAM_START] == 0x21) {
+            tests.push_back({getTimestamp(), "3/6", hex8(RAM_END), "0x21", "0x21", "PASS", "RAM Writing 8-bit (write8)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "3/6", hex8(Motherboard::RAM_END), "0x21", hex2(memory.memory[RAMTestAddressEnd]), "FAIL", "RAM Writing 8-bit (write8)", "~"});
+            tests.push_back({getTimestamp(), "3/6", hex8(RAM_END), "0x21", hex2(memory.memory[RAM_END - RAM_START]), "FAIL", "RAM Writing 8-bit (write8)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.write8(RAMTestAddressStart, 0x03);
-        if (memory.memory[RAMTestAddressStart] == 0x03) {
-            tests.push_back({getTimestamp(), "4/6", hex8(Motherboard::RAM_START), "0x03", "0x03", "PASS", "RAM Writing 8-bit (write8)", "Overwriting"});
+        memory.write8(RAM_START, 0x03);
+        if (memory.memory[0] == 0x03) {
+            tests.push_back({getTimestamp(), "4/6", hex8(RAM_START), "0x03", "0x03", "PASS", "RAM Writing 8-bit (write8)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "4/6", hex8(Motherboard::RAM_START), "0x03", hex2(memory.memory[RAMTestAddressStart]), "FAIL", "RAM Writing 8-bit (write8)", "Overwriting"});
+            tests.push_back({getTimestamp(), "4/6", hex8(RAM_START), "0x03", hex2(memory.memory[0]), "FAIL", "RAM Writing 8-bit (write8)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
-        memory.write8(RAMTestAddressMiddle, 0x6A);
-        if (memory.memory[RAMTestAddressMiddle] == 0x6A) {
-            tests.push_back({getTimestamp(), "5/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), "0x6A", "0x6A", "PASS", "RAM Writing 8-bit (write8)", "Overwriting"});
+        memory.write8(RAM_START + RAM_SIZE / 2, 0x6A);
+        if (memory.memory[RAM_SIZE / 2] == 0x6A) {
+            tests.push_back({getTimestamp(), "5/6", hex8(RAM_START + RAM_SIZE / 2), "0x6A", "0x6A", "PASS", "RAM Writing 8-bit (write8)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "5/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), "0x6A", hex2(memory.memory[RAMTestAddressMiddle]), "FAIL", "RAM Writing 8-bit (write8)", "Overwriting"});
+            tests.push_back({getTimestamp(), "5/6", hex8(RAM_START + RAM_SIZE / 2), "0x6A", hex2(memory.memory[RAM_SIZE / 2]), "FAIL", "RAM Writing 8-bit (write8)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
-        memory.write8(RAMTestAddressEnd, 0xC3);
-        if (memory.memory[RAMTestAddressEnd] == 0xC3) {
-            tests.push_back({getTimestamp(), "6/6   PASS", hex8(Motherboard::RAM_END), "0xC3", "0xC3", "PASS", "RAM Writing 8-bit (write8)", "Overwriting"});
+        memory.write8(RAM_END, 0xC3);
+        if (memory.memory[RAM_END - RAM_START] == 0xC3) {
+            tests.push_back({getTimestamp(), "6/6   PASS", hex8(RAM_END), "0xC3", "0xC3", "PASS", "RAM Writing 8-bit (write8)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "6/6   FAIL", hex8(Motherboard::RAM_END), "0xC3", hex2(memory.memory[RAMTestAddressEnd]), "FAIL", "RAM Writing 8-bit (write8)", "Overwriting"});
+            tests.push_back({getTimestamp(), "6/6   FAIL", hex8(RAM_END), "0xC3", hex2(memory.memory[RAM_END - RAM_START]), "FAIL", "RAM Writing 8-bit (write8)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
         // CLEANING
 
-        memory.write8(RAMTestAddressStart, 0x00);
-        memory.write8(RAMTestAddressMiddle + Motherboard::RAM_START, 0x00);
-        memory.write8(RAMTestAddressEnd, 0x00);
+        memory.write8(RAM_START, 0x00);
+        memory.write8(RAM_START + RAM_SIZE / 2, 0x00);
+        memory.write8(RAM_END, 0x00);
 
 
         vector<uint8_t> testBytes1 = {0xDE};
@@ -263,59 +263,59 @@ int main() {
         vector<uint8_t> testBytes5 = {0xC1};
         vector<uint8_t> testBytes6 = {0xF7};
 
-        memory.writeBytesVector(RAMTestAddressStart, testBytes1);
-        if (memory.memory[RAMTestAddressStart] == testBytes1[0]) {
-            tests.push_back({getTimestamp(), "1/6", hex8(Motherboard::RAM_START), hex2(testBytes1[0]), hex2(testBytes1[0]), "PASS", "RAM Writing 8-bit (writeBytesVector)", "~"});
+        memory.writeBytesVector(RAM_START, testBytes1);
+        if (memory.memory[0] == testBytes1[0]) {
+            tests.push_back({getTimestamp(), "1/6", hex8(RAM_START), hex2(testBytes1[0]), hex2(testBytes1[0]), "PASS", "RAM Writing 8-bit (writeBytesVector)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "1/6", hex8(Motherboard::RAM_START), hex2(testBytes1[0]), hex2(memory.memory[RAMTestAddressStart]), "FAIL", "RAM Writing 8-bit (writeBytesVector)", "~"});
+            tests.push_back({getTimestamp(), "1/6", hex8(RAM_START), hex2(testBytes1[0]), hex2(memory.memory[0]), "FAIL", "RAM Writing 8-bit (writeBytesVector)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressMiddle, testBytes2);
-        if (memory.memory[RAMTestAddressMiddle] == testBytes2[0]) {
-            tests.push_back({getTimestamp(), "2/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), hex2(testBytes2[0]), hex2(testBytes2[0]), "PASS", "RAM Writing 8-bit (writeBytesVector)", "~"});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, testBytes2);
+        if (memory.memory[RAM_SIZE / 2] == testBytes2[0]) {
+            tests.push_back({getTimestamp(), "2/6", hex8(RAM_START + RAM_SIZE / 2), hex2(testBytes2[0]), hex2(testBytes2[0]), "PASS", "RAM Writing 8-bit (writeBytesVector)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "2/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), hex2(testBytes2[0]), hex2(memory.memory[RAMTestAddressMiddle]), "FAIL", "RAM Writing 8-bit (writeBytesVector)", "~"});
+            tests.push_back({getTimestamp(), "2/6", hex8(RAM_START + RAM_SIZE / 2), hex2(testBytes2[0]), hex2(memory.memory[RAM_SIZE / 2]), "FAIL", "RAM Writing 8-bit (writeBytesVector)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressEnd, testBytes3);
-        if (memory.memory[RAMTestAddressEnd] == testBytes3[0]) {
-            tests.push_back({getTimestamp(), "3/6", hex8(Motherboard::RAM_END), hex2(testBytes3[0]), hex2(testBytes3[0]), "PASS", "RAM Writing 8-bit (writeBytesVector)", "~"});
+        memory.writeBytesVector(RAM_END, testBytes3);
+        if (memory.memory[RAM_END - RAM_START] == testBytes3[0]) {
+            tests.push_back({getTimestamp(), "3/6", hex8(RAM_END), hex2(testBytes3[0]), hex2(testBytes3[0]), "PASS", "RAM Writing 8-bit (writeBytesVector)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "3/6", hex8(Motherboard::RAM_END), hex2(testBytes3[0]), hex2(memory.memory[RAMTestAddressEnd]), "FAIL", "RAM Writing 8-bit (writeBytesVector)", "~"});
+            tests.push_back({getTimestamp(), "3/6", hex8(RAM_END), hex2(testBytes3[0]), hex2(memory.memory[RAM_END - RAM_START]), "FAIL", "RAM Writing 8-bit (writeBytesVector)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressStart, testBytes4);
-        if (memory.memory[RAMTestAddressStart] == testBytes4[0]) {
-            tests.push_back({getTimestamp(), "4/6", hex8(Motherboard::RAM_START), hex2(testBytes4[0]), hex2(testBytes4[0]), "PASS", "RAM Writing 8-bit (writeBytesVector)", "Overwriting"});
+        memory.writeBytesVector(RAM_START, testBytes4);
+        if (memory.memory[0] == testBytes4[0]) {
+            tests.push_back({getTimestamp(), "4/6", hex8(RAM_START), hex2(testBytes4[0]), hex2(testBytes4[0]), "PASS", "RAM Writing 8-bit (writeBytesVector)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "4/6", hex8(Motherboard::RAM_START), hex2(testBytes4[0]), hex2(memory.memory[RAMTestAddressStart]), "FAIL", "RAM Writing 8-bit (writeBytesVector)", "Overwriting"});
+            tests.push_back({getTimestamp(), "4/6", hex8(RAM_START), hex2(testBytes4[0]), hex2(memory.memory[0]), "FAIL", "RAM Writing 8-bit (writeBytesVector)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressMiddle, testBytes5);
-        if (memory.memory[RAMTestAddressMiddle] == testBytes5[0]) {
-            tests.push_back({getTimestamp(), "5/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), hex2(testBytes5[0]), hex2(testBytes5[0]), "PASS", "RAM Writing 8-bit (writeBytesVector)", "Overwriting"});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, testBytes5);
+        if (memory.memory[RAM_SIZE / 2] == testBytes5[0]) {
+            tests.push_back({getTimestamp(), "5/6", hex8(RAM_START + RAM_SIZE / 2), hex2(testBytes5[0]), hex2(testBytes5[0]), "PASS", "RAM Writing 8-bit (writeBytesVector)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "5/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), hex2(testBytes5[0]), hex2(memory.memory[RAMTestAddressMiddle]), "FAIL", "RAM Writing 8-bit (writeBytesVector)", "Overwriting"});
+            tests.push_back({getTimestamp(), "5/6", hex8(RAM_START + RAM_SIZE / 2), hex2(testBytes5[0]), hex2(memory.memory[RAM_SIZE / 2]), "FAIL", "RAM Writing 8-bit (writeBytesVector)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressEnd, testBytes6);
-        if (memory.memory[RAMTestAddressEnd] == testBytes6[0]) {
-            tests.push_back({getTimestamp(), "6/6   PASS", hex8(Motherboard::RAM_END), hex2(testBytes6[0]), hex2(testBytes6[0]), "PASS", "RAM Writing 8-bit (writeBytesVector)", "Overwriting"});
+        memory.writeBytesVector(RAM_END, testBytes6);
+        if (memory.memory[RAM_END - RAM_START] == testBytes6[0]) {
+            tests.push_back({getTimestamp(), "6/6   PASS", hex8(RAM_END), hex2(testBytes6[0]), hex2(testBytes6[0]), "PASS", "RAM Writing 8-bit (writeBytesVector)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "6/6   FAIL", hex8(Motherboard::RAM_END), hex2(testBytes6[0]), hex2(memory.memory[RAMTestAddressEnd]), "FAIL", "RAM Writing 8-bit (writeBytesVector)", "Overwriting"});
+            tests.push_back({getTimestamp(), "6/6   FAIL", hex8(RAM_END), hex2(testBytes6[0]), hex2(memory.memory[RAM_END - RAM_START]), "FAIL", "RAM Writing 8-bit (writeBytesVector)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
         // CLEANING
 
-        memory.writeBytesVector(RAMTestAddressStart, {0x00});
-        memory.writeBytesVector(RAMTestAddressMiddle + Motherboard::RAM_START, {0x00});
-        memory.writeBytesVector(RAMTestAddressEnd, {0x00});
+        memory.writeBytesVector(RAM_START, {0x00});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, {0x00});
+        memory.writeBytesVector(RAM_END, {0x00});
 
 
         testBytes1 = {0xDE,0x91,0x3B,0x7C};
@@ -325,77 +325,77 @@ int main() {
         testBytes5 = {0x0C,0xE7,0x5F,0xB2};
         testBytes6 = {0x81,0x3D,0x6A,0xF9};
 
-        memory.writeBytesVector(RAMTestAddressStart, testBytes1);
-        if (memory.memory[RAMTestAddressStart] == testBytes1[0] &&
-            memory.memory[RAMTestAddressStart + 1] == testBytes1[1] &&
-            memory.memory[RAMTestAddressStart + 2] == testBytes1[2] &&
-            memory.memory[RAMTestAddressStart + 3] == testBytes1[3]) {
-                tests.push_back({getTimestamp(), "1/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes1), formStringFromBytes(testBytes1), "PASS", "RAM Writing 32-bit (writeBytesVector)", "~"});
+        memory.writeBytesVector(RAM_START, testBytes1);
+        if (memory.memory[0] == testBytes1[0] &&
+            memory.memory[1] == testBytes1[1] &&
+            memory.memory[2] == testBytes1[2] &&
+            memory.memory[3] == testBytes1[3]) {
+                tests.push_back({getTimestamp(), "1/6", hex8(RAM_START), formStringFromBytes(testBytes1), formStringFromBytes(testBytes1), "PASS", "RAM Writing 32-bit (writeBytesVector)", "~"});
         } else {
-                tests.push_back({getTimestamp(), "1/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes1), getStringGetBytes(RAMTestAddressStart, 4), "FAIL", "RAM Writing 32-bit (writeBytesVector)", "~"});
+                tests.push_back({getTimestamp(), "1/6", hex8(RAM_START), formStringFromBytes(testBytes1), getStringGetBytes(RAM_START, 4), "FAIL", "RAM Writing 32-bit (writeBytesVector)", "~"});
                 testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressMiddle, testBytes2);
-        if (memory.memory[RAMTestAddressMiddle] == testBytes2[0] &&
-            memory.memory[RAMTestAddressMiddle + 1] == testBytes2[1] &&
-            memory.memory[RAMTestAddressMiddle + 2] == testBytes2[2] &&
-            memory.memory[RAMTestAddressMiddle + 3] == testBytes2[3]) {
-                tests.push_back({getTimestamp(), "2/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes2), formStringFromBytes(testBytes2), "PASS", "RAM Writing 32-bit (writeBytesVector)", "~"});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, testBytes2);
+        if (memory.memory[RAM_SIZE / 2] == testBytes2[0] &&
+            memory.memory[RAM_SIZE / 2 + 1] == testBytes2[1] &&
+            memory.memory[RAM_SIZE / 2 + 2] == testBytes2[2] &&
+            memory.memory[RAM_SIZE / 2 + 3] == testBytes2[3]) {
+                tests.push_back({getTimestamp(), "2/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes2), formStringFromBytes(testBytes2), "PASS", "RAM Writing 32-bit (writeBytesVector)", "~"});
         } else {
-                tests.push_back({getTimestamp(), "2/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes2), getStringGetBytes(RAMTestAddressMiddle, 4), "FAIL", "RAM Writing 32-bit (writeBytesVector)", "~"});
+                tests.push_back({getTimestamp(), "2/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes2), getStringGetBytes(RAM_START + RAM_SIZE / 2, 4), "FAIL", "RAM Writing 32-bit (writeBytesVector)", "~"});
                 testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressEnd - 3, testBytes3);
-        if (memory.memory[RAMTestAddressEnd - 3] == testBytes3[0] &&
-            memory.memory[RAMTestAddressEnd - 2] == testBytes3[1] &&
-            memory.memory[RAMTestAddressEnd - 1] == testBytes3[2] &&
-            memory.memory[RAMTestAddressEnd] == testBytes3[3]) {
-                tests.push_back({getTimestamp(), "3/6", hex8(Motherboard::RAM_END - 3), formStringFromBytes(testBytes3), formStringFromBytes(testBytes3), "PASS", "RAM Writing 32-bit (writeBytesVector)", "~"});
+        memory.writeBytesVector(RAM_END - 3, testBytes3);
+        if (memory.memory[RAM_END - RAM_START - 3] == testBytes3[0] &&
+            memory.memory[RAM_END - RAM_START - 2] == testBytes3[1] &&
+            memory.memory[RAM_END - RAM_START - 1] == testBytes3[2] &&
+            memory.memory[RAM_END - RAM_START] == testBytes3[3]) {
+                tests.push_back({getTimestamp(), "3/6", hex8(RAM_END - 3), formStringFromBytes(testBytes3), formStringFromBytes(testBytes3), "PASS", "RAM Writing 32-bit (writeBytesVector)", "~"});
         } else {
-                tests.push_back({getTimestamp(), "3/6", hex8(Motherboard::RAM_END - 3), formStringFromBytes(testBytes3), getStringGetBytes(RAMTestAddressEnd - 3, 4), "FAIL", "RAM Writing 32-bit (writeBytesVector)", "~"});
+                tests.push_back({getTimestamp(), "3/6", hex8(RAM_END - 3), formStringFromBytes(testBytes3), getStringGetBytes(RAM_END - 3, 4), "FAIL", "RAM Writing 32-bit (writeBytesVector)", "~"});
                 testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressStart, testBytes4);
-        if (memory.memory[RAMTestAddressStart] == testBytes4[0] &&
-            memory.memory[RAMTestAddressStart + 1] == testBytes4[1] &&
-            memory.memory[RAMTestAddressStart + 2] == testBytes4[2] &&
-            memory.memory[RAMTestAddressStart + 3] == testBytes4[3]) {
-                tests.push_back({getTimestamp(), "4/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes4), formStringFromBytes(testBytes4), "PASS", "RAM Writing 32-bit (writeBytesVector)", "Overwriting"});
+        memory.writeBytesVector(RAM_START, testBytes4);
+        if (memory.memory[0] == testBytes4[0] &&
+            memory.memory[1] == testBytes4[1] &&
+            memory.memory[2] == testBytes4[2] &&
+            memory.memory[3] == testBytes4[3]) {
+                tests.push_back({getTimestamp(), "4/6", hex8(RAM_START), formStringFromBytes(testBytes4), formStringFromBytes(testBytes4), "PASS", "RAM Writing 32-bit (writeBytesVector)", "Overwriting"});
         } else {
-                tests.push_back({getTimestamp(), "4/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes4), getStringGetBytes(RAMTestAddressStart, 4), "FAIL", "RAM Writing 32-bit (writeBytesVector)", "Overwriting"});
+                tests.push_back({getTimestamp(), "4/6", hex8(RAM_START), formStringFromBytes(testBytes4), getStringGetBytes(RAM_START, 4), "FAIL", "RAM Writing 32-bit (writeBytesVector)", "Overwriting"});
                 testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressMiddle, testBytes5);
-        if (memory.memory[RAMTestAddressMiddle] == testBytes5[0] &&
-            memory.memory[RAMTestAddressMiddle + 1] == testBytes5[1] &&
-            memory.memory[RAMTestAddressMiddle + 2] == testBytes5[2] &&
-            memory.memory[RAMTestAddressMiddle + 3] == testBytes5[3]) {
-                tests.push_back({getTimestamp(), "5/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes5), formStringFromBytes(testBytes5), "PASS", "RAM Writing 32-bit (writeBytesVector)", "Overwriting"});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, testBytes5);
+        if (memory.memory[RAM_SIZE / 2] == testBytes5[0] &&
+            memory.memory[RAM_SIZE / 2 + 1] == testBytes5[1] &&
+            memory.memory[RAM_SIZE / 2 + 2] == testBytes5[2] &&
+            memory.memory[RAM_SIZE / 2 + 3] == testBytes5[3]) {
+                tests.push_back({getTimestamp(), "5/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes5), formStringFromBytes(testBytes5), "PASS", "RAM Writing 32-bit (writeBytesVector)", "Overwriting"});
         } else {
-                tests.push_back({getTimestamp(), "5/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes5), getStringGetBytes(RAMTestAddressMiddle, 4), "FAIL", "RAM Writing 32-bit (writeBytesVector)", "Overwriting"});
+                tests.push_back({getTimestamp(), "5/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes5), getStringGetBytes(RAM_START + RAM_SIZE / 2, 4), "FAIL", "RAM Writing 32-bit (writeBytesVector)", "Overwriting"});
                 testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressEnd - 3, testBytes6);
-        if (memory.memory[RAMTestAddressEnd - 3] == testBytes6[0] &&
-            memory.memory[RAMTestAddressEnd - 2] == testBytes6[1] &&
-            memory.memory[RAMTestAddressEnd - 1] == testBytes6[2] &&
-            memory.memory[RAMTestAddressEnd] == testBytes6[3]) {
-                tests.push_back({getTimestamp(), "6/6   PASS", hex8(Motherboard::RAM_END - 3), formStringFromBytes(testBytes6), formStringFromBytes(testBytes6), "PASS", "RAM Writing 32-bit (writeBytesVector)", "Overwriting"});
+        memory.writeBytesVector(RAM_END - 3, testBytes6);
+        if (memory.memory[RAM_END - RAM_START - 3] == testBytes6[0] &&
+            memory.memory[RAM_END - RAM_START - 2] == testBytes6[1] &&
+            memory.memory[RAM_END - RAM_START - 1] == testBytes6[2] &&
+            memory.memory[RAM_END - RAM_START] == testBytes6[3]) {
+                tests.push_back({getTimestamp(), "6/6   PASS", hex8(RAM_END - 3), formStringFromBytes(testBytes6), formStringFromBytes(testBytes6), "PASS", "RAM Writing 32-bit (writeBytesVector)", "Overwriting"});
         } else {
-                tests.push_back({getTimestamp(), "6/6   FAIL", hex8(Motherboard::RAM_END - 3), formStringFromBytes(testBytes6), getStringGetBytes(RAMTestAddressEnd - 3, 4), "FAIL", "RAM Writing 32-bit (writeBytesVector)", "Overwriting"});
+                tests.push_back({getTimestamp(), "6/6   FAIL", hex8(RAM_END - 3), formStringFromBytes(testBytes6), getStringGetBytes(RAM_END - 3, 4), "FAIL", "RAM Writing 32-bit (writeBytesVector)", "Overwriting"});
                 testFailed(outputFile, tests);
         }
 
         // CLEANING
 
-        memory.writeBytesVector(RAMTestAddressStart, {0x00, 0x00, 0x00, 0x00});
-        memory.writeBytesVector(RAMTestAddressMiddle + Motherboard::RAM_START, {0x00, 0x00, 0x00, 0x00});
-        memory.writeBytesVector(RAMTestAddressEnd - 3, {0x00, 0x00, 0x00, 0x00});
+        memory.writeBytesVector(RAM_START, {0x00, 0x00, 0x00, 0x00});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, {0x00, 0x00, 0x00, 0x00});
+        memory.writeBytesVector(RAM_END - 3, {0x00, 0x00, 0x00, 0x00});
 
 
         testBytes1 = {0xDE,0x91,0x3B,0x7C,0x4F,0xA2,0x11,0x99};
@@ -405,101 +405,101 @@ int main() {
         testBytes5 = {0x0C,0xE7,0x5F,0xB2,0x8D,0x33,0xF9,0x40};
         testBytes6 = {0x81,0x3D,0x6A,0xF9,0x12,0xB4,0x67,0xC8};
 
-        memory.writeBytesVector(RAMTestAddressStart, testBytes1);
-        if (memory.memory[RAMTestAddressStart] == testBytes1[0] &&
-            memory.memory[RAMTestAddressStart + 1] == testBytes1[1] &&
-            memory.memory[RAMTestAddressStart + 2] == testBytes1[2] &&
-            memory.memory[RAMTestAddressStart + 3] == testBytes1[3] &&
-            memory.memory[RAMTestAddressStart + 4] == testBytes1[4] &&
-            memory.memory[RAMTestAddressStart + 5] == testBytes1[5] &&
-            memory.memory[RAMTestAddressStart + 6] == testBytes1[6] &&
-            memory.memory[RAMTestAddressStart + 7] == testBytes1[7]) {
-                tests.push_back({getTimestamp(), "1/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes1), formStringFromBytes(testBytes1), "PASS", "RAM Writing 64-bit (writeBytesVector)", "~"});
+        memory.writeBytesVector(RAM_START, testBytes1);
+        if (memory.memory[0] == testBytes1[0] &&
+            memory.memory[1] == testBytes1[1] &&
+            memory.memory[2] == testBytes1[2] &&
+            memory.memory[3] == testBytes1[3] &&
+            memory.memory[4] == testBytes1[4] &&
+            memory.memory[5] == testBytes1[5] &&
+            memory.memory[6] == testBytes1[6] &&
+            memory.memory[7] == testBytes1[7]) {
+                tests.push_back({getTimestamp(), "1/6", hex8(RAM_START), formStringFromBytes(testBytes1), formStringFromBytes(testBytes1), "PASS", "RAM Writing 64-bit (writeBytesVector)", "~"});
         } else {
-                tests.push_back({getTimestamp(), "1/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes1), getStringGetBytes(RAMTestAddressStart, 8), "FAIL", "RAM Writing 64-bit (writeBytesVector)", "~"});
+                tests.push_back({getTimestamp(), "1/6", hex8(RAM_START), formStringFromBytes(testBytes1), getStringGetBytes(RAM_START, 8), "FAIL", "RAM Writing 64-bit (writeBytesVector)", "~"});
                 testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressMiddle, testBytes2);
-        if (memory.memory[RAMTestAddressMiddle] == testBytes2[0] &&
-            memory.memory[RAMTestAddressMiddle + 1] == testBytes2[1] &&
-            memory.memory[RAMTestAddressMiddle + 2] == testBytes2[2] &&
-            memory.memory[RAMTestAddressMiddle + 3] == testBytes2[3] &&
-            memory.memory[RAMTestAddressMiddle + 4] == testBytes2[4] &&
-            memory.memory[RAMTestAddressMiddle + 5] == testBytes2[5] &&
-            memory.memory[RAMTestAddressMiddle + 6] == testBytes2[6] &&
-            memory.memory[RAMTestAddressMiddle + 7] == testBytes2[7]) {
-                tests.push_back({getTimestamp(), "2/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes2), formStringFromBytes(testBytes2), "PASS", "RAM Writing 64-bit (writeBytesVector)", "~"});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, testBytes2);
+        if (memory.memory[RAM_SIZE / 2] == testBytes2[0] &&
+            memory.memory[RAM_SIZE / 2 + 1] == testBytes2[1] &&
+            memory.memory[RAM_SIZE / 2 + 2] == testBytes2[2] &&
+            memory.memory[RAM_SIZE / 2 + 3] == testBytes2[3] &&
+            memory.memory[RAM_SIZE / 2 + 4] == testBytes2[4] &&
+            memory.memory[RAM_SIZE / 2 + 5] == testBytes2[5] &&
+            memory.memory[RAM_SIZE / 2 + 6] == testBytes2[6] &&
+            memory.memory[RAM_SIZE / 2 + 7] == testBytes2[7]) {
+                tests.push_back({getTimestamp(), "2/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes2), formStringFromBytes(testBytes2), "PASS", "RAM Writing 64-bit (writeBytesVector)", "~"});
         } else {
-                tests.push_back({getTimestamp(), "2/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes2), getStringGetBytes(RAMTestAddressMiddle, 8), "FAIL", "RAM Writing 64-bit (writeBytesVector)", "~"});
+                tests.push_back({getTimestamp(), "2/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes2), getStringGetBytes(RAM_START + RAM_SIZE / 2, 8), "FAIL", "RAM Writing 64-bit (writeBytesVector)", "~"});
                 testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressEnd - 7, testBytes3);
-        if (memory.memory[RAMTestAddressEnd - 7] == testBytes3[0] &&
-            memory.memory[RAMTestAddressEnd - 6] == testBytes3[1] &&
-            memory.memory[RAMTestAddressEnd - 5] == testBytes3[2] &&
-            memory.memory[RAMTestAddressEnd - 4] == testBytes3[3] &&
-            memory.memory[RAMTestAddressEnd - 3] == testBytes3[4] &&
-            memory.memory[RAMTestAddressEnd - 2] == testBytes3[5] &&
-            memory.memory[RAMTestAddressEnd - 1] == testBytes3[6] &&
-            memory.memory[RAMTestAddressEnd] == testBytes3[7]) {
-                tests.push_back({getTimestamp(), "3/6", hex8(Motherboard::RAM_END - 7), formStringFromBytes(testBytes3), formStringFromBytes(testBytes3), "PASS", "RAM Writing 64-bit (writeBytesVector)", "~"});
+        memory.writeBytesVector(RAM_END - 7, testBytes3);
+        if (memory.memory[RAM_END - RAM_START - 7] == testBytes3[0] &&
+            memory.memory[RAM_END - RAM_START - 6] == testBytes3[1] &&
+            memory.memory[RAM_END - RAM_START - 5] == testBytes3[2] &&
+            memory.memory[RAM_END - RAM_START - 4] == testBytes3[3] &&
+            memory.memory[RAM_END - RAM_START - 3] == testBytes3[4] &&
+            memory.memory[RAM_END - RAM_START - 2] == testBytes3[5] &&
+            memory.memory[RAM_END - RAM_START - 1] == testBytes3[6] &&
+            memory.memory[RAM_END - RAM_START] == testBytes3[7]) {
+                tests.push_back({getTimestamp(), "3/6", hex8(RAM_END - 7), formStringFromBytes(testBytes3), formStringFromBytes(testBytes3), "PASS", "RAM Writing 64-bit (writeBytesVector)", "~"});
         } else {
-                tests.push_back({getTimestamp(), "3/6", hex8(Motherboard::RAM_END - 7), formStringFromBytes(testBytes3), getStringGetBytes(RAMTestAddressEnd - 7, 8), "FAIL", "RAM Writing 64-bit (writeBytesVector)", "~"});
+                tests.push_back({getTimestamp(), "3/6", hex8(RAM_END - 7), formStringFromBytes(testBytes3), getStringGetBytes(RAM_END - 7, 8), "FAIL", "RAM Writing 64-bit (writeBytesVector)", "~"});
                 testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressStart, testBytes4);
-        if (memory.memory[RAMTestAddressStart] == testBytes4[0] &&
-            memory.memory[RAMTestAddressStart + 1] == testBytes4[1] &&
-            memory.memory[RAMTestAddressStart + 2] == testBytes4[2] &&
-            memory.memory[RAMTestAddressStart + 3] == testBytes4[3] &&
-            memory.memory[RAMTestAddressStart + 4] == testBytes4[4] &&
-            memory.memory[RAMTestAddressStart + 5] == testBytes4[5] &&
-            memory.memory[RAMTestAddressStart + 6] == testBytes4[6] &&
-            memory.memory[RAMTestAddressStart + 7] == testBytes4[7]) {
-                tests.push_back({getTimestamp(), "4/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes4), formStringFromBytes(testBytes4), "PASS", "RAM Writing 64-bit (writeBytesVector)", "Overwriting"});
+        memory.writeBytesVector(RAM_START, testBytes4);
+        if (memory.memory[0] == testBytes4[0] &&
+            memory.memory[1] == testBytes4[1] &&
+            memory.memory[2] == testBytes4[2] &&
+            memory.memory[3] == testBytes4[3] &&
+            memory.memory[4] == testBytes4[4] &&
+            memory.memory[5] == testBytes4[5] &&
+            memory.memory[6] == testBytes4[6] &&
+            memory.memory[7] == testBytes4[7]) {
+                tests.push_back({getTimestamp(), "4/6", hex8(RAM_START), formStringFromBytes(testBytes4), formStringFromBytes(testBytes4), "PASS", "RAM Writing 64-bit (writeBytesVector)", "Overwriting"});
         } else {
-                tests.push_back({getTimestamp(), "4/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes4), getStringGetBytes(RAMTestAddressStart, 8), "FAIL", "RAM Writing 64-bit (writeBytesVector)", "Overwriting"});
+                tests.push_back({getTimestamp(), "4/6", hex8(RAM_START), formStringFromBytes(testBytes4), getStringGetBytes(RAM_START, 8), "FAIL", "RAM Writing 64-bit (writeBytesVector)", "Overwriting"});
                 testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressMiddle, testBytes5);
-        if (memory.memory[RAMTestAddressMiddle] == testBytes5[0] &&
-            memory.memory[RAMTestAddressMiddle + 1] == testBytes5[1] &&
-            memory.memory[RAMTestAddressMiddle + 2] == testBytes5[2] &&
-            memory.memory[RAMTestAddressMiddle + 3] == testBytes5[3] &&
-            memory.memory[RAMTestAddressMiddle + 4] == testBytes5[4] &&
-            memory.memory[RAMTestAddressMiddle + 5] == testBytes5[5] &&
-            memory.memory[RAMTestAddressMiddle + 6] == testBytes5[6] &&
-            memory.memory[RAMTestAddressMiddle + 7] == testBytes5[7]) {
-                tests.push_back({getTimestamp(), "5/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes5), formStringFromBytes(testBytes5), "PASS", "RAM Writing 64-bit (writeBytesVector)", "Overwriting"});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, testBytes5);
+        if (memory.memory[RAM_SIZE / 2] == testBytes5[0] &&
+            memory.memory[RAM_SIZE / 2 + 1] == testBytes5[1] &&
+            memory.memory[RAM_SIZE / 2 + 2] == testBytes5[2] &&
+            memory.memory[RAM_SIZE / 2 + 3] == testBytes5[3] &&
+            memory.memory[RAM_SIZE / 2 + 4] == testBytes5[4] &&
+            memory.memory[RAM_SIZE / 2 + 5] == testBytes5[5] &&
+            memory.memory[RAM_SIZE / 2 + 6] == testBytes5[6] &&
+            memory.memory[RAM_SIZE / 2 + 7] == testBytes5[7]) {
+                tests.push_back({getTimestamp(), "5/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes5), formStringFromBytes(testBytes5), "PASS", "RAM Writing 64-bit (writeBytesVector)", "Overwriting"});
         } else {
-                tests.push_back({getTimestamp(), "5/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes5), getStringGetBytes(RAMTestAddressMiddle, 8), "FAIL", "RAM Writing 64-bit (writeBytesVector)", "Overwriting"});
+                tests.push_back({getTimestamp(), "5/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes5), getStringGetBytes(RAM_START + RAM_SIZE / 2, 8), "FAIL", "RAM Writing 64-bit (writeBytesVector)", "Overwriting"});
                 testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressEnd - 7, testBytes6);
-        if (memory.memory[RAMTestAddressEnd - 7] == testBytes6[0] &&
-            memory.memory[RAMTestAddressEnd - 6] == testBytes6[1] &&
-            memory.memory[RAMTestAddressEnd - 5] == testBytes6[2] &&
-            memory.memory[RAMTestAddressEnd - 4] == testBytes6[3] &&
-            memory.memory[RAMTestAddressEnd - 3] == testBytes6[4] &&
-            memory.memory[RAMTestAddressEnd - 2] == testBytes6[5] &&
-            memory.memory[RAMTestAddressEnd - 1] == testBytes6[6] &&
-            memory.memory[RAMTestAddressEnd] == testBytes6[7]) {
-                tests.push_back({getTimestamp(), "6/6   PASS", hex8(Motherboard::RAM_END - 7), formStringFromBytes(testBytes6), formStringFromBytes(testBytes6), "PASS", "RAM Writing 64-bit (writeBytesVector)", "Overwriting"});
+        memory.writeBytesVector(RAM_END - 7, testBytes6);
+        if (memory.memory[RAM_END - RAM_START - 7] == testBytes6[0] &&
+            memory.memory[RAM_END - RAM_START - 6] == testBytes6[1] &&
+            memory.memory[RAM_END - RAM_START - 5] == testBytes6[2] &&
+            memory.memory[RAM_END - RAM_START - 4] == testBytes6[3] &&
+            memory.memory[RAM_END - RAM_START - 3] == testBytes6[4] &&
+            memory.memory[RAM_END - RAM_START - 2] == testBytes6[5] &&
+            memory.memory[RAM_END - RAM_START - 1] == testBytes6[6] &&
+            memory.memory[RAM_END - RAM_START] == testBytes6[7]) {
+                tests.push_back({getTimestamp(), "6/6   PASS", hex8(RAM_END - 7), formStringFromBytes(testBytes6), formStringFromBytes(testBytes6), "PASS", "RAM Writing 64-bit (writeBytesVector)", "Overwriting"});
         } else {
-                tests.push_back({getTimestamp(), "6/6   FAIL", hex8(Motherboard::RAM_END - 7), formStringFromBytes(testBytes6), getStringGetBytes(RAMTestAddressEnd - 7, 8), "FAIL", "RAM Writing 64-bit (writeBytesVector)", "Overwriting"});
+                tests.push_back({getTimestamp(), "6/6   FAIL", hex8(RAM_END - 7), formStringFromBytes(testBytes6), getStringGetBytes(RAM_END - 7, 8), "FAIL", "RAM Writing 64-bit (writeBytesVector)", "Overwriting"});
                 testFailed(outputFile, tests);
         }
 
         // CLEANING
 
-        memory.writeBytesVector(RAMTestAddressStart, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
-        memory.writeBytesVector(RAMTestAddressMiddle + Motherboard::RAM_START, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
-        memory.writeBytesVector(RAMTestAddressEnd - 7, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
+        memory.writeBytesVector(RAM_START, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
+        memory.writeBytesVector(RAM_END - 7, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00});
 
 
         testBytes1 = {
@@ -568,10 +568,10 @@ int main() {
             0x8A,0x41,0xCD,0x12,0x7F,0x36,0xB5,0x0D
         };
 
-        memory.writeBytesVector(RAMTestAddressStart, testBytes1);
+        memory.writeBytesVector(RAM_START, testBytes1);
         bool pass1 = true;
         for (int i = 0; i < 64; i++) {
-            if (memory.memory[RAMTestAddressStart + i] != testBytes1[i]) {
+            if (memory.memory[i] != testBytes1[i]) {
                 pass1 = false;
                 break;
             }
@@ -579,9 +579,9 @@ int main() {
         tests.push_back({
             getTimestamp(),
             "1/6",
-            hex8(Motherboard::RAM_START),
+            hex8(RAM_START),
             formStringFromBytes(testBytes1),
-            pass1 ? formStringFromBytes(testBytes1) : getStringGetBytes(RAMTestAddressStart, 64),
+            pass1 ? formStringFromBytes(testBytes1) : getStringGetBytes(RAM_START, 64),
             pass1 ? "PASS" : "FAIL",
             "RAM Writing 512-bit (writeBytesVector)",
             "~"
@@ -591,10 +591,10 @@ int main() {
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressMiddle, testBytes2);
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, testBytes2);
         bool pass2 = true;
         for (int i = 0; i < 64; i++) {
-            if (memory.memory[RAMTestAddressMiddle + i] != testBytes2[i]) {
+            if (memory.memory[RAM_SIZE / 2 + i] != testBytes2[i]) {
                 pass2 = false;
                 break;
             }
@@ -603,9 +603,9 @@ int main() {
         tests.push_back({
             getTimestamp(),
             "2/6",
-            hex8(RAMTestAddressMiddle + Motherboard::RAM_START),
+            hex8(RAM_START + RAM_SIZE / 2),
             formStringFromBytes(testBytes2),
-            pass2 ? formStringFromBytes(testBytes2) : getStringGetBytes(RAMTestAddressMiddle, 64),
+            pass2 ? formStringFromBytes(testBytes2) : getStringGetBytes(RAM_START + RAM_SIZE / 2, 64),
             pass2 ? "PASS" : "FAIL",
             "RAM Writing 512-bit (writeBytesVector)",
             "~"
@@ -615,10 +615,10 @@ int main() {
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressEnd - 63, testBytes3);
+        memory.writeBytesVector(RAM_END - 63, testBytes3);
         bool pass3 = true;
         for (int i = 0; i < 64; i++) {
-            if (memory.memory[RAMTestAddressEnd - 63 + i] != testBytes3[i]) {
+            if (memory.memory[RAM_END - RAM_START - 63 + i] != testBytes3[i]) {
                 pass3 = false;
                 break;
             }
@@ -626,9 +626,9 @@ int main() {
         tests.push_back({
             getTimestamp(),
             "3/6",
-            hex8(Motherboard::RAM_END - 63),
+            hex8(RAM_END - 63),
             formStringFromBytes(testBytes3),
-            pass3 ? formStringFromBytes(testBytes3) : getStringGetBytes(RAMTestAddressEnd - 63, 64),
+            pass3 ? formStringFromBytes(testBytes3) : getStringGetBytes(RAM_END - 63, 64),
             pass3 ? "PASS" : "FAIL",
             "RAM Writing 512-bit (writeBytesVector)",
             "~"
@@ -638,10 +638,10 @@ int main() {
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressStart, testBytes4);
+        memory.writeBytesVector(RAM_START, testBytes4);
         bool pass4 = true;
         for (int i = 0; i < 64; i++) {
-            if (memory.memory[RAMTestAddressStart + i] != testBytes4[i]) {
+            if (memory.memory[i] != testBytes4[i]) {
                 pass4 = false;
                 break;
             }
@@ -649,9 +649,9 @@ int main() {
         tests.push_back({
             getTimestamp(),
             "4/6",
-            hex8(Motherboard::RAM_START),
+            hex8(RAM_START),
             formStringFromBytes(testBytes4),
-            pass4 ? formStringFromBytes(testBytes4) : getStringGetBytes(RAMTestAddressStart, 64),
+            pass4 ? formStringFromBytes(testBytes4) : getStringGetBytes(RAM_START, 64),
             pass4 ? "PASS" : "FAIL",
             "RAM Writing 512-bit (writeBytesVector)",
             "Overwriting"
@@ -661,10 +661,10 @@ int main() {
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressMiddle, testBytes5);
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, testBytes5);
         bool pass5 = true;
         for (int i = 0; i < 64; i++) {
-            if (memory.memory[RAMTestAddressMiddle + i] != testBytes5[i]) {
+            if (memory.memory[RAM_SIZE / 2 + i] != testBytes5[i]) {
                 pass5 = false;
                 break;
             }
@@ -672,9 +672,9 @@ int main() {
         tests.push_back({
             getTimestamp(),
             "5/6",
-            hex8(RAMTestAddressMiddle + Motherboard::RAM_START),
+            hex8(RAM_START + RAM_SIZE / 2),
             formStringFromBytes(testBytes5),
-            pass5 ? formStringFromBytes(testBytes5) : getStringGetBytes(RAMTestAddressMiddle, 64),
+            pass5 ? formStringFromBytes(testBytes5) : getStringGetBytes(RAM_START + RAM_SIZE / 2, 64),
             pass5 ? "PASS" : "FAIL",
             "RAM Writing 512-bit (writeBytesVector)",
             "Overwriting"
@@ -684,10 +684,10 @@ int main() {
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressEnd - 63, testBytes6);
+        memory.writeBytesVector(RAM_END - 63, testBytes6);
         bool pass6 = true;
         for (int i = 0; i < 64; i++) {
-            if (memory.memory[RAMTestAddressEnd - 63 + i] != testBytes6[i]) {
+            if (memory.memory[RAM_END - RAM_START - 63 + i] != testBytes6[i]) {
                 pass6 = false;
                 break;
             }
@@ -695,9 +695,9 @@ int main() {
         tests.push_back({
             getTimestamp(),
             pass6 ? "6/6   PASS" : "6/6   FAIL",
-            hex8(Motherboard::RAM_END - 63),
+            hex8(RAM_END - 63),
             formStringFromBytes(testBytes6),
-            pass6 ? formStringFromBytes(testBytes6) : getStringGetBytes(RAMTestAddressEnd - 63, 64),
+            pass6 ? formStringFromBytes(testBytes6) : getStringGetBytes(RAM_END - 63, 64),
             pass6 ? "PASS" : "FAIL",
             "RAM Writing 512-bit (writeBytesVector)",
             "Overwriting"
@@ -709,9 +709,9 @@ int main() {
 
         // CLEANING
 
-        memory.writeBytesVector(RAMTestAddressStart, std::vector<uint8_t>(64, 0x00));
-        memory.writeBytesVector(RAMTestAddressMiddle, std::vector<uint8_t>(64, 0x00));
-        memory.writeBytesVector(RAMTestAddressEnd - 63, std::vector<uint8_t>(64, 0x00));
+        memory.writeBytesVector(RAM_START, std::vector<uint8_t>(64, 0x00));
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, std::vector<uint8_t>(64, 0x00));
+        memory.writeBytesVector(RAM_END - 63, std::vector<uint8_t>(64, 0x00));
 
 
         // RAM READING
@@ -723,60 +723,60 @@ int main() {
         testBytes5 = {0x19};
         testBytes6 = {0xC6};
 
-        memory.write8(RAMTestAddressStart, testBytes1[0]);
+        memory.write8(RAM_START, testBytes1[0]);
 
-        if (memory.read8(RAMTestAddressStart) == testBytes1[0]) {
-            tests.push_back({getTimestamp(), "1/6", hex8(Motherboard::RAM_START), hex2(testBytes1[0]), hex2(testBytes1[0]), "PASS", "RAM Reading 8-bit (read8)", "~"});
+        if (memory.read8(RAM_START) == testBytes1[0]) {
+            tests.push_back({getTimestamp(), "1/6", hex8(RAM_START), hex2(testBytes1[0]), hex2(testBytes1[0]), "PASS", "RAM Reading 8-bit (read8)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "1/6", hex8(Motherboard::RAM_START), hex2(testBytes1[0]), hex2(memory.memory[RAMTestAddressStart]), "FAIL", "RAM Reading 8-bit (read8)", "~"});
+            tests.push_back({getTimestamp(), "1/6", hex8(RAM_START), hex2(testBytes1[0]), hex2(memory.memory[0]), "FAIL", "RAM Reading 8-bit (read8)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.write8(RAMTestAddressMiddle, testBytes2[0]);
-        if (memory.read8(RAMTestAddressMiddle) == testBytes2[0]) {
-            tests.push_back({getTimestamp(), "2/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), hex2(testBytes2[0]), hex2(testBytes2[0]), "PASS", "RAM Reading 8-bit (read8)", "~"});
+        memory.write8(RAM_START + RAM_SIZE / 2, testBytes2[0]);
+        if (memory.read8(RAM_START + RAM_SIZE / 2) == testBytes2[0]) {
+            tests.push_back({getTimestamp(), "2/6", hex8(RAM_START + RAM_SIZE / 2), hex2(testBytes2[0]), hex2(testBytes2[0]), "PASS", "RAM Reading 8-bit (read8)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "2/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), hex2(testBytes2[0]), hex2(memory.memory[RAMTestAddressMiddle]), "FAIL", "RAM Reading 8-bit (read8)", "~"});
+            tests.push_back({getTimestamp(), "2/6", hex8(RAM_START + RAM_SIZE / 2), hex2(testBytes2[0]), hex2(memory.memory[RAM_SIZE / 2]), "FAIL", "RAM Reading 8-bit (read8)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.write8(RAMTestAddressEnd, testBytes3[0]);
-        if (memory.read8(RAMTestAddressEnd) == testBytes3[0]) {
-            tests.push_back({getTimestamp(), "3/6", hex8(Motherboard::RAM_END), hex2(testBytes3[0]), hex2(testBytes3[0]), "PASS", "RAM Reading 8-bit (read8)", "~"});
+        memory.write8(RAM_END, testBytes3[0]);
+        if (memory.read8(RAM_END) == testBytes3[0]) {
+            tests.push_back({getTimestamp(), "3/6", hex8(RAM_END), hex2(testBytes3[0]), hex2(testBytes3[0]), "PASS", "RAM Reading 8-bit (read8)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "3/6", hex8(Motherboard::RAM_END), hex2(testBytes3[0]), hex2(memory.memory[RAMTestAddressEnd]), "FAIL", "RAM Reading 8-bit (read8)", "~"});
+            tests.push_back({getTimestamp(), "3/6", hex8(RAM_END), hex2(testBytes3[0]), hex2(memory.memory[RAM_END - RAM_START]), "FAIL", "RAM Reading 8-bit (read8)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.write8(RAMTestAddressStart, testBytes4[0]);
-        if (memory.read8(RAMTestAddressStart) == testBytes4[0]) {
-            tests.push_back({getTimestamp(), "4/6", hex8(Motherboard::RAM_START), hex2(testBytes4[0]), hex2(testBytes4[0]), "PASS", "RAM Reading 8-bit (read8)", "Overwriting"});
+        memory.write8(RAM_START, testBytes4[0]);
+        if (memory.read8(RAM_START) == testBytes4[0]) {
+            tests.push_back({getTimestamp(), "4/6", hex8(RAM_START), hex2(testBytes4[0]), hex2(testBytes4[0]), "PASS", "RAM Reading 8-bit (read8)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "4/6", hex8(Motherboard::RAM_START), hex2(testBytes4[0]), hex2(memory.memory[RAMTestAddressStart]), "FAIL", "RAM Reading 8-bit (read8)", "Overwriting"});
+            tests.push_back({getTimestamp(), "4/6", hex8(RAM_START), hex2(testBytes4[0]), hex2(memory.memory[0]), "FAIL", "RAM Reading 8-bit (read8)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
-        memory.write8(RAMTestAddressMiddle, testBytes5[0]);
-        if (memory.read8(RAMTestAddressMiddle) == testBytes5[0]) {
-            tests.push_back({getTimestamp(), "5/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), hex2(testBytes5[0]), hex2(testBytes5[0]), "PASS", "RAM Reading 8-bit (read8)", "Overwriting"});
+        memory.write8(RAM_START + RAM_SIZE / 2, testBytes5[0]);
+        if (memory.read8(RAM_START + RAM_SIZE / 2) == testBytes5[0]) {
+            tests.push_back({getTimestamp(), "5/6", hex8(RAM_START + RAM_SIZE / 2), hex2(testBytes5[0]), hex2(testBytes5[0]), "PASS", "RAM Reading 8-bit (read8)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "5/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), hex2(testBytes5[0]), hex2(memory.memory[RAMTestAddressMiddle]), "FAIL", "RAM Reading 8-bit (read8)", "Overwriting"});
+            tests.push_back({getTimestamp(), "5/6", hex8(RAM_START + RAM_SIZE / 2), hex2(testBytes5[0]), hex2(memory.memory[RAM_SIZE / 2]), "FAIL", "RAM Reading 8-bit (read8)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
-        memory.write8(RAMTestAddressEnd, testBytes6[0]);
-        if (memory.read8(RAMTestAddressEnd) == testBytes6[0]) {
-            tests.push_back({getTimestamp(), "6/6   PASS", hex8(Motherboard::RAM_END), hex2(testBytes6[0]), hex2(testBytes6[0]), "PASS", "RAM Reading 8-bit (read8)", "Overwriting"});
+        memory.write8(RAM_END, testBytes6[0]);
+        if (memory.read8(RAM_END) == testBytes6[0]) {
+            tests.push_back({getTimestamp(), "6/6   PASS", hex8(RAM_END), hex2(testBytes6[0]), hex2(testBytes6[0]), "PASS", "RAM Reading 8-bit (read8)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "6/6   FAIL", hex8(Motherboard::RAM_END), hex2(testBytes6[0]), hex2(memory.memory[RAMTestAddressEnd]), "FAIL", "RAM Reading 8-bit (read8)", "Overwriting"});
+            tests.push_back({getTimestamp(), "6/6   FAIL", hex8(RAM_END), hex2(testBytes6[0]), hex2(memory.memory[RAM_END - RAM_START]), "FAIL", "RAM Reading 8-bit (read8)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
         // CLEANING
 
-        memory.write8(RAMTestAddressStart, 0x00);
-        memory.write8(RAMTestAddressMiddle + Motherboard::RAM_START, 0x00);
-        memory.write8(RAMTestAddressEnd, 0x00);
+        memory.write8(RAM_START, 0x00);
+        memory.write8(RAM_START + RAM_SIZE / 2, 0x00);
+        memory.write8(RAM_END, 0x00);
 
 
         testBytes1 = {0x01, 0xAB};
@@ -786,59 +786,59 @@ int main() {
         testBytes5 = {0xEE, 0x19};
         testBytes6 = {0x10, 0xC6};
 
-        memory.writeBytesVector(RAMTestAddressStart, testBytes1);
-        if (memory.read16(RAMTestAddressStart) == 0xAB01) {
-            tests.push_back({getTimestamp(), "1/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes1), formStringFromBytes(testBytes1), "PASS", "RAM Reading 16-bit (read16)", "~"});
+        memory.writeBytesVector(RAM_START, testBytes1);
+        if (memory.read16(RAM_START) == 0xAB01) {
+            tests.push_back({getTimestamp(), "1/6", hex8(RAM_START), formStringFromBytes(testBytes1), formStringFromBytes(testBytes1), "PASS", "RAM Reading 16-bit (read16)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "1/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes1), getStringGetBytes(RAMTestAddressStart, 2), "FAIL", "RAM Reading 16-bit (read16)", "~"});
+            tests.push_back({getTimestamp(), "1/6", hex8(RAM_START), formStringFromBytes(testBytes1), getStringGetBytes(RAM_START, 2), "FAIL", "RAM Reading 16-bit (read16)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressMiddle, testBytes2);
-        if (memory.read16(RAMTestAddressMiddle) == 0x349F) {
-            tests.push_back({getTimestamp(), "2/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes2), formStringFromBytes(testBytes2), "PASS", "RAM Reading 16-bit (read16)", "~"});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, testBytes2);
+        if (memory.read16(RAM_START + RAM_SIZE / 2) == 0x349F) {
+            tests.push_back({getTimestamp(), "2/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes2), formStringFromBytes(testBytes2), "PASS", "RAM Reading 16-bit (read16)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "2/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes2), getStringGetBytes(RAMTestAddressMiddle, 2), "FAIL", "RAM Reading 16-bit (read16)", "~"});
+            tests.push_back({getTimestamp(), "2/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes2), getStringGetBytes(RAM_START + RAM_SIZE / 2, 2), "FAIL", "RAM Reading 16-bit (read16)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressEnd - 1, testBytes3);
-        if (memory.read16(RAMTestAddressEnd - 1) == 0xF288) {
-            tests.push_back({getTimestamp(), "3/6", hex8(Motherboard::RAM_END - 1), formStringFromBytes(testBytes3), formStringFromBytes(testBytes3), "PASS", "RAM Reading 16-bit (read16)", "~"});
+        memory.writeBytesVector(RAM_END - 1, testBytes3);
+        if (memory.read16(RAM_END - 1) == 0xF288) {
+            tests.push_back({getTimestamp(), "3/6", hex8(RAM_END - 1), formStringFromBytes(testBytes3), formStringFromBytes(testBytes3), "PASS", "RAM Reading 16-bit (read16)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "3/6", hex8(Motherboard::RAM_END - 1), formStringFromBytes(testBytes3), getStringGetBytes(RAMTestAddressEnd - 1, 2), "FAIL", "RAM Reading 16-bit (read16)", "~"});
+            tests.push_back({getTimestamp(), "3/6", hex8(RAM_END - 1), formStringFromBytes(testBytes3), getStringGetBytes(RAM_END - 1, 2), "FAIL", "RAM Reading 16-bit (read16)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressStart, testBytes4);
-        if (memory.read16(RAMTestAddressStart) == 0x7D42) {
-            tests.push_back({getTimestamp(), "4/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes4), formStringFromBytes(testBytes4), "PASS", "RAM Reading 16-bit (read16)", "Overwriting"});
+        memory.writeBytesVector(RAM_START, testBytes4);
+        if (memory.read16(RAM_START) == 0x7D42) {
+            tests.push_back({getTimestamp(), "4/6", hex8(RAM_START), formStringFromBytes(testBytes4), formStringFromBytes(testBytes4), "PASS", "RAM Reading 16-bit (read16)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "4/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes4), getStringGetBytes(RAMTestAddressStart, 2), "FAIL", "RAM Reading 16-bit (read16)", "Overwriting"});
+            tests.push_back({getTimestamp(), "4/6", hex8(RAM_START), formStringFromBytes(testBytes4), getStringGetBytes(RAM_START, 2), "FAIL", "RAM Reading 16-bit (read16)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressMiddle, testBytes5);
-        if (memory.read16(RAMTestAddressMiddle) == 0x19EE) {
-            tests.push_back({getTimestamp(), "5/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes5), formStringFromBytes(testBytes5), "PASS", "RAM Reading 16-bit (read16)", "Overwriting"});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, testBytes5);
+        if (memory.read16(RAM_START + RAM_SIZE / 2) == 0x19EE) {
+            tests.push_back({getTimestamp(), "5/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes5), formStringFromBytes(testBytes5), "PASS", "RAM Reading 16-bit (read16)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "5/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes5), getStringGetBytes(RAMTestAddressMiddle, 2), "FAIL", "RAM Reading 16-bit (read16)", "Overwriting"});
+            tests.push_back({getTimestamp(), "5/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes5), getStringGetBytes(RAM_START + RAM_SIZE / 2, 2), "FAIL", "RAM Reading 16-bit (read16)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressEnd - 1, testBytes6);
-        if (memory.read16(RAMTestAddressEnd - 1) == 0xC610) {
-            tests.push_back({getTimestamp(), "6/6   PASS", hex8(Motherboard::RAM_END - 1), formStringFromBytes(testBytes6), formStringFromBytes(testBytes6), "PASS", "RAM Reading 16-bit (read16)", "Overwriting"});
+        memory.writeBytesVector(RAM_END - 1, testBytes6);
+        if (memory.read16(RAM_END - 1) == 0xC610) {
+            tests.push_back({getTimestamp(), "6/6   PASS", hex8(RAM_END - 1), formStringFromBytes(testBytes6), formStringFromBytes(testBytes6), "PASS", "RAM Reading 16-bit (read16)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "6/6   FAIL", hex8(Motherboard::RAM_END - 1), formStringFromBytes(testBytes6), getStringGetBytes(RAMTestAddressEnd - 1, 2), "FAIL", "RAM Reading 16-bit (read16)", "Overwriting"});
+            tests.push_back({getTimestamp(), "6/6   FAIL", hex8(RAM_END - 1), formStringFromBytes(testBytes6), getStringGetBytes(RAM_END - 1, 2), "FAIL", "RAM Reading 16-bit (read16)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
         // CLEANING
 
-        memory.writeBytesVector(RAMTestAddressStart, {0x00, 0x00});
-        memory.writeBytesVector(RAMTestAddressMiddle + Motherboard::RAM_START, {0x00, 0x00});
-        memory.writeBytesVector(RAMTestAddressEnd - 1, {0x00, 0x00});
+        memory.writeBytesVector(RAM_START, {0x00, 0x00});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, {0x00, 0x00});
+        memory.writeBytesVector(RAM_END - 1, {0x00, 0x00});
 
 
         testBytes1 = {0x3A, 0xF1, 0x7C, 0xD4};
@@ -848,59 +848,59 @@ int main() {
         testBytes5 = {0xFE, 0x2B, 0xA1, 0x73};
         testBytes6 = {0x4D, 0x90, 0xE8, 0x56};
 
-        memory.writeBytesVector(RAMTestAddressStart, testBytes1);
-        if (memory.read32(RAMTestAddressStart) == 0xD47CF13A) {
-            tests.push_back({getTimestamp(), "1/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes1), formStringFromBytes(testBytes1), "PASS", "RAM Reading 32-bit (read32)", "~"});
+        memory.writeBytesVector(RAM_START, testBytes1);
+        if (memory.read32(RAM_START) == 0xD47CF13A) {
+            tests.push_back({getTimestamp(), "1/6", hex8(RAM_START), formStringFromBytes(testBytes1), formStringFromBytes(testBytes1), "PASS", "RAM Reading 32-bit (read32)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "1/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes1), getStringGetBytes(RAMTestAddressStart, 4), "FAIL", "RAM Reading 32-bit (read32)", "~"});
+            tests.push_back({getTimestamp(), "1/6", hex8(RAM_START), formStringFromBytes(testBytes1), getStringGetBytes(RAM_START, 4), "FAIL", "RAM Reading 32-bit (read32)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressMiddle, testBytes2);
-        if (memory.read32(RAMTestAddressMiddle) == 0x6FAB429E) {
-            tests.push_back({getTimestamp(), "2/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes2), formStringFromBytes(testBytes2), "PASS", "RAM Reading 32-bit (read32)", "~"});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, testBytes2);
+        if (memory.read32(RAM_START + RAM_SIZE / 2) == 0x6FAB429E) {
+            tests.push_back({getTimestamp(), "2/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes2), formStringFromBytes(testBytes2), "PASS", "RAM Reading 32-bit (read32)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "2/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes2), getStringGetBytes(RAMTestAddressMiddle, 4), "FAIL", "RAM Reading 32-bit (read32)", "~"});
+            tests.push_back({getTimestamp(), "2/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes2), getStringGetBytes(RAM_START + RAM_SIZE / 2, 4), "FAIL", "RAM Reading 32-bit (read32)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressEnd - 3, testBytes3);
-        if (memory.read32(RAMTestAddressEnd - 3) == 0x8058C711) {
-            tests.push_back({getTimestamp(), "3/6", hex8(Motherboard::RAM_END - 3), formStringFromBytes(testBytes3), formStringFromBytes(testBytes3), "PASS", "RAM Reading 32-bit (read32)", "~"});
+        memory.writeBytesVector(RAM_END - 3, testBytes3);
+        if (memory.read32(RAM_END - 3) == 0x8058C711) {
+            tests.push_back({getTimestamp(), "3/6", hex8(RAM_END - 3), formStringFromBytes(testBytes3), formStringFromBytes(testBytes3), "PASS", "RAM Reading 32-bit (read32)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "3/6", hex8(Motherboard::RAM_END - 3), formStringFromBytes(testBytes3), getStringGetBytes(RAMTestAddressEnd - 3, 4), "FAIL", "RAM Reading 32-bit (read32)", "~"});
+            tests.push_back({getTimestamp(), "3/6", hex8(RAM_END - 3), formStringFromBytes(testBytes3), getStringGetBytes(RAM_END - 3, 4), "FAIL", "RAM Reading 32-bit (read32)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressStart, testBytes4);
-        if (memory.read32(RAMTestAddressStart) == 0x19348FD2) {
-            tests.push_back({getTimestamp(), "4/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes4), formStringFromBytes(testBytes4), "PASS", "RAM Reading 32-bit (read32)", "Overwriting"});
+        memory.writeBytesVector(RAM_START, testBytes4);
+        if (memory.read32(RAM_START) == 0x19348FD2) {
+            tests.push_back({getTimestamp(), "4/6", hex8(RAM_START), formStringFromBytes(testBytes4), formStringFromBytes(testBytes4), "PASS", "RAM Reading 32-bit (read32)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "4/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes4), getStringGetBytes(RAMTestAddressStart, 4), "FAIL", "RAM Reading 32-bit (read32)", "Overwriting"});
+            tests.push_back({getTimestamp(), "4/6", hex8(RAM_START), formStringFromBytes(testBytes4), getStringGetBytes(RAM_START, 4), "FAIL", "RAM Reading 32-bit (read32)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressMiddle, testBytes5);
-        if (memory.read32(RAMTestAddressMiddle) == 0x73A12BFE) {
-            tests.push_back({getTimestamp(), "5/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes5), formStringFromBytes(testBytes5), "PASS", "RAM Reading 32-bit (read32)", "Overwriting"});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, testBytes5);
+        if (memory.read32(RAM_START + RAM_SIZE / 2) == 0x73A12BFE) {
+            tests.push_back({getTimestamp(), "5/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes5), formStringFromBytes(testBytes5), "PASS", "RAM Reading 32-bit (read32)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "5/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes5), getStringGetBytes(RAMTestAddressMiddle, 4), "FAIL", "RAM Reading 32-bit (read32)", "Overwriting"});
+            tests.push_back({getTimestamp(), "5/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes5), getStringGetBytes(RAM_START + RAM_SIZE / 2, 4), "FAIL", "RAM Reading 32-bit (read32)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressEnd - 3, testBytes6);
-        if (memory.read32(RAMTestAddressEnd - 3) == 0x56E8904D) {
-            tests.push_back({getTimestamp(), "6/6   PASS", hex8(Motherboard::RAM_END - 3), formStringFromBytes(testBytes6), formStringFromBytes(testBytes6), "PASS", "RAM Reading 32-bit (read32)", "Overwriting"});
+        memory.writeBytesVector(RAM_END - 3, testBytes6);
+        if (memory.read32(RAM_END - 3) == 0x56E8904D) {
+            tests.push_back({getTimestamp(), "6/6   PASS", hex8(RAM_END - 3), formStringFromBytes(testBytes6), formStringFromBytes(testBytes6), "PASS", "RAM Reading 32-bit (read32)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "6/6   FAIL", hex8(Motherboard::RAM_END - 3), formStringFromBytes(testBytes6), getStringGetBytes(RAMTestAddressEnd - 3, 4), "FAIL", "RAM Reading 32-bit (read32)", "Overwriting"});
+            tests.push_back({getTimestamp(), "6/6   FAIL", hex8(RAM_END - 3), formStringFromBytes(testBytes6), getStringGetBytes(RAM_END - 3, 4), "FAIL", "RAM Reading 32-bit (read32)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
         // CLEANING
 
-        memory.writeBytesVector(RAMTestAddressStart, {0x00, 0x00, 0x00, 0x00});
-        memory.writeBytesVector(RAMTestAddressMiddle + Motherboard::RAM_START, {0x00, 0x00, 0x00, 0x00});
-        memory.writeBytesVector(RAMTestAddressEnd - 3, {0x00, 0x00, 0x00, 0x00});
+        memory.writeBytesVector(RAM_START, {0x00, 0x00, 0x00, 0x00});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, {0x00, 0x00, 0x00, 0x00});
+        memory.writeBytesVector(RAM_END - 3, {0x00, 0x00, 0x00, 0x00});
 
 
         testBytes1 = {0x8C, 0x5D, 0xE1, 0x2A, 0xF4, 0x09, 0xB7, 0x63};
@@ -910,59 +910,59 @@ int main() {
         testBytes5 = {0x7F, 0x16, 0xDA, 0xB4, 0xC9, 0x02, 0x8E, 0x55};
         testBytes6 = {0x01, 0xF3, 0x68, 0x9B, 0xD7, 0x4E, 0x20, 0xAC};
 
-        memory.writeBytesVector(RAMTestAddressStart, testBytes1);
-        if (memory.read64(RAMTestAddressStart) == 0x63B709F42AE15D8C) {
-            tests.push_back({getTimestamp(), "1/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes1), formStringFromBytes(testBytes1), "PASS", "RAM Reading 64-bit (read64)", "~"});
+        memory.writeBytesVector(RAM_START, testBytes1);
+        if (memory.read64(RAM_START) == 0x63B709F42AE15D8C) {
+            tests.push_back({getTimestamp(), "1/6", hex8(RAM_START), formStringFromBytes(testBytes1), formStringFromBytes(testBytes1), "PASS", "RAM Reading 64-bit (read64)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "1/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes1), getStringGetBytes(RAMTestAddressStart, 8), "FAIL", "RAM Reading 64-bit (read64)", "~"});
+            tests.push_back({getTimestamp(), "1/6", hex8(RAM_START), formStringFromBytes(testBytes1), getStringGetBytes(RAM_START, 8), "FAIL", "RAM Reading 64-bit (read64)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressMiddle, testBytes2);
-        if (memory.read64(RAMTestAddressMiddle) == 0xB521F84CD07EA913) {
-            tests.push_back({getTimestamp(), "2/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes2), formStringFromBytes(testBytes2), "PASS", "RAM Reading 64-bit (read64)", "~"});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, testBytes2);
+        if (memory.read64(RAM_START + RAM_SIZE / 2) == 0xB521F84CD07EA913) {
+            tests.push_back({getTimestamp(), "2/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes2), formStringFromBytes(testBytes2), "PASS", "RAM Reading 64-bit (read64)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "2/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes2), getStringGetBytes(RAMTestAddressMiddle, 8), "FAIL", "RAM Reading 64-bit (read64)", "~"});
+            tests.push_back({getTimestamp(), "2/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes2), getStringGetBytes(RAM_START + RAM_SIZE / 2, 8), "FAIL", "RAM Reading 64-bit (read64)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressEnd - 7, testBytes3);
-        if (memory.read64(RAMTestAddressEnd - 7) == 0x9E117BA288C30F6D) {
-            tests.push_back({getTimestamp(), "3/6", hex8(Motherboard::RAM_END - 7), formStringFromBytes(testBytes3), formStringFromBytes(testBytes3), "PASS", "RAM Reading 64-bit (read64)", "~"});
+        memory.writeBytesVector(RAM_END - 7, testBytes3);
+        if (memory.read64(RAM_END - 7) == 0x9E117BA288C30F6D) {
+            tests.push_back({getTimestamp(), "3/6", hex8(RAM_END - 7), formStringFromBytes(testBytes3), formStringFromBytes(testBytes3), "PASS", "RAM Reading 64-bit (read64)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "3/6", hex8(Motherboard::RAM_END - 7), formStringFromBytes(testBytes3), getStringGetBytes(RAMTestAddressEnd - 7, 8), "FAIL", "RAM Reading 64-bit (read64)", "~"});
+            tests.push_back({getTimestamp(), "3/6", hex8(RAM_END - 7), formStringFromBytes(testBytes3), getStringGetBytes(RAM_END - 7, 8), "FAIL", "RAM Reading 64-bit (read64)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressStart, testBytes4);
-        if (memory.read64(RAMTestAddressStart) == 0x0DF14A38C65B92E7) {
-            tests.push_back({getTimestamp(), "4/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes4), formStringFromBytes(testBytes4), "PASS", "RAM Reading 64-bit (read64)", "Overwriting"});
+        memory.writeBytesVector(RAM_START, testBytes4);
+        if (memory.read64(RAM_START) == 0x0DF14A38C65B92E7) {
+            tests.push_back({getTimestamp(), "4/6", hex8(RAM_START), formStringFromBytes(testBytes4), formStringFromBytes(testBytes4), "PASS", "RAM Reading 64-bit (read64)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "4/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes4), getStringGetBytes(RAMTestAddressStart, 8), "FAIL", "RAM Reading 64-bit (read64)", "Overwriting"});
+            tests.push_back({getTimestamp(), "4/6", hex8(RAM_START), formStringFromBytes(testBytes4), getStringGetBytes(RAM_START, 8), "FAIL", "RAM Reading 64-bit (read64)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressMiddle, testBytes5);
-        if (memory.read64(RAMTestAddressMiddle) == 0x558E02C9B4DA167F) {
-            tests.push_back({getTimestamp(), "5/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes5), formStringFromBytes(testBytes5), "PASS", "RAM Reading 64-bit (read64)", "Overwriting"});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, testBytes5);
+        if (memory.read64(RAM_START + RAM_SIZE / 2) == 0x558E02C9B4DA167F) {
+            tests.push_back({getTimestamp(), "5/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes5), formStringFromBytes(testBytes5), "PASS", "RAM Reading 64-bit (read64)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "5/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes5), getStringGetBytes(RAMTestAddressMiddle, 8), "FAIL", "RAM Reading 64-bit (read64)", "Overwriting"});
+            tests.push_back({getTimestamp(), "5/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes5), getStringGetBytes(RAM_START + RAM_SIZE / 2, 8), "FAIL", "RAM Reading 64-bit (read64)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressEnd - 7, testBytes6);
-        if (memory.read64(RAMTestAddressEnd - 7) == 0xAC204ED79B68F301) {
-            tests.push_back({getTimestamp(), "6/6   PASS", hex8(Motherboard::RAM_END - 7), formStringFromBytes(testBytes6), formStringFromBytes(testBytes6), "PASS", "RAM Reading 64-bit (read64)", "Overwriting"});
+        memory.writeBytesVector(RAM_END - 7, testBytes6);
+        if (memory.read64(RAM_END - 7) == 0xAC204ED79B68F301) {
+            tests.push_back({getTimestamp(), "6/6   PASS", hex8(RAM_END - 7), formStringFromBytes(testBytes6), formStringFromBytes(testBytes6), "PASS", "RAM Reading 64-bit (read64)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "6/6   FAIL", hex8(Motherboard::RAM_END - 7), formStringFromBytes(testBytes6), getStringGetBytes(RAMTestAddressEnd - 7, 8), "FAIL", "RAM Reading 64-bit (read64)", "Overwriting"});
+            tests.push_back({getTimestamp(), "6/6   FAIL", hex8(RAM_END - 7), formStringFromBytes(testBytes6), getStringGetBytes(RAM_END - 7, 8), "FAIL", "RAM Reading 64-bit (read64)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
         // CLEANING
 
-        memory.writeBytesVector(RAMTestAddressStart, {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00});
-        memory.writeBytesVector(RAMTestAddressMiddle + Motherboard::RAM_START, {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00});
-        memory.writeBytesVector(RAMTestAddressEnd - 7, {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00});
+        memory.writeBytesVector(RAM_START, {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00});
+        memory.writeBytesVector(RAM_END - 7, {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00});
 
 
         testBytes1 = {
@@ -1031,80 +1031,80 @@ int main() {
             0x8F, 0x12, 0xD5, 0x6A, 0x03, 0xBE, 0x49, 0xF0
         };
 
-        memory.writeBytesVector(RAMTestAddressStart, testBytes1);
-        if (memory.readBytesVector(RAMTestAddressStart, 64) == testBytes1) {
-            tests.push_back({getTimestamp(), "1/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes1), formStringFromBytes(testBytes1), "PASS", "RAM Reading 512-bit (readBytesVector)", "~"});
+        memory.writeBytesVector(RAM_START, testBytes1);
+        if (memory.readBytesVector(RAM_START, 64) == testBytes1) {
+            tests.push_back({getTimestamp(), "1/6", hex8(RAM_START), formStringFromBytes(testBytes1), formStringFromBytes(testBytes1), "PASS", "RAM Reading 512-bit (readBytesVector)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "1/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes1), getStringGetBytes(RAMTestAddressStart, 64), "FAIL", "RAM Reading 512-bit (readBytesVector)", "~"});
+            tests.push_back({getTimestamp(), "1/6", hex8(RAM_START), formStringFromBytes(testBytes1), getStringGetBytes(RAM_START, 64), "FAIL", "RAM Reading 512-bit (readBytesVector)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressMiddle, testBytes2);
-        if (memory.readBytesVector(RAMTestAddressMiddle, 64) == testBytes2) {
-            tests.push_back({getTimestamp(), "2/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes2), formStringFromBytes(testBytes2), "PASS", "RAM Reading 512-bit (readBytesVector)", "~"});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, testBytes2);
+        if (memory.readBytesVector(RAM_START + RAM_SIZE / 2, 64) == testBytes2) {
+            tests.push_back({getTimestamp(), "2/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes2), formStringFromBytes(testBytes2), "PASS", "RAM Reading 512-bit (readBytesVector)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "2/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes2), getStringGetBytes(RAMTestAddressMiddle, 64), "FAIL", "RAM Reading 512-bit (readBytesVector)", "~"});
+            tests.push_back({getTimestamp(), "2/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes2), getStringGetBytes(RAM_START + RAM_SIZE / 2, 64), "FAIL", "RAM Reading 512-bit (readBytesVector)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressEnd - 63, testBytes3);
-        if (memory.readBytesVector(RAMTestAddressEnd - 63, 64) == testBytes3) {
-            tests.push_back({getTimestamp(), "3/6", hex8(Motherboard::RAM_END - 63), formStringFromBytes(testBytes3), formStringFromBytes(testBytes3), "PASS", "RAM Reading 512-bit (readBytesVector)", "~"});
+        memory.writeBytesVector(RAM_END - 63, testBytes3);
+        if (memory.readBytesVector(RAM_END - 63, 64) == testBytes3) {
+            tests.push_back({getTimestamp(), "3/6", hex8(RAM_END - 63), formStringFromBytes(testBytes3), formStringFromBytes(testBytes3), "PASS", "RAM Reading 512-bit (readBytesVector)", "~"});
         } else {
-            tests.push_back({getTimestamp(), "3/6", hex8(Motherboard::RAM_END - 63), formStringFromBytes(testBytes3), getStringGetBytes(RAMTestAddressEnd - 63, 64), "FAIL", "RAM Reading 512-bit (readBytesVector)", "~"});
+            tests.push_back({getTimestamp(), "3/6", hex8(RAM_END - 63), formStringFromBytes(testBytes3), getStringGetBytes(RAM_END - 63, 64), "FAIL", "RAM Reading 512-bit (readBytesVector)", "~"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressStart, testBytes4);
-        if (memory.readBytesVector(RAMTestAddressStart, 64) == testBytes4) {
-            tests.push_back({getTimestamp(), "4/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes4), formStringFromBytes(testBytes4), "PASS", "RAM Reading 512-bit (readBytesVector)", "Overwriting"});
+        memory.writeBytesVector(RAM_START, testBytes4);
+        if (memory.readBytesVector(RAM_START, 64) == testBytes4) {
+            tests.push_back({getTimestamp(), "4/6", hex8(RAM_START), formStringFromBytes(testBytes4), formStringFromBytes(testBytes4), "PASS", "RAM Reading 512-bit (readBytesVector)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "4/6", hex8(Motherboard::RAM_START), formStringFromBytes(testBytes4), getStringGetBytes(RAMTestAddressStart, 64), "FAIL", "RAM Reading 512-bit (readBytesVector)", "Overwriting"});
+            tests.push_back({getTimestamp(), "4/6", hex8(RAM_START), formStringFromBytes(testBytes4), getStringGetBytes(RAM_START, 64), "FAIL", "RAM Reading 512-bit (readBytesVector)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressMiddle, testBytes5);
-        if (memory.readBytesVector(RAMTestAddressMiddle, 64) == testBytes5) {
-            tests.push_back({getTimestamp(), "5/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes5), formStringFromBytes(testBytes5), "PASS", "RAM Reading 512-bit (readBytesVector)", "Overwriting"});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, testBytes5);
+        if (memory.readBytesVector(RAM_START + RAM_SIZE / 2, 64) == testBytes5) {
+            tests.push_back({getTimestamp(), "5/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes5), formStringFromBytes(testBytes5), "PASS", "RAM Reading 512-bit (readBytesVector)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "5/6", hex8(RAMTestAddressMiddle + Motherboard::RAM_START), formStringFromBytes(testBytes5), getStringGetBytes(RAMTestAddressMiddle, 64), "FAIL", "RAM Reading 512-bit (readBytesVector)", "Overwriting"});
+            tests.push_back({getTimestamp(), "5/6", hex8(RAM_START + RAM_SIZE / 2), formStringFromBytes(testBytes5), getStringGetBytes(RAM_START + RAM_SIZE / 2, 64), "FAIL", "RAM Reading 512-bit (readBytesVector)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
-        memory.writeBytesVector(RAMTestAddressEnd - 63, testBytes6);
-        if (memory.readBytesVector(RAMTestAddressEnd - 63, 64) == testBytes6) {
-            tests.push_back({getTimestamp(), "6/6   PASS", hex8(Motherboard::RAM_END - 63), formStringFromBytes(testBytes6), formStringFromBytes(testBytes6), "PASS", "RAM Reading 512-bit (readBytesVector)", "Overwriting"});
+        memory.writeBytesVector(RAM_END - 63, testBytes6);
+        if (memory.readBytesVector(RAM_END - 63, 64) == testBytes6) {
+            tests.push_back({getTimestamp(), "6/6   PASS", hex8(RAM_END - 63), formStringFromBytes(testBytes6), formStringFromBytes(testBytes6), "PASS", "RAM Reading 512-bit (readBytesVector)", "Overwriting"});
         } else {
-            tests.push_back({getTimestamp(), "6/6   FAIL", hex8(Motherboard::RAM_END - 63), formStringFromBytes(testBytes6), getStringGetBytes(RAMTestAddressEnd - 63, 64), "FAIL", "RAM Reading 512-bit (readBytesVector)", "Overwriting"});
+            tests.push_back({getTimestamp(), "6/6   FAIL", hex8(RAM_END - 63), formStringFromBytes(testBytes6), getStringGetBytes(RAM_END - 63, 64), "FAIL", "RAM Reading 512-bit (readBytesVector)", "Overwriting"});
             testFailed(outputFile, tests);
         }
 
         // CLEANING
 
-        memory.writeBytesVector(RAMTestAddressStart, vector<uint8_t> {64, 0x00});
-        memory.writeBytesVector(RAMTestAddressMiddle + Motherboard::RAM_START, vector<uint8_t> {64, 0x00});
-        memory.writeBytesVector(RAMTestAddressEnd - 63, vector<uint8_t> {64, 0x00});
+        memory.writeBytesVector(RAM_START, vector<uint8_t> {64, 0x00});
+        memory.writeBytesVector(RAM_START + RAM_SIZE / 2, vector<uint8_t> {64, 0x00});
+        memory.writeBytesVector(RAM_END - 63, vector<uint8_t> {64, 0x00});
 
 
         testBytes1 = {0x00};
 
         memory.resetErrorResult();
 
-        memory.read8(RAMTestAddressStart - 1);
+        memory.read8(RAM_START - 1);
         if (memory.getTestingErrorResult() == true) {
-            tests.push_back({getTimestamp(), "1/2", hex8(Motherboard::RAM_START - 1), "True", "True", "PASS", "RAM Error test RA01AOOB (read8)", "Error test"});
+            tests.push_back({getTimestamp(), "1/2", hex8(RAM_START - 1), "True", "True", "PASS", "RAM Error test RA01AOOB (read8)", "Error test"});
         } else {
-            tests.push_back({getTimestamp(), "1/2", hex8(Motherboard::RAM_START - 1), "True", "False", "FAIL", "RAM Error test RA01AOOB (read8)", "Error test"});
+            tests.push_back({getTimestamp(), "1/2", hex8(RAM_START - 1), "True", "False", "FAIL", "RAM Error test RA01AOOB (read8)", "Error test"});
             testFailed(outputFile, tests);
         }
 
         memory.resetErrorResult();
 
-        memory.read8(RAMTestAddressEnd + 1);
+        memory.read8(RAM_END + 1);
         if (memory.getTestingErrorResult() == true) {
-            tests.push_back({getTimestamp(), "2/2   PASS", hex8(Motherboard::RAM_END + 1), "True", "True", "PASS", "RAM Error test RA01AOOB (read8)", "Error test"});
+            tests.push_back({getTimestamp(), "2/2   PASS", hex8(RAM_END + 1), "True", "True", "PASS", "RAM Error test RA01AOOB (read8)", "Error test"});
         } else {
-            tests.push_back({getTimestamp(), "2/2   FAIL", hex8(Motherboard::RAM_END + 1), "True", "False", "FAIL", "RAM Error test RA01AOOB (read8)", "Error test"});
+            tests.push_back({getTimestamp(), "2/2   FAIL", hex8(RAM_END + 1), "True", "False", "FAIL", "RAM Error test RA01AOOB (read8)", "Error test"});
             testFailed(outputFile, tests);
         }
 
@@ -1113,23 +1113,136 @@ int main() {
         
         memory.resetErrorResult();
 
-        memory.read16(RAMTestAddressStart - 1);
-        cout << to_string(memory.getTestingErrorResult());
+        memory.read16(RAM_START - 1);
         if (memory.getTestingErrorResult() == true) {
-            tests.push_back({getTimestamp(), "1/2", hex8(Motherboard::RAM_START - 1), "True", "True", "PASS", "RAM Error test RA02AOOB (read16)", "Error test"});
+            tests.push_back({getTimestamp(), "1/2", hex8(RAM_START - 1), "True", "True", "PASS", "RAM Error test RA02AOOB (read16)", "Error test"});
         } else {
-            tests.push_back({getTimestamp(), "1/2", hex8(Motherboard::RAM_START - 1), "True", "False", "FAIL", "RAM Error test RA02AOOB (read16)", "Error test"});
+            tests.push_back({getTimestamp(), "1/2", hex8(RAM_START - 1), "True", "False", "FAIL", "RAM Error test RA02AOOB (read16)", "Error test"});
             testFailed(outputFile, tests);
         }
 
         memory.resetErrorResult();
 
-        memory.read16(RAMTestAddressEnd);
-        cout << to_string(memory.getTestingErrorResult());
+        memory.read16(RAM_END);
         if (memory.getTestingErrorResult() == true) {
-            tests.push_back({getTimestamp(), "2/2   PASS", hex8(Motherboard::RAM_END), "True", "True", "PASS", "RAM Error test RA02AOOB (read16)", "Error test"});
+            tests.push_back({getTimestamp(), "2/2   PASS", hex8(RAM_END), "True", "True", "PASS", "RAM Error test RA02AOOB (read16)", "Error test"});
         } else {
-            tests.push_back({getTimestamp(), "2/2   FAIL", hex8(Motherboard::RAM_END), "True", "False", "FAIL", "RAM Error test RA02AOOB (read16)", "Error test"});
+            tests.push_back({getTimestamp(), "2/2   FAIL", hex8(RAM_END), "True", "False", "FAIL", "RAM Error test RA02AOOB (read16)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
+
+        testBytes1 = {0x00, 0x00, 0x00, 0x00};
+        
+        memory.resetErrorResult();
+
+        memory.read32(RAM_START - 1);
+        if (memory.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "1/2", hex8(RAM_START - 1), "True", "True", "PASS", "RAM Error test RA03AOOB (read32)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "1/2", hex8(RAM_START - 1), "True", "False", "FAIL", "RAM Error test RA03AOOB (read32)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
+        memory.resetErrorResult();
+
+        memory.read32(RAM_END - 2);
+        if (memory.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "2/2   PASS", hex8(RAM_END - 2), "True", "True", "PASS", "RAM Error test RA03AOOB (read32)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "2/2   FAIL", hex8(RAM_END - 2), "True", "False", "FAIL", "RAM Error test RA03AOOB (read32)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
+
+        testBytes1 = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        
+        memory.resetErrorResult();
+
+        memory.read64(RAM_START - 1);
+        if (memory.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "1/2", hex8(RAM_START - 1), "True", "True", "PASS", "RAM Error test RA04AOOB (read64)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "1/2", hex8(RAM_START - 1), "True", "False", "FAIL", "RAM Error test RA04AOOB (read64)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
+        memory.resetErrorResult();
+
+        memory.read64(RAM_END - 6);
+        if (memory.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "2/2   PASS", hex8(RAM_END - 6), "True", "True", "PASS", "RAM Error test RA04AOOB (read64)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "2/2   FAIL", hex8(RAM_END - 6), "True", "False", "FAIL", "RAM Error test RA04AOOB (read64)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
+
+        testBytes1 = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        
+        memory.resetErrorResult();
+
+        memory.readBytesVector(RAM_START - 1, 16);
+        if (memory.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "1/2", hex8(RAM_START - 1), "True", "True", "PASS", "RAM Error test RA05AOOB (readBytesVector)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "1/2", hex8(RAM_START - 1), "True", "False", "FAIL", "RAM Error test RA05AOOB (readBytesVector)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
+        memory.resetErrorResult();
+
+        memory.readBytesVector(RAM_END - 14, 16);
+        if (memory.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "2/2   PASS", hex8(RAM_END - 14), "True", "True", "PASS", "RAM Error test RA05AOOB (readBytesVector)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "2/2   FAIL", hex8(RAM_END - 14), "True", "False", "FAIL", "RAM Error test RA05AOOB (readBytesVector)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
+
+        testBytes1 = {0x00};
+        
+        memory.resetErrorResult();
+
+        memory.write8(RAM_START - 1, testBytes1[0]);
+        if (memory.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "1/2", hex8(RAM_START - 1), "True", "True", "PASS", "RAM Error test RA05AOOB (write8)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "1/2", hex8(RAM_START - 1), "True", "False", "FAIL", "RAM Error test RA05AOOB (write8)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
+        memory.resetErrorResult();
+
+        memory.write8(RAM_END + 1, testBytes1[0]);
+        if (memory.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "2/2   PASS", hex8(RAM_END + 1), "True", "True", "PASS", "RAM Error test RA06AOOB (write8)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "2/2   FAIL", hex8(RAM_END + 1), "True", "False", "FAIL", "RAM Error test RA06AOOB (write8)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
+
+        testBytes1 = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+        
+        memory.resetErrorResult();
+
+        memory.writeBytesVector(RAM_START - 1, testBytes1);
+        if (memory.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "1/2", hex8(RAM_START - 1), "True", "True", "PASS", "RAM Error test RA07AOOB (writeBytesVector)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "1/2", hex8(RAM_START - 1), "True", "False", "FAIL", "RAM Error test RA07AOOB (writeBytesVector)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
+        memory.resetErrorResult();
+
+        memory.writeBytesVector(RAM_END - 14, testBytes1);
+        if (memory.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "2/2   PASS", hex8(RAM_END - 14), "True", "True", "PASS", "RAM Error test RA07AOOB (writeBytesVector)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "2/2   FAIL", hex8(RAM_END - 14), "True", "False", "FAIL", "RAM Error test RA07AOOB (writeBytesVector)", "Error test"});
             testFailed(outputFile, tests);
         }
 

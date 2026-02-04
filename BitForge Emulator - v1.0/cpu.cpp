@@ -183,63 +183,59 @@ void CPU::execute() {
 }
 
 uint8_t CPU::read8(uint64_t address) {
-    if (address >= motherboard->ROM_START && address <= motherboard->ROM_END)
+    if (address >= Motherboard::ROM_START && address <= Motherboard::ROM_END)
         return rom->read8(address);
 
-    if (address >= motherboard->RAM_START && address <= motherboard->RAM_END)
-        return memory->read8(address - motherboard->RAM_END);
-
-    return 0;
+    if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END)
+        return memory->read8(address);
 }
 
 uint16_t CPU::read16(uint64_t address) {
-    if (address >= motherboard->ROM_START && address <= motherboard->ROM_END)
+    if (address >= Motherboard::ROM_START && address <= Motherboard::ROM_END)
         return rom->read16(address);
 
-    if (address >= motherboard->RAM_START && address <= motherboard->RAM_END)
-        return memory->read16(address - motherboard->RAM_END);
-
-    return 0;
+    if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END)
+        return memory->read16(address);
 }
 
 uint32_t CPU::read32(uint64_t address) {
-    if (address >= motherboard->ROM_START && address <= motherboard->ROM_END)
+    if (address >= Motherboard::ROM_START && address <= Motherboard::ROM_END)
         return rom->read32(address);
 
-    if (address >= motherboard->RAM_START && address <= motherboard->RAM_END)
-        return memory->read32(address - motherboard->RAM_END);
-
-    return 0;
+    if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END)
+        return memory->read32(address);
 }
 
 uint64_t CPU::read64(uint64_t address) {
-    if (address >= motherboard->ROM_START && address <= motherboard->ROM_END)
+    if (address >= Motherboard::ROM_START && address <= Motherboard::ROM_END)
         return rom->read64(address);
 
-    if (address >= motherboard->RAM_START && address <= motherboard->RAM_END)
-        return memory->read64(address - motherboard->RAM_END);
-
-    return 0;
+    if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END)
+        return memory->read64(address);
 }
 
 void CPU::write8(uint64_t address, uint8_t value) {
-    if (address >= motherboard->ROM_START && address <= motherboard->ROM_END)
-        CPU::error("CP01CWTR", std::to_string(address));
+    if (address >= Motherboard::ROM_START && address <= Motherboard::ROM_END)
+        CPU::error("CP01CWTR", "Absolute address: " + std::to_string(address));
 
-    if (address >= motherboard->RAM_START && address <= motherboard->RAM_END)
-        memory->write8(address - motherboard->RAM_END, value);
+    if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END)
+        memory->write8(address, value);
 }
 
 std::vector<uint8_t> CPU::readBytesVector(uint64_t start, size_t length) {
-    if (start >= motherboard->ROM_START && start <= motherboard->ROM_END)
+    if (start >= Motherboard::ROM_START && start <= Motherboard::ROM_END)
         return rom->readBytesVector(start, length);
 
-    if (start >= motherboard->RAM_START && start <= motherboard->RAM_END)
-        return memory->readBytesVector(start - motherboard->RAM_END, length);
+    if (start >= Motherboard::RAM_START && start <= Motherboard::RAM_END)
+        return memory->readBytesVector(start, length);
+}
 
-    std::vector<uint8_t> value;
+void CPU::writeBytesVector(uint64_t start, const std::vector<uint8_t>& data) {
+    if (start >= Motherboard::ROM_START && start <= Motherboard::ROM_END)
+        CPU::error("CP02CWTR", "Absolute address: " + std::to_string(start));
 
-    return value;
+    if (start >= Motherboard::RAM_START && start <= Motherboard::RAM_END)
+        memory->writeBytesVector(start, data);
 }
 
 void CPU::error(std::string errorType, std::string info) const {

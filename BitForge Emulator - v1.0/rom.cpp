@@ -22,14 +22,14 @@ void ROM::loadFromFile(const std::string& filename) {
 }
 
 uint8_t ROM::read8(uint64_t address) const {
-    if (address - Motherboard::ROM_START > data.size())
+    if (address - Motherboard::ROM_START > Motherboard::ROM_SIZE)
         error("RO04AOOB", std::to_string(address));
 
     return data[address - Motherboard::ROM_START];
 }
 
 uint16_t ROM::read16(uint64_t start) const {
-    if (start - Motherboard::ROM_START + 1 > data.size())
+    if (start - Motherboard::ROM_START + 1 > Motherboard::ROM_SIZE)
         error("RO05AOOB", std::to_string(start) + " + length (2)");
 
     uint16_t result = 0;
@@ -40,7 +40,7 @@ uint16_t ROM::read16(uint64_t start) const {
 }
 
 uint32_t ROM::read32(uint64_t start) const {
-    if (start - Motherboard::ROM_START + 3 > data.size())
+    if (start - Motherboard::ROM_START + 3 > Motherboard::ROM_SIZE)
         error("RO06AOOB", std::to_string(start) + " + length (4)");
 
     uint32_t result = 0;
@@ -51,7 +51,7 @@ uint32_t ROM::read32(uint64_t start) const {
 }
 
 uint64_t ROM::read64(uint64_t start) const {
-    if (start - Motherboard::ROM_START + 7 > data.size())
+    if (start - Motherboard::ROM_START + 7 > Motherboard::ROM_SIZE)
         error("RO07AOOB", std::to_string(start) + " + length (8)");
 
     uint64_t result = 0;
@@ -62,7 +62,7 @@ uint64_t ROM::read64(uint64_t start) const {
 }
 
 std::vector<uint8_t> ROM::readBytesVector(uint64_t address, size_t length) const {
-    if (address - Motherboard::ROM_START + length - 1 > data.size())
+    if (address - Motherboard::ROM_START + length - 1 > Motherboard::ROM_SIZE)
         error("RO08AOOB", std::to_string(address) + " + length (" + std::to_string(length) + ")");
 
     return std::vector<uint8_t>(data.begin() + address - Motherboard::ROM_START, data.begin() + address - Motherboard::ROM_START + length);

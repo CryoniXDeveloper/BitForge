@@ -182,9 +182,47 @@ void testFailedImpl(std::ofstream& outputFile, const std::vector<TestDetails>& t
     throw std::runtime_error("Test failed");
 }
 
+void writeByte(const char* path, uint64_t offset, uint8_t value) {
+    std::fstream file(path, std::ios::in | std::ios::out | std::ios::binary);
+    
+    if (!file) {
+        std::ofstream creator(path, std::ios::binary);
+        creator.close();
+        
+        file.open(path, std::ios::in | std::ios::out | std::ios::binary);
+    }
+
+    if (!file) {
+        std::cerr << "FATAL: Could not open/create " << path << ". Check if the folder exists!" << std::endl;
+        return;
+    }
+
+    uint64_t fileOffset = offset - Motherboard::ROM_START;
+    file.seekp(fileOffset);
+    file.write(reinterpret_cast<const char*>(&value), 1);
+    file.close(); 
+}
+
+void writeBytes(const char* path, uint64_t offset, const uint8_t* data, size_t size) {
+    std::fstream file(path, std::ios::in | std::ios::out | std::ios::binary);
+    if (!file) return;
+
+    offset = offset - Motherboard::ROM_START;
+
+    file.seekp(offset);
+    file.write(reinterpret_cast<const char*>(data), size);
+}
+
 int main() {
     try {
         ofstream outputFile("Test.txt");
+        
+        std::fstream check("testRom.bin", std::ios::in | std::ios::out | std::ios::binary);
+            if (!check) {
+                std::ofstream creator("testRom.bin", std::ios::binary);
+            }
+
+        rom.loadFromFile("testRom.bin");
 
         vector<TestDetails> tests = {};
 
@@ -198,6 +236,10 @@ int main() {
         uint64_t RAM_SIZE = Motherboard::RAM_SIZE;
         uint64_t RAM_START = Motherboard::RAM_START;
         uint64_t RAM_END = Motherboard::RAM_END;
+
+        uint64_t ROM_SIZE = Motherboard::ROM_SIZE;
+        uint64_t ROM_START = Motherboard::ROM_START;
+        uint64_t ROM_END = Motherboard::ROM_END;
 
         // RAM WRITING
 
@@ -1084,7 +1126,9 @@ int main() {
         memory.writeBytesVector(RAM_START, vector<uint8_t> {64, 0x00});
         memory.writeBytesVector(RAM_START + RAM_SIZE / 2, vector<uint8_t> {64, 0x00});
         memory.writeBytesVector(RAM_END - 63, vector<uint8_t> {64, 0x00});
+        
 
+        // RAM ERROR TESTING
 
         testBytes1 = {0x00};
 
@@ -1245,6 +1289,77 @@ int main() {
             tests.push_back({getTimestamp(), "2/2   FAIL", hex8(RAM_END - 14), "True", "False", "FAIL", "RAM Error test RA07AOOB (writeBytesVector)", "Error test"});
             testFailed(outputFile, tests);
         }
+
+
+        // ROM READING
+
+        testBytes1 = {0xAB};
+        testBytes2 = {0x34};
+        testBytes3 = {0xF2};
+        testBytes4 = {0x7D};
+        testBytes5 = {0x19};
+        testBytes6 = {0xC6};
+
+        writeByte("testRom.bin", ROM_START, testBytes1[0]);
+        rom.loadFromFile("testRom.bin");
+        if (rom.read8(ROM_START) == testBytes1[0]) {
+            tests.push_back({getTimestamp(), "1/6", hex8(ROM_START), hex2(testBytes1[0]), hex2(testBytes1[0]), "PASS", "ROM Reading 8-bit (read8)", "~"});
+        } else {
+            tests.push_back({getTimestamp(), "1/6", hex8(ROM_START), hex2(testBytes1[0]), hex2(rom.read8(ROM_START)), "FAIL", "ROM Reading 8-bit (read8)", "~"});
+            testFailed(outputFile, tests);
+        }
+
+        writeByte("testRom.bin", ROM_START + ROM_SIZE / 2, testBytes2[0]);
+        rom.loadFromFile("testRom.bin");
+        if (rom.read8(ROM_START + ROM_SIZE / 2) == testBytes2[0]) {
+            tests.push_back({getTimestamp(), "2/6", hex8(ROM_START + ROM_SIZE / 2), hex2(testBytes2[0]), hex2(testBytes2[0]), "PASS", "ROM Reading 8-bit (read8)", "~"});
+        } else {
+            tests.push_back({getTimestamp(), "2/6", hex8(ROM_START + ROM_SIZE / 2), hex2(testBytes2[0]), hex2(rom.read8(ROM_START + ROM_SIZE / 2)), "FAIL", "ROM Reading 8-bit (read8)", "~"});
+            testFailed(outputFile, tests);
+        }
+
+        writeByte("testRom.bin", ROM_END, testBytes3[0]);
+        rom.loadFromFile("testRom.bin");
+        if (rom.read8(ROM_END) == testBytes3[0]) {
+            tests.push_back({getTimestamp(), "3/6", hex8(ROM_END), hex2(testBytes3[0]), hex2(testBytes3[0]), "PASS", "ROM Reading 8-bit (read8)", "~"});
+        } else {
+            tests.push_back({getTimestamp(), "3/6", hex8(ROM_END), hex2(testBytes3[0]), hex2(rom.read8(ROM_END)), "FAIL", "ROM Reading 8-bit (read8)", "~"});
+            testFailed(outputFile, tests);
+        }
+
+        writeByte("testRom.bin", ROM_START, testBytes4[0]);
+        rom.loadFromFile("testRom.bin");
+        if (rom.read8(ROM_START) == testBytes4[0]) {
+            tests.push_back({getTimestamp(), "4/6", hex8(ROM_START), hex2(testBytes4[0]), hex2(testBytes4[0]), "PASS", "ROM Reading 8-bit (read8)", "Overwriting"});
+        } else {
+            tests.push_back({getTimestamp(), "4/6", hex8(ROM_START), hex2(testBytes4[0]), hex2(rom.read8(ROM_START)), "FAIL", "ROM Reading 8-bit (read8)", "Overwriting"});
+            testFailed(outputFile, tests);
+        }
+
+        writeByte("testRom.bin", ROM_START + ROM_SIZE / 2, testBytes5[0]);
+        rom.loadFromFile("testRom.bin");
+        if (rom.read8(ROM_START + ROM_SIZE / 2) == testBytes5[0]) {
+            tests.push_back({getTimestamp(), "5/6", hex8(ROM_START + ROM_SIZE / 2), hex2(testBytes5[0]), hex2(testBytes5[0]), "PASS", "ROM Reading 8-bit (read8)", "Overwriting"});
+        } else {
+            tests.push_back({getTimestamp(), "5/6", hex8(ROM_START + ROM_SIZE / 2), hex2(testBytes5[0]), hex2(rom.read8(ROM_START + ROM_SIZE / 2)), "FAIL", "ROM Reading 8-bit (read8)", "Overwriting"});
+            testFailed(outputFile, tests);
+        }
+
+        writeByte("testRom.bin", ROM_END, testBytes6[0]);
+        rom.loadFromFile("testRom.bin");
+        if (rom.read8(ROM_END) == testBytes6[0]) {
+            tests.push_back({getTimestamp(), "6/6   PASS", hex8(ROM_END), hex2(testBytes6[0]), hex2(testBytes6[0]), "PASS", "ROM Reading 8-bit (read8)", "Overwriting"});
+        } else {
+            tests.push_back({getTimestamp(), "6/6   FAIL", hex8(ROM_END), hex2(testBytes6[0]), hex2(rom.read8(ROM_END)), "FAIL", "ROM Reading 8-bit (read8)", "Overwriting"});
+            testFailed(outputFile, tests);
+        }
+
+        // CLEANING
+
+        writeByte("testRom.bin", ROM_START, 0x00);
+        writeByte("testRom.bin", ROM_START + ROM_SIZE / 2, 0x00);
+        writeByte("testRom.bin", ROM_END, 0x00);
+        rom.loadFromFile("testRom.bin");
 
         fillLog(outputFile, tests);
 

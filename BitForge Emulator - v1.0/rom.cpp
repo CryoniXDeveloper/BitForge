@@ -21,14 +21,14 @@ void ROM::loadFromFile(const std::string& filename) {
     if (!f) error("RO02FTRF", filename);
 }
 
-uint8_t ROM::read8(uint64_t address) const {
+uint8_t ROM::read8(uint64_t address) {
     if (address - Motherboard::ROM_START > Motherboard::ROM_SIZE)
         error("RO04AOOB", std::to_string(address));
 
     return data[address - Motherboard::ROM_START];
 }
 
-uint16_t ROM::read16(uint64_t start) const {
+uint16_t ROM::read16(uint64_t start) {
     if (start - Motherboard::ROM_START + 1 > Motherboard::ROM_SIZE)
         error("RO05AOOB", std::to_string(start) + " + length (2)");
 
@@ -39,7 +39,7 @@ uint16_t ROM::read16(uint64_t start) const {
     return result;
 }
 
-uint32_t ROM::read32(uint64_t start) const {
+uint32_t ROM::read32(uint64_t start) {
     if (start - Motherboard::ROM_START + 3 > Motherboard::ROM_SIZE)
         error("RO06AOOB", std::to_string(start) + " + length (4)");
 
@@ -50,7 +50,7 @@ uint32_t ROM::read32(uint64_t start) const {
     return result;
 }
 
-uint64_t ROM::read64(uint64_t start) const {
+uint64_t ROM::read64(uint64_t start) {
     if (start - Motherboard::ROM_START + 7 > Motherboard::ROM_SIZE)
         error("RO07AOOB", std::to_string(start) + " + length (8)");
 
@@ -61,19 +61,29 @@ uint64_t ROM::read64(uint64_t start) const {
     return result;
 }
 
-std::vector<uint8_t> ROM::readBytesVector(uint64_t address, size_t length) const {
-    if (address - Motherboard::ROM_START + length - 1 > Motherboard::ROM_SIZE)
+std::vector<uint8_t> ROM::readBytesVector(uint64_t address, size_t length) {
+    if (address - Motherboard::ROM_START + length - 1 > Motherboard::ROM_SIZE) {
         error("RO08AOOB", std::to_string(address) + " + length (" + std::to_string(length) + ")");
+        return {0};
 
-    return std::vector<uint8_t>(data.begin() + address - Motherboard::ROM_START, data.begin() + address - Motherboard::ROM_START + length);
+    } else {
+        return std::vector<uint8_t>(data.begin() + address - Motherboard::ROM_START, data.begin() + address - Motherboard::ROM_START + length);
+    }
 }
 
-void ROM::error(const std::string& e, const std::string& i) const {
-    std::string r = "ERROR [" + e + "]";
-    if (!i.empty()) r += " - " + i;
-    r += "\nStopping execution...";
-    std::cout << r;
-    std::exit(0);
+void ROM::error(std::string errorType, std::string info) {
+    if (!testing) {
+        std::string returnString = "ERROR [" + errorType + "]";
+        if (info != "")
+            returnString += " - More info: " + info;
+        returnString += "\n\nFind out more in errorTypes.txt.\nStopping execution...";
+        std::cout << returnString;
+        std::cin.get();
+        exit(0);
+
+    } else {
+        testingErrorSuccess = true;
+    }
 }
 
 ROM rom;

@@ -80,6 +80,7 @@ std::vector<uint8_t> RAM::readBytesVector(uint64_t start, size_t length) {
 void RAM::write8(uint64_t address, uint8_t value) {
     if (address < Motherboard::RAM_START || address > Motherboard::RAM_END) {
         error("RA06AOOB", "Absolute address: " + std::to_string(address));
+        return;
 
     } else {
         memory[address - Motherboard::RAM_START] = value;

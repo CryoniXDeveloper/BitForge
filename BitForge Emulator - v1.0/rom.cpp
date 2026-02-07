@@ -22,52 +22,60 @@ void ROM::loadFromFile(const std::string& filename) {
 }
 
 uint8_t ROM::read8(uint64_t address) {
-    if (address - Motherboard::ROM_START > Motherboard::ROM_SIZE)
-        error("RO04AOOB", std::to_string(address));
+    if (address < Motherboard::ROM_START || address > Motherboard::ROM_END)
+        error("RO04AOOB", "Absolute address: " + std::to_string(address));
 
     return data[address - Motherboard::ROM_START];
 }
 
 uint16_t ROM::read16(uint64_t start) {
-    if (start - Motherboard::ROM_START + 1 > Motherboard::ROM_SIZE)
-        error("RO05AOOB", std::to_string(start) + " + length (2)");
+    uint64_t address = start - Motherboard::ROM_START;
+
+    if (start < Motherboard::ROM_START || address + 1 > Motherboard::ROM_SIZE - 1)
+        error("RO05AOOB", "Absolute address: " + std::to_string(start) + " + length (2)");
 
     uint16_t result = 0;
     for (size_t i = 0; i < 2; i++)
-        result |= ((uint16_t)data[start - Motherboard::ROM_START + i]) << (8 * i);
+        result |= ((uint16_t)data[address + i]) << (8 * i);
 
     return result;
 }
 
 uint32_t ROM::read32(uint64_t start) {
-    if (start - Motherboard::ROM_START + 3 > Motherboard::ROM_SIZE)
-        error("RO06AOOB", std::to_string(start) + " + length (4)");
+    uint64_t address = start - Motherboard::ROM_START;
+
+    if (start < Motherboard::ROM_START || address + 3 > Motherboard::ROM_SIZE - 1)
+        error("RO06AOOB", "Absolute address: " + std::to_string(start) + " + length (4)");
 
     uint32_t result = 0;
     for (size_t i = 0; i < 4; i++)
-        result |= ((uint32_t)data[start - Motherboard::ROM_START + i]) << (8 * i);
+        result |= ((uint32_t)data[address + i]) << (8 * i);
 
     return result;
 }
 
 uint64_t ROM::read64(uint64_t start) {
-    if (start - Motherboard::ROM_START + 7 > Motherboard::ROM_SIZE)
-        error("RO07AOOB", std::to_string(start) + " + length (8)");
+    uint64_t address = start - Motherboard::ROM_START;
+
+    if (start < Motherboard::ROM_START || address + 7 > Motherboard::ROM_SIZE - 1)
+        error("RO07AOOB", "Absolute address: " + std::to_string(start) + " + length (8)");
 
     uint64_t result = 0;
     for (size_t i = 0; i < 8; i++)
-        result |= ((uint64_t)data[start - Motherboard::ROM_START + i]) << (8 * i);
+        result |= ((uint64_t)data[address + i]) << (8 * i);
 
     return result;
 }
 
-std::vector<uint8_t> ROM::readBytesVector(uint64_t address, size_t length) {
-    if (address - Motherboard::ROM_START + length - 1 > Motherboard::ROM_SIZE) {
-        error("RO08AOOB", std::to_string(address) + " + length (" + std::to_string(length) + ")");
+std::vector<uint8_t> ROM::readBytesVector(uint64_t start, size_t length) {
+    uint64_t address = start - Motherboard::ROM_START;
+
+    if (start < Motherboard::ROM_START || address + length - 1 > Motherboard::ROM_SIZE - 1) {
+        error("RO08AOOB", "Absolute address: " + std::to_string(start) + " + length (" + std::to_string(length) + ")");
         return {0};
 
     } else {
-        return std::vector<uint8_t>(data.begin() + address - Motherboard::ROM_START, data.begin() + address - Motherboard::ROM_START + length);
+        return std::vector<uint8_t>(data.begin() + address, data.begin() + address + length);
     }
 }
 

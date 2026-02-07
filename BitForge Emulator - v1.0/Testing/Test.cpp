@@ -1738,6 +1738,122 @@ int main() {
 
         rom.resetErrorResult();
 
+        rom.loadFromFile("testSizeError.bin");
+        if (rom.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "1/1   PASS", "~", "True", "True", "PASS", "ROM Error test RO03FSII (loadFromFile)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "1/1   FAIL", "~", "True", "False", "FAIL", "ROM Error test RO03FSII (loadFromFile)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
+        rom.resetErrorResult();
+        
+        rom.read8(ROM_START - 1);
+        rom.loadFromFile("testRom.bin");
+        if (rom.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "1/2", hex8(ROM_START - 1), "True", "True", "PASS", "ROM Error test RO04AOOB (read8)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "1/2", hex8(ROM_START - 1), "True", "False", "FAIL", "ROM Error test RO04AOOB (read8)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
+        rom.resetErrorResult();
+        
+        rom.read8(ROM_END + 1);
+        rom.loadFromFile("testRom.bin");
+        if (rom.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "2/2   PASS", hex8(ROM_END + 1), "True", "True", "PASS", "ROM Error test RO04AOOB (read8)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "2/2   FAIL", hex8(ROM_END + 1), "True", "False", "FAIL", "ROM Error test RO04AOOB (read8)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
+        rom.resetErrorResult();
+        
+        rom.read16(ROM_START - 1);
+        rom.loadFromFile("testRom.bin");
+        if (rom.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "1/2", hex8(ROM_START - 1), "True", "True", "PASS", "ROM Error test RO05AOOB (read16)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "1/2", hex8(ROM_START - 1), "True", "False", "FAIL", "ROM Error test RO05AOOB (read16)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
+        rom.resetErrorResult();
+        
+        rom.read16(ROM_END);
+        rom.loadFromFile("testRom.bin");
+        if (rom.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "2/2   PASS", hex8(ROM_END), "True", "True", "PASS", "ROM Error test RO05AOOB (read16)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "2/2   FAIL", hex8(ROM_END), "True", "False", "FAIL", "ROM Error test RO05AOOB (read16)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
+        rom.resetErrorResult();
+        
+        rom.read32(ROM_START - 1);
+        rom.loadFromFile("testRom.bin");
+        if (rom.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "1/2", hex8(ROM_START - 1), "True", "True", "PASS", "ROM Error test RO06AOOB (read32)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "1/2", hex8(ROM_START - 1), "True", "False", "FAIL", "ROM Error test RO06AOOB (read32)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
+        rom.resetErrorResult();
+        
+        rom.read32(ROM_END - 2);
+        rom.loadFromFile("testRom.bin");
+        if (rom.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "2/2   PASS", hex8(ROM_END - 2), "True", "True", "PASS", "ROM Error test RO06AOOB (read32)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "2/2   FAIL", hex8(ROM_END - 2), "True", "False", "FAIL", "ROM Error test RO06AOOB (read32)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
+        rom.resetErrorResult();
+        
+        rom.read64(ROM_START - 1);
+        rom.loadFromFile("testRom.bin");
+        if (rom.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "1/2", hex8(ROM_START - 1), "True", "True", "PASS", "ROM Error test RO07AOOB (read64)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "1/2", hex8(ROM_START - 1), "True", "False", "FAIL", "ROM Error test RO07AOOB (read64)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
+        rom.resetErrorResult();
+        
+        rom.read64(ROM_END - 6);
+        rom.loadFromFile("testRom.bin");
+        if (rom.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "2/2   PASS", hex8(ROM_END - 6), "True", "True", "PASS", "ROM Error test RO07AOOB (read64)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "2/2   FAIL", hex8(ROM_END - 6), "True", "False", "FAIL", "ROM Error test RO07AOOB (read64)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
+        rom.resetErrorResult();
+        
+        rom.readBytesVector(ROM_START - 1, 16);
+        if (rom.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "1/2", hex8(ROM_START - 1), "True", "True", "PASS", "ROM Error test RO08AOOB (readBytesVector)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "1/2", hex8(ROM_START - 1), "True", "False", "FAIL", "ROM Error test RO08AOOB (readBytesVector)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
+        rom.resetErrorResult();
+        
+        rom.readBytesVector(ROM_END - 14, 16);
+        if (rom.getTestingErrorResult() == true) {
+            tests.push_back({getTimestamp(), "2/2   PASS", hex8(ROM_END - 14), "True", "True", "PASS", "ROM Error test RO08AOOB (readBytesVector)", "Error test"});
+        } else {
+            tests.push_back({getTimestamp(), "2/2   FAIL", hex8(ROM_END - 14), "True", "False", "FAIL", "ROM Error test RO08AOOB (readBytesVector)", "Error test"});
+            testFailed(outputFile, tests);
+        }
+
         fillLog(outputFile, tests);
 
     } catch (const exception& error) {

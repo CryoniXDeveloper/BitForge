@@ -1,0 +1,11 @@
+r0 - hardwired 0
+r1 to r63 - general-use registers
+
+
+
+
+TrASM .trasm
+
+Trayent - TrayC .tr
+
+TrayOS

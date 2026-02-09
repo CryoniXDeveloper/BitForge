@@ -5,3 +5,7 @@ Emulator:
 Testing:
     cd "C:\Users\Admin\Desktop\Prog. 2026\BitForge Emulator - v1.0\Testing"
     g++ Test.cpp ../ram.cpp ../rom.cpp -o Test.exe
+
+Assembler:
+    cd "C:\Users\Admin\Desktop\Prog. 2026\BitForge Emulator - v1.0\Assembler"
+    g++ assembler.cpp ../rom.cpp -o assembler.exe

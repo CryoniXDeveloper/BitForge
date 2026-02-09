@@ -14,15 +14,13 @@ void Assembler::checkFileExtension(std::string fileName, std::string fileExtensi
     size_t dotPosition = fileName.rfind('.');
 
     if (dotPosition == std::string::npos) {
-        std::cerr << "\nError: File has no extension.";
-        exit(0);
+        assembler.error("ASM00002", fileName);
     }
 
     std::string extractedString = fileName.substr(dotPosition + 1);
 
     if (extractedString != fileExtension) {
-        std::cerr << "\nError: File extension is incorrect. (" + fileName + "), extension expected: ." + fileExtension;
-        exit(0);
+        assembler.error("ASM00003", fileName + "; extension expected: ." + fileExtension);
     }
 }
 
@@ -69,16 +67,37 @@ std::vector<uint8_t> Assembler::getOperandInfoBytes(std::string operandDescripto
     return operandByte.at(operandDescriptor);
 }
 
+void Assembler::error(std::string errorType, std::string info) const {
+    std::string returnString = "ERROR [" + errorType + "]";
+    if (info != "")
+        returnString += " - More info: " + info;
+    returnString += "\n\nFind out more in errorTypes.txt.\nStopping execution...";
+    std::cout << returnString;
+    std::cin.get();
+    exit(0);
+}
+
+void pushData(std::vector<uint8_t> data) {
+    assembler.binaryToWrite.insert(
+        assembler.binaryToWrite.end(),
+        data.begin(),
+        data.end()
+    );
+}
+
 int main() {
     std::cout << "Enter the path of the assembly file to be converted into binary: ";
 
     std::string assemblyFile;
     std::getline(std::cin, assemblyFile);
 
+    if (assemblyFile.empty()) {
+        assemblyFile = "asmFile.trasm";
+    }
+
     std::ifstream inFile(assemblyFile);
     if (!inFile) {
-        std::cerr << "\nError: Assembly file does not exist or cannot be opened.\n";
-        return 1;
+        assembler.error("ASM00001", assemblyFile);
     }
 
     assembler.checkFileExtension(assemblyFile, "trasm");
@@ -88,14 +107,17 @@ int main() {
     std::string outputFile;
     std::getline(std::cin, outputFile);
 
+    if (outputFile.empty()) {
+        outputFile = "output.bin";
+    }
+
     assembler.checkFileExtension(outputFile, "bin");
 
     std::cout << "Turning assembly into binary..." << std::endl;
 
     std::ifstream asmFile(assemblyFile);
     if (!asmFile) {
-        std::cerr << "Error: Could not open assembly file for reading." << std::endl;
-        return 1;
+        assembler.error("ASM00004", assemblyFile);
     }
 
     std::string line;
@@ -111,61 +133,64 @@ int main() {
 
         size_t currentIndex = 0;
         size_t toAdd = 0;
-
-        if (tokens[currentIndex] == "mval" && tokens.size() > 1 && tokens[1].rfind("mb", 0) == 0) {
-            tokens[currentIndex] = tokens[currentIndex] + " " + tokens[currentIndex + 1];
-            toAdd = 2;
-        } else {
-            toAdd = 1;
-        }
-
         std::vector<uint8_t> currentData;
+        std::string mnemonic;
+
         try {
-            currentData = assembler.getOpcode(tokens[currentIndex]);
-            std::cout << "[Line " << lineNumber << "] Opcode for \"" << tokens[currentIndex] << "\":";
-            for (auto b : currentData) std::cout << " " << std::hex << (int)b;
-            std::cout << std::dec << std::endl;
-        } catch (const std::out_of_range&) {
-            std::cerr << "[Line " << lineNumber << "] ERROR: Opcode \"" << tokens[currentIndex] << "\" not found in map!" << std::endl;
-            continue;
-        }
 
-        assembler.binaryToWrite.insert(
-            assembler.binaryToWrite.end(),
-            currentData.begin(),
-            currentData.end()
-        );
-
-        if (Assembler::operandInfoMnemonics.find(tokens[0]) != Assembler::operandInfoMnemonics.end()) {
-            currentIndex += toAdd;
-            if (currentIndex >= tokens.size()) {
-                std::cerr << "[Line " << lineNumber << "] ERROR: No operand descriptor after mnemonic!" << std::endl;
-                continue;
+            if (tokens[currentIndex] == "nac") {
+                currentData = assembler.getOpcode(tokens[currentIndex]);
+                pushData(currentData);
             }
 
-            try {
+            else if (tokens[currentIndex] == "mval" &&
+                    Assembler::operandInfoMnemonics.find(tokens[currentIndex] + " " + tokens[currentIndex + 1]) != Assembler::operandInfoMnemonics.end()) {
+                
+                mnemonic = tokens[currentIndex] + " " + tokens[currentIndex + 1];
+                        
+                currentData = assembler.getOpcode(mnemonic);
+                pushData(currentData);
+
+                currentIndex += 2;
+
                 currentData = assembler.getOperandInfoBytes(tokens[currentIndex]);
-                std::cout << "[Line " << lineNumber << "] Operand bytes for \"" << tokens[currentIndex] << "\":";
-                for (auto b : currentData) std::cout << " " << std::hex << (int)b;
-                std::cout << std::dec << std::endl;
-            } catch (const std::out_of_range&) {
-                std::cerr << "[Line " << lineNumber << "] ERROR: Operand \"" << tokens[currentIndex] << "\" not found in map!" << std::endl;
-                continue;
+                pushData(currentData);
             }
 
-            assembler.binaryToWrite.insert(
-                assembler.binaryToWrite.end(),
-                currentData.begin(),
-                currentData.end()
-            );
+            else if (tokens[currentIndex] == "wait") {
+                currentData = assembler.getOpcode(tokens[currentIndex]);
+                pushData(currentData);
+            }
+
+            else if (tokens[currentIndex] == "stop") {
+                currentData = assembler.getOpcode(tokens[currentIndex]);
+                pushData(currentData);
+            }
+
+            else if (tokens[currentIndex] == "sleepms") {
+                currentData = assembler.getOpcode(tokens[currentIndex]);
+                pushData(currentData);
+            }
+
+            else if (tokens[currentIndex] == "sleepins") {
+                currentData = assembler.getOpcode(tokens[currentIndex]);
+                pushData(currentData);
+            }
+
+            else {
+                assembler.error("ASM00005", assemblyFile + "; line: " + std::to_string(lineNumber));
+            }
+        }
+        catch (const std::exception& e) {
+            assembler.error("ASM00006", assemblyFile + "; line: " + std::to_string(lineNumber));
         }
     }
 
     std::ofstream outFile(outputFile, std::ios::binary);
     if (!outFile) {
-        std::cerr << "Error: Could not open output file for writing." << std::endl;
-        return 1;
+        assembler.error("ASM00007", outputFile);
     }
+
     outFile.write(reinterpret_cast<const char*>(assembler.binaryToWrite.data()), assembler.binaryToWrite.size());
     outFile.close();
 

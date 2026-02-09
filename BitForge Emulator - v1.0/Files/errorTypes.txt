@@ -17,3 +17,12 @@ RO08AOOB - Address out of bounds on readBytesVector request.       Info is addre
 
 CP01CWTR - Cannot write to Read Only Memory.                       Info is address.
 CP02CWTR - Cannot write to Read Only Memory.                       Info is address.
+
+Assembler:
+ASM00001 - File is corrupted or empty.                             Info is file name.
+ASM00002 - File has no extension.                                  Info is file name.
+ASM00003 - File has incorrect extension.                           Info is file name & expected extension.
+ASM00004 - Cannot read from file.                                  Info is file name.
+ASM00005 - Something went wrong.                                   Info is file name & line.
+ASM00006 - Caught exception.                                       Info is file name & line.
+ASM00007 - Cannot write into file.                                 Info is file name.

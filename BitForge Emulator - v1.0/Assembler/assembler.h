@@ -101,6 +101,8 @@ struct Assembler {
         {"mval mb64", {0x13}}, {"wait", {0xFC}}, {"stop", {0xFD}}, {"sleepms", {0xFE}}, {"sleepins", {0xFF}},
     };
 
+    void pushData(std::vector<uint8_t> data);
+
     void checkFileExtension(std::string fileName, std::string fileExtension);
 
     std::string trim(const std::string& str);
@@ -108,6 +110,8 @@ struct Assembler {
 
     std::vector<uint8_t> getOpcode(std::string mnemonic);
     std::vector<uint8_t> getOperandInfoBytes(std::string operandDescriptor);
+
+    void error(std::string errorType, std::string info) const;
 };
 
 extern Assembler assembler;

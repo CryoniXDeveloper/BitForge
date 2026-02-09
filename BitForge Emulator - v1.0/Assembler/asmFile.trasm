@@ -1,9 +1,9 @@
 nac
-mval mb8 r8<mi32< 8b237 32b283971
+mval mb8 r8<mi32<
 mval mb16 mi16<<
 mval mb32 mr8<i64<
 mval mb64 mi64<r8<
 wait
 stop
 sleepms
-sleepins wait
+sleepins

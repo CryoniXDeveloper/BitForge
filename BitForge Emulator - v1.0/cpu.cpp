@@ -135,15 +135,9 @@ void CPU::decode() {
             break;
 
         case 0xFE:
-            operands64.push_back(read64(instructionPointer));
-
-            instructionSize += 8;
             break;
 
         case 0xFF:
-            operands64.push_back(read64(instructionPointer));
-
-            instructionSize += 8;
             break;
     }
 }
@@ -168,16 +162,9 @@ void CPU::execute() {
             break;
 
         case 0xFE:
-            sleepMicroseconds(operands64[0]);
-
-            instructionPointer += instructionSize;
             break;
 
         case 0xFF:
-            setFlagBit(FLAG_SLEEP, true);
-            sleepCounter = operands64[0];
-
-            instructionPointer += instructionSize;
             break;
     }
 }
@@ -246,16 +233,4 @@ void CPU::error(std::string errorType, std::string info) const {
     std::cout << returnString;
     std::cin.get();
     exit(0);
-}
-
-void CPU::sleepMicroseconds(uint64_t microseconds) {
-    LARGE_INTEGER freq, start, now;
-    QueryPerformanceFrequency(&freq);
-    QueryPerformanceCounter(&start);
-
-    double waitTicks = (microseconds / 1'000'000.0) * freq.QuadPart;
-
-    do {
-        QueryPerformanceCounter(&now);
-    } while ((now.QuadPart - start.QuadPart) < waitTicks);
 }

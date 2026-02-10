@@ -155,6 +155,14 @@ int main() {
 
                 currentData = assembler.getOperandInfoBytes(tokens[currentIndex]);
                 pushData(currentData);
+                
+                int size1 = Assembler::operandMapBytes.at(tokens[currentIndex]).size1;
+                int size2 = Assembler::operandMapBytes.at(tokens[currentIndex]).size2;
+
+                currentIndex += 1;
+
+                currentData = assembler.getOperandInfoBytes(tokens[currentIndex]);
+                pushData(currentData);
             }
 
             else if (tokens[currentIndex] == "wait") {

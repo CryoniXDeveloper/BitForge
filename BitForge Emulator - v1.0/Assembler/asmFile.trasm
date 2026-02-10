@@ -1,9 +1,9 @@
 nac
-mval mb8 r8<mi32<
+mval mb8 r8<mi32< 62 29817928
 mval mb16 mi16<<
 mval mb32 mr8<i64<
 mval mb64 mi64<r8<
 wait
 stop
-sleepms
-sleepins
+sleepms r8< 10
+sleepins mi64< 10029837223

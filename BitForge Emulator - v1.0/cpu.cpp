@@ -170,59 +170,101 @@ void CPU::execute() {
 }
 
 uint8_t CPU::read8(uint64_t address) {
-    if (address >= Motherboard::ROM_START && address <= Motherboard::ROM_END)
+    if (address >= Motherboard::ROM_START && address <= Motherboard::ROM_END) {
         return rom->read8(address);
-
-    if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END)
+    }
+    
+    else if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END) {
         return memory->read8(address);
+    }
+
+    else {
+        error("CP03AOOB", "Absolute address: " + std::to_string(address));
+    }
 }
 
 uint16_t CPU::read16(uint64_t address) {
-    if (address >= Motherboard::ROM_START && address <= Motherboard::ROM_END)
+    if (address >= Motherboard::ROM_START && address <= Motherboard::ROM_END) {
         return rom->read16(address);
-
-    if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END)
+    }
+    
+    else if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END) {
         return memory->read16(address);
+    }
+    
+    else {
+        error("CP04AOOB", "Absolute address: " + std::to_string(address));
+    }
 }
 
 uint32_t CPU::read32(uint64_t address) {
-    if (address >= Motherboard::ROM_START && address <= Motherboard::ROM_END)
+    if (address >= Motherboard::ROM_START && address <= Motherboard::ROM_END) {
         return rom->read32(address);
-
-    if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END)
+    }
+    
+    else if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END) {
         return memory->read32(address);
+    }
+    
+    else {
+        error("CP05AOOB", "Absolute address: " + std::to_string(address));
+    }
 }
 
 uint64_t CPU::read64(uint64_t address) {
-    if (address >= Motherboard::ROM_START && address <= Motherboard::ROM_END)
+    if (address >= Motherboard::ROM_START && address <= Motherboard::ROM_END) {
         return rom->read64(address);
-
-    if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END)
+    }
+    
+    else if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END) {
         return memory->read64(address);
-}
-
-void CPU::write8(uint64_t address, uint8_t value) {
-    if (address >= Motherboard::ROM_START && address <= Motherboard::ROM_END)
-        CPU::error("CP01CWTR", "Absolute address: " + std::to_string(address));
-
-    if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END)
-        memory->write8(address, value);
+    }
+    
+    else {
+        error("CP06AOOB", "Absolute address: " + std::to_string(address));
+    }
 }
 
 std::vector<uint8_t> CPU::readBytesVector(uint64_t start, size_t length) {
-    if (start >= Motherboard::ROM_START && start <= Motherboard::ROM_END)
+    if (start >= Motherboard::ROM_START && start <= Motherboard::ROM_END) {
         return rom->readBytesVector(start, length);
-
-    if (start >= Motherboard::RAM_START && start <= Motherboard::RAM_END)
+    }
+    
+    else if (start >= Motherboard::RAM_START && start <= Motherboard::RAM_END) {
         return memory->readBytesVector(start, length);
+    }
+    
+    else {
+        error("CP07AOOB", "Absolute address: " + std::to_string(start));
+    }
+}
+
+void CPU::write8(uint64_t address, uint8_t value) {
+    if (address >= Motherboard::ROM_START && address <= Motherboard::ROM_END) {
+        error("CP01CWTR", "Absolute address: " + std::to_string(address));
+    }
+    
+    else if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END) {
+        memory->write8(address, value);
+    }
+    
+    else {
+        error("CP08AOOB", "Absolute address: " + std::to_string(address));
+    }
 }
 
 void CPU::writeBytesVector(uint64_t start, const std::vector<uint8_t>& data) {
-    if (start >= Motherboard::ROM_START && start <= Motherboard::ROM_END)
-        CPU::error("CP02CWTR", "Absolute address: " + std::to_string(start));
-
-    if (start >= Motherboard::RAM_START && start <= Motherboard::RAM_END)
+    if (start >= Motherboard::ROM_START && start <= Motherboard::ROM_END) {
+        error("CP02CWTR", "Absolute address: " + std::to_string(start));
+    }
+    
+    else if (start >= Motherboard::RAM_START && start <= Motherboard::RAM_END) {
         memory->writeBytesVector(start, data);
+    }
+    
+    else {
+        error("CP09AOOB", "Absolute address: " + std::to_string(start));
+    }
 }
 
 void CPU::error(std::string errorType, std::string info) const {

@@ -1,1 +1,8 @@
-mval mb8 r8<mi32< 62 29817928
+mval mb16 r8<i16< 0b1010 0xa38e
+
+sleepms r8< 10
+
+mval mb8 r8<i8< 0b1100 0x20
+mval mb8 mi8<i8< 0x20 0xA3
+
+sleepins mr8< 12

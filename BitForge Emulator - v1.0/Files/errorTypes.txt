@@ -17,6 +17,13 @@ RO08AOOB - Address out of bounds on readBytesVector request.       Info is addre
 
 CP01CWTR - Cannot write to Read Only Memory.                       Info is address.
 CP02CWTR - Cannot write to Read Only Memory.                       Info is address.
+CP03AOOB - Address out of bounds on read8 request.                 Info is address.
+CP04AOOB - Address out of bounds on read16 request.                Info is address.
+CP05AOOB - Address out of bounds on read32 request.                Info is address.
+CP06AOOB - Address out of bounds on read64 request.                Info is address.
+CP07AOOB - Address out of bounds on readBytesVector request.       Info is address.
+CP08AOOB - Address out of bounds on write8 request.                Info is address.
+CP09AOOB - Address out of bounds on writeBytesVector request.      Info is address.
 
 Assembler:
 ASM00001 - File is corrupted or empty.                             Info is file name.

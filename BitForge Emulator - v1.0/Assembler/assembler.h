@@ -90,6 +90,17 @@ struct Assembler {
         {"mr8<mi64<", {0x3A}},
         {"mr8<mr8<",  {0x3B}},
         {"mr8<<",     {0x3B}},
+
+        {"r8<",       {0x3C}},
+        {"i8<",       {0x3D}},
+        {"i16<",      {0x3E}},
+        {"i32<",      {0x3F}},
+        {"i64<",      {0x40}},
+        {"mi8<",      {0x41}},
+        {"mi16<",     {0x42}},
+        {"mi32<",     {0x43}},
+        {"mi64<",     {0x44}},
+        {"mr8<",      {0x45}},
     };
 
     inline static const std::unordered_map<std::string, operandInfo> operandMapBits = {
@@ -164,6 +175,18 @@ struct Assembler {
         {"mr8<mi64<", {"mr", 8, "mi", 64}},   // 0x3A
         {"mr8<mr8<",  {"mr", 8, "mr", 8}},    // 0x3B
         {"mr8<<",     {"mr", 8, "mr", 8}},    // 0x3B
+
+        {"r8<",       {"r", 8,  "", 0}},      // 0x3C
+        {"i8<",       {"i", 8,  "", 0}},      // 0x3D
+        {"i16<",      {"i", 16, "", 0}},      // 0x3E
+        {"i32<",      {"i", 32, "", 0}},      // 0x3F
+        {"i64<",      {"i", 64, "", 0}},      // 0x40
+        {"mi8<",      {"mi", 8,  "", 0}},     // 0x41
+        {"mi16<",     {"mi", 16, "", 0}},     // 0x42
+        {"mi32<",     {"mi", 32, "", 0}},     // 0x43
+        {"mi64<",     {"mi", 64, "", 0}},     // 0x44
+        {"mr8<",      {"mr", 8,  "", 0}},     // 0x45
+
     };
 
     inline static const std::unordered_map<std::string, operandInfo> operandMapBytes = {
@@ -238,6 +261,18 @@ struct Assembler {
         {"mr8<mi64<", {"mr", 1, "mi", 8}},
         {"mr8<mr8<",  {"mr", 1, "mr", 1}},
         {"mr8<<",     {"mr", 1, "mr", 1}},
+
+        {"r8<",       {"r", 1, "", 0}},
+        {"i8<",       {"i", 1, "", 0}},
+        {"i16<",      {"i", 2, "", 0}},
+        {"i32<",      {"i", 4, "", 0}},
+        {"i64<",      {"i", 8, "", 0}},
+        {"mi8<",      {"mi", 1, "", 0}},
+        {"mi16<",     {"mi", 2, "", 0}},
+        {"mi32<",     {"mi", 4, "", 0}},
+        {"mi64<",     {"mi", 8, "", 0}},
+        {"mr8<",      {"mr", 1, "", 0}},
+
     };
 
     inline static const std::unordered_set<std::string> operandInfoMnemonics = {

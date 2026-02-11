@@ -201,10 +201,34 @@ int main() {
             else if (tokens[currentIndex] == "sleepms") {
                 currentData = assembler.getOpcode(tokens[currentIndex]);
                 pushData(currentData);
+
+                currentIndex += 1;
+
+                currentData = assembler.getOperandInfoBytes(tokens[currentIndex]);
+                pushData(currentData);
+                
+                int size1 = Assembler::operandMapBytes.at(tokens[currentIndex]).size1;
+
+                currentIndex += 1;
+                
+                currentData = intToBytes(tokens[currentIndex], size1);
+                pushData(currentData);
             }
 
             else if (tokens[currentIndex] == "sleepins") {
                 currentData = assembler.getOpcode(tokens[currentIndex]);
+                pushData(currentData);
+
+                currentIndex += 1;
+
+                currentData = assembler.getOperandInfoBytes(tokens[currentIndex]);
+                pushData(currentData);
+                
+                int size1 = Assembler::operandMapBytes.at(tokens[currentIndex]).size1;
+
+                currentIndex += 1;
+                
+                currentData = intToBytes(tokens[currentIndex], size1);
                 pushData(currentData);
             }
 

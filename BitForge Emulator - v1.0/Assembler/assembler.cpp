@@ -85,6 +85,24 @@ void pushData(std::vector<uint8_t> data) {
     );
 }
 
+std::vector<uint8_t> intToBytes(const std::string& valueStr, int amountOfBytes) {
+    std::vector<uint8_t> result;
+    int64_t value;
+
+    if (valueStr.size() > 2 && valueStr[0] == '0' && valueStr[1] == 'b') {
+        value = std::stoll(valueStr.substr(2), nullptr, 2);
+    } else {
+        value = std::stoll(valueStr, nullptr, 0);
+    }
+
+    for (int x = 0; x < amountOfBytes; x++) {
+        result.push_back(static_cast<uint8_t>(value & 0xFF));
+        value >>= 8;
+    }
+
+    return result;
+}
+
 int main() {
     std::cout << "Enter the path of the assembly file to be converted into binary: ";
 
@@ -160,8 +178,13 @@ int main() {
                 int size2 = Assembler::operandMapBytes.at(tokens[currentIndex]).size2;
 
                 currentIndex += 1;
+                
+                currentData = intToBytes(tokens[currentIndex], size1);
+                pushData(currentData);
 
-                currentData = assembler.getOperandInfoBytes(tokens[currentIndex]);
+                currentIndex += 1;
+                
+                currentData = intToBytes(tokens[currentIndex], size2);
                 pushData(currentData);
             }
 

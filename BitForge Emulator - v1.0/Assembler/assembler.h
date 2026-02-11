@@ -249,6 +249,8 @@ struct Assembler {
         {"mval mb64", {0x13}}, {"wait", {0xFC}}, {"stop", {0xFD}}, {"sleepms", {0xFE}}, {"sleepins", {0xFF}},
     };
 
+    std::vector<uint8_t> intToBytes(std::string value, int amountOfBytes);
+
     void pushData(std::vector<uint8_t> data);
 
     void checkFileExtension(std::string fileName, std::string fileExtension);

@@ -5,4 +5,4 @@ sleepms r8< 10
 mval mb8 r8<i8< 0b1100 0x20
 mval mb8 mi8<i8< 0x20 0xA3
 
-sleepins mr8< 12
+sleepsec mr8< 12

@@ -1,10 +1,11 @@
 0x00 - nac
-0x01 to 0x0F - paging opcode
+0x01 to 0x0F - extended opcode
 0x10 - mval mb8 {descriptor} {address} {value}
 0x11 - mval mb16
 0x12 - mval mb32
 0x13 - mval mb64
+0x14 - mval mb64plus {descriptor} {address} {value}
 0xFC - wait
 0xFD - stop
 0xFE - sleepms {descriptor} {value}
-0xFF - sleepins {descriptor} {value}
+0xFF - sleepsec {descriptor} {value}

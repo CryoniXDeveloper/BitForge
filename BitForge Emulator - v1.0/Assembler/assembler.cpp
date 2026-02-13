@@ -215,7 +215,7 @@ int main() {
                 pushData(currentData);
             }
 
-            else if (tokens[currentIndex] == "sleepins") {
+            else if (tokens[currentIndex] == "sleepsec") {
                 currentData = assembler.getOpcode(tokens[currentIndex]);
                 pushData(currentData);
 

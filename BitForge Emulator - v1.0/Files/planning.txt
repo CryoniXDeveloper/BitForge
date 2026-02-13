@@ -1,0 +1,57 @@
+check now many mnemonics x86_64 has and check them all.
+
+? how will i miss no mnemonics?
+
+ - invent new mnemonics if anything
+
+ - implement most of the mnemonics in the table, i dont have to write about everysingle one for now.
+
+ ? what else could i have as a mnemonic
+
+
+Today, introduce most of the mnemoniscs and put omst of the most mnemonics introduced into TrASM Complete Guide.
+Think about implementing mb24, mb40, mb48, mb56. - NO
+
+Make mval mb64plus More than 64 bits of data.
+Before we would use registers to move big amounts of data, we could scratch that idea and acutally used betterr thingas as tihs.
+
+To also use the general registers better.
+
+mval mb64plus - YES
+
+directives.
+
+Put % infront of the mnemonic to allow inputing missing operands - %mval mbXX ...
+How to set a default value of an operand?
+Like this:
+
+set %di def.od r8<mi32<
+
+Using r8<mi32< as an examéple value
+
+Now to reset it:
+
+set %di def.od null
+
+Extended code should not be seperated into groups.
+
+This is ver usefull for repeated operands, or loops in general,
+We dont waste time wirth parsing a value, only checking if its there or no
+ if you have for example 3 operand mnemonic in an instruction and you have set a default value for operand 1 and operand 3,
+ to not waste time to decide wheter the inputed value should be replaxcing a default one or inputing an empty one,
+ you have to put as prefix for each value you put under a directive mnemonic, so like this: (we use a default value for operand descriptor and operand 1)
+
+ %mval mb32 1o.0x09239872
+
+This is kinda fast to parse, You get the 1st 2 letters, if its 1o or any number then o, you replace that operand with it.
+
+ill probably change it inte future, that you will be able to ban some directives for a moment if youre goign to replace them. like this:
+
+%pause def.od
+%resume def.od
+
+that way you could impenet a specific one for some moment. Maybe it xcould  be int he isntruction it self as:
+
+%mval mb32 rule -def.od r8<mi16< 1o.0xFFF
+
+tzhis might be too complicated for parsinbg tho so idk, it may lose the point in speed

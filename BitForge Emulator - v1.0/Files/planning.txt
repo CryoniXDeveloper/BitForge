@@ -55,3 +55,9 @@ that way you could impenet a specific one for some moment. Maybe it xcould  be i
 %mval mb32 rule -def.od r8<mi16< 1o.0xFFF
 
 tzhis might be too complicated for parsinbg tho so idk, it may lose the point in speed
+
+
+
+
+IMPORTANT
+make sometihng to disable errors, such as @err throw widthSpecifierTooSmallForImmediate false

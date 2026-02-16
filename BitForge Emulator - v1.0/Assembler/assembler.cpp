@@ -34,6 +34,24 @@ std::string Assembler::trim(const std::string& str) {
     return str.substr(start, end - start);
 }
 
+std::vector<std::string> Assembler::splitOperandDescriptor(const std::string& str) {
+    std::vector<std::string> parts;
+    size_t start = 0;
+    size_t pos = str.find('<');
+
+    while (pos != std::string::npos) {
+        parts.push_back(str.substr(start, pos - start + 1));
+        start = pos + 1;
+        pos = str.find('<', start);
+    }
+
+    if (start < str.size()) {
+        parts.push_back(str.substr(start));
+    }
+
+    return parts;
+}
+
 std::vector<std::string> Assembler::split(const std::string& str) {
     std::vector<std::string> tokens;
     size_t i = 0;
@@ -63,7 +81,7 @@ std::vector<uint8_t> Assembler::getOpcode(std::string mnemonic) {
     return mnemonicOpcode.at(mnemonic);
 }
 
-std::vector<uint8_t> Assembler::getOperandInfoBytes(std::string operandDescriptor) {
+std::vector<uint8_t> Assembler::getOperandInfoByte(std::string operandDescriptor) {
     return operandByte.at(operandDescriptor);
 }
 
@@ -71,8 +89,10 @@ void Assembler::error(std::string errorType, std::string info) const {
     std::string returnString = "ERROR [" + errorType + "]";
     if (info != "")
         returnString += " - More info: " + info;
-    returnString += "\n\nFind out more in errorTypes.txt.\nStopping execution...";
-    std::cout << returnString;
+    returnString += "\n\nFind out more in errorTypes.txt.\nStopping execution...\n";
+    
+    std::cout << returnString << std::endl; 
+    
     std::cin.get();
     exit(0);
 }
@@ -87,12 +107,27 @@ void pushData(std::vector<uint8_t> data) {
 
 std::vector<uint8_t> intToBytes(const std::string& valueStr, int amountOfBytes) {
     std::vector<uint8_t> result;
-    int64_t value;
+    uint64_t value;
 
-    if (valueStr.size() > 2 && valueStr[0] == '0' && valueStr[1] == 'b') {
-        value = std::stoll(valueStr.substr(2), nullptr, 2);
-    } else {
-        value = std::stoll(valueStr, nullptr, 0);
+    try {
+        if (valueStr.size() > 2 && valueStr[0] == '0' && valueStr[1] == 'b') {
+            // Binary
+            value = std::stoull(valueStr.substr(2), nullptr, 2);
+        } else if (valueStr.size() > 2 && valueStr[0] == '0' && valueStr[1] == 'x') {
+            // Hex
+            value = std::stoull(valueStr.substr(2), nullptr, 16);
+        } else {
+            // Decimal
+            value = std::stoull(valueStr, nullptr, 10);
+        }
+    } catch (const std::exception& e) {
+        assembler.error("ASM00005", "Invalid number: " + valueStr);
+    }
+
+    uint64_t maxValue = (amountOfBytes >= 8) ? 0xFFFFFFFFFFFFFFFF : ((1ULL << (8 * amountOfBytes)) - 1);
+
+    if (value > maxValue) {
+        assembler.error("ASM00005", "Operand value " + valueStr + " too large for " + std::to_string(amountOfBytes) + " byte(s)");
     }
 
     for (int x = 0; x < amountOfBytes; x++) {
@@ -154,6 +189,9 @@ int main() {
         std::vector<uint8_t> currentData;
         std::string mnemonic;
 
+        std::string operandDescriptor1;
+        std::string operandDescriptor2;
+
         try {
 
             if (tokens[currentIndex] == "nac") {
@@ -161,30 +199,77 @@ int main() {
                 pushData(currentData);
             }
 
-            else if (tokens[currentIndex] == "mval" &&
-                    Assembler::operandInfoMnemonics.find(tokens[currentIndex] + " " + tokens[currentIndex + 1]) != Assembler::operandInfoMnemonics.end()) {
-                
-                mnemonic = tokens[currentIndex] + " " + tokens[currentIndex + 1];
-                        
+            else if (Assembler::mvalMnemonics.find(tokens.at(currentIndex)) != Assembler::mvalMnemonics.end()) {
+                mnemonic = tokens.at(currentIndex);
                 currentData = assembler.getOpcode(mnemonic);
                 pushData(currentData);
 
-                currentIndex += 2;
+                currentIndex += 1;
+                if (currentIndex >= tokens.size()) {
+                    assembler.error("ASM00005", "Missing descriptors at line " + std::to_string(lineNumber));
+                }
 
-                currentData = assembler.getOperandInfoBytes(tokens[currentIndex]);
-                pushData(currentData);
+                std::vector<std::string> descriptors = assembler.splitOperandDescriptor(tokens.at(currentIndex));
                 
-                int size1 = Assembler::operandMapBytes.at(tokens[currentIndex]).size1;
-                int size2 = Assembler::operandMapBytes.at(tokens[currentIndex]).size2;
+                if (descriptors.empty()) {
+                    assembler.error("ASM00005", "Invalid descriptor format at line " + std::to_string(lineNumber));
+                }
+
+                operandDescriptor1 = descriptors.at(0);
+                
+                if (descriptors.size() > 1) {
+                    operandDescriptor2 = descriptors.at(1);
+                } else {
+                    operandDescriptor2 = operandDescriptor1;
+                }
+
+                if (operandDescriptor2 == "<" || operandDescriptor2.empty()) {
+                    operandDescriptor2 = operandDescriptor1;
+                }
+
+                currentData = assembler.getOperandInfoByte(operandDescriptor1);
+                pushData(currentData);
+
+                int size1 = Assembler::operandMapBytes.at(operandDescriptor1).size;
+                std::string type1 = Assembler::operandMapBytes.at(operandDescriptor1).type;
+
+                currentData = assembler.getOperandInfoByte(operandDescriptor2);
+                pushData(currentData);
+
+                int size2 = Assembler::operandMapBytes.at(operandDescriptor2).size;
+                std::string type2 = Assembler::operandMapBytes.at(operandDescriptor2).type;
+
+                if (mnemonic.rfind("mval", 0) == 0 && type2 == "i") {
+                    int expectedSize = std::stoi(mnemonic.substr(4)) / 8;
+                    if (size2 != expectedSize) {
+                        assembler.error("ASM00005", "Immediate type mismatch at line " + std::to_string(lineNumber));
+                    }
+                }
 
                 currentIndex += 1;
-                
-                currentData = intToBytes(tokens[currentIndex], size1);
+                if (currentIndex >= tokens.size()) {
+                    assembler.error("ASM00005", "Missing 1st operand value at line " + std::to_string(lineNumber));
+                }
+
+                currentData = intToBytes(tokens.at(currentIndex), size1);
+
+                if ((type1 == "r" || type1 == "mr") && static_cast<int>(currentData[0]) > assembler.registers64max) {
+                    assembler.error("ASM00005", "No such register; line " + std::to_string(lineNumber));
+                }
+
                 pushData(currentData);
 
                 currentIndex += 1;
-                
-                currentData = intToBytes(tokens[currentIndex], size2);
+                if (currentIndex >= tokens.size()) {
+                    assembler.error("ASM00005", "Missing 2nd operand value at line " + std::to_string(lineNumber));
+                }
+
+                currentData = intToBytes(tokens.at(currentIndex), size2);
+
+                if ((type2 == "r" || type2 == "mr") && static_cast<int>(currentData[0]) > assembler.registers64max) {
+                    assembler.error("ASM00005", "No such register; line " + std::to_string(lineNumber));
+                }
+
                 pushData(currentData);
             }
 
@@ -204,10 +289,10 @@ int main() {
 
                 currentIndex += 1;
 
-                currentData = assembler.getOperandInfoBytes(tokens[currentIndex]);
+                currentData = assembler.getOperandInfoByte(tokens[currentIndex]);
                 pushData(currentData);
                 
-                int size1 = Assembler::operandMapBytes.at(tokens[currentIndex]).size1;
+                int size1 = Assembler::operandMapBytes.at(tokens[currentIndex]).size;
 
                 currentIndex += 1;
                 
@@ -221,10 +306,10 @@ int main() {
 
                 currentIndex += 1;
 
-                currentData = assembler.getOperandInfoBytes(tokens[currentIndex]);
+                currentData = assembler.getOperandInfoByte(tokens[currentIndex]);
                 pushData(currentData);
                 
-                int size1 = Assembler::operandMapBytes.at(tokens[currentIndex]).size1;
+                int size1 = Assembler::operandMapBytes.at(tokens[currentIndex]).size;
 
                 currentIndex += 1;
                 
@@ -236,12 +321,13 @@ int main() {
                 assembler.error("ASM00005", assemblyFile + "; line: " + std::to_string(lineNumber));
             }
         }
+
         catch (const std::exception& e) {
-            assembler.error("ASM00006", assemblyFile + "; line: " + std::to_string(lineNumber));
+            assembler.error("ASM00006", assemblyFile + "; line: " + std::to_string(lineNumber) + "; " + e.what());
         }
     }
 
-    std::ofstream outFile(outputFile, std::ios::binary);
+    std::ofstream outFile(outputFile, std::ios::binary | std::ios::trunc);
     if (!outFile) {
         assembler.error("ASM00007", outputFile);
     }

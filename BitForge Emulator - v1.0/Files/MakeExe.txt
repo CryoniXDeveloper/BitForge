@@ -1,11 +1,11 @@
 Emulator:
     cd "C:\Users\Admin\Desktop\Prog. 2026\BitForge Emulator - v1.0"
-    g++ *.cpp -o computer.exe
+    g++ *.cpp -o computer.exe -std=c++23
 
 Testing:
     cd "C:\Users\Admin\Desktop\Prog. 2026\BitForge Emulator - v1.0\Testing"
-    g++ Test.cpp ../ram.cpp ../rom.cpp -o Test.exe
+    g++ Test.cpp ../ram.cpp ../rom.cpp -o Test.exe -std=c++23
 
 Assembler:
     cd "C:\Users\Admin\Desktop\Prog. 2026\BitForge Emulator - v1.0\Assembler"
-    g++ assembler.cpp ../rom.cpp -o assembler.exe
+    g++ assembler.cpp ../rom.cpp -o assembler.exe -std=c++23

@@ -1,0 +1,17 @@
+mval8 operates strictly on 8-bit data.
+
+When the destination is a register
+→ Only the lower 8 bits of that register are written.
+→ Values larger than 8 bits are NOT allowed.
+
+When the source is an immediate
+→ The immediate must fit in 8 bits (0x00–0xFF).
+→ Any larger value results in an error.
+
+When using direct memory addressing
+→ The address itself may be up to 64 bits.
+→ Exactly 8 bits are read from that memory location.
+
+When using indirect memory addressing
+→ The full 64-bit register is used as the address.
+→ Exactly 8 bits are read from the computed address.

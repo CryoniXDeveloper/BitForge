@@ -43,7 +43,6 @@ void CPU::start() {
 
 void CPU::fetch() {
     opcode = read8(instructionPointer);
-    instructionSize = 0;
 
     if (opcode == 0x00 || opcode >= 0x10) {
         instructionPointer++;
@@ -59,6 +58,11 @@ void CPU::fetch() {
         instructionPointer++;
         return;
     }
+}
+
+template<typename T>
+void CPU::pushData(T& data, size_t length) {
+    return;
 }
 
 void CPU::decode() {
@@ -78,57 +82,52 @@ void CPU::decode() {
             break;
 
         case 0x10:
-            mnemonicType = read8(instructionPointer);
-
-            op1Type = mnemonicMoveOperand1Types.at(mnemonicType);
-            op1Size = mnemonicMoveOperand1Bytes.at(mnemonicType);
-            
-            op2Type = mnemonicMoveOperand2Types.at(mnemonicType);
-            op2Size = mnemonicMoveOperand2Bytes.at(mnemonicType);
-
+            mnemonicType1 = read8(instructionPointer);
+            instructionPointer++;
+            mnemonicType2 = read8(instructionPointer);
             instructionPointer++;
 
-            switch (op1Size) {
-                case 1:
-                    operands8.push_back(read8(instructionPointer));
-                    instructionSize++;
+            op1Type = mnemonicMoveOperandTypes.at(mnemonicType1);
+            op1Size = mnemonicMoveOperandBytes.at(mnemonicType1);
+            
+            op2Type = mnemonicMoveOperandTypes.at(mnemonicType2);
+            op2Size = mnemonicMoveOperandBytes.at(mnemonicType2);
 
-                case 2:
-                    operands16.push_back(read16(instructionPointer));
-                    instructionSize += 2;
+            if (op1Size == 1) {
+                operands8.push_back(read8(instructionPointer));
 
-                case 4:
-                    operands32.push_back(read32(instructionPointer));
-                    instructionSize += 4;
+            } else if (op1Size == 2) {
+                operands16.push_back(read16(instructionPointer));
 
-                case 8:
-                    operands64.push_back(read64(instructionPointer));
-                    instructionSize += 8;
+            } else if (op1Size == 4) {
+                operands32.push_back(read32(instructionPointer));
+
+            } else if (op1Size == 8) {
+                operands64.push_back(read64(instructionPointer));
+
+            } else {
+                operandsVector.push_back(readBytesVector(instructionPointer, op1Size));
             }
 
-            instructionPointer += instructionSize;
-            instructionSize = 0;
+            instructionPointer += op1Size;
 
-            switch (op2Size) {
-                case 1:
-                    operands8.push_back(read8(instructionPointer));
-                    instructionSize++;
+            if (op2Size == 1) {
+                operands8.push_back(read8(instructionPointer));
 
-                case 2:
-                    operands16.push_back(read16(instructionPointer));
-                    instructionSize += 2;
+            } else if (op2Size == 2) {
+                operands16.push_back(read16(instructionPointer));
 
-                case 4:
-                    operands32.push_back(read32(instructionPointer));
-                    instructionSize += 4;
+            } else if (op2Size == 4) {
+                operands32.push_back(read32(instructionPointer));
 
-                case 8:
-                    operands64.push_back(read64(instructionPointer));
-                    instructionSize += 8;
+            } else if (op2Size == 8) {
+                operands64.push_back(read64(instructionPointer));
+
+            } else {
+                operandsVector.push_back(readBytesVector(instructionPointer, op2Size));
             }
 
-            instructionPointer += instructionSize;
-            instructionSize = 0;
+            instructionPointer += op2Size;
             break;
 
         case 0xFD:
@@ -152,6 +151,7 @@ void CPU::execute() {
 
             if (op1Type == "r") {
             }
+
             else if (op1Type == "mi") {
             }
             else if (op1Type == "mr") {
@@ -180,6 +180,7 @@ uint8_t CPU::read8(uint64_t address) {
 
     else {
         error("CP03AOOB", "Absolute address: " + std::to_string(address));
+        return 0;
     }
 }
 
@@ -194,6 +195,7 @@ uint16_t CPU::read16(uint64_t address) {
     
     else {
         error("CP04AOOB", "Absolute address: " + std::to_string(address));
+        return 0;
     }
 }
 
@@ -208,6 +210,7 @@ uint32_t CPU::read32(uint64_t address) {
     
     else {
         error("CP05AOOB", "Absolute address: " + std::to_string(address));
+        return 0;
     }
 }
 
@@ -222,6 +225,7 @@ uint64_t CPU::read64(uint64_t address) {
     
     else {
         error("CP06AOOB", "Absolute address: " + std::to_string(address));
+        return 0;
     }
 }
 
@@ -236,6 +240,7 @@ std::vector<uint8_t> CPU::readBytesVector(uint64_t start, size_t length) {
     
     else {
         error("CP07AOOB", "Absolute address: " + std::to_string(start));
+        return {0};
     }
 }
 

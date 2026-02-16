@@ -1,8 +1,2 @@
-mval mb16 r8<i16< 0b1010 0xa38e
-
-sleepms r8< 10
-
-mval mb8 r8<i8< 0b1100 0x20
-mval mb8 mi8<i8< 0x20 0xA3
-
-sleepsec mr8< 12
+mval16 mi16<i16< 0x01FF 511
+mval64 mi64<i64< 0xFFFFFFFFFFFFFFFF 0xFFFFFFFFFFFFFFFF

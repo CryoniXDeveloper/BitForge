@@ -194,8 +194,8 @@ int main() {
 
         try {
 
-            if (tokens[currentIndex] == "nac") {
-                currentData = assembler.getOpcode(tokens[currentIndex]);
+            if (tokens.at(currentIndex) == "nac") {
+                currentData = assembler.getOpcode(tokens.at(currentIndex));
                 pushData(currentData);
             }
 
@@ -273,47 +273,120 @@ int main() {
                 pushData(currentData);
             }
 
-            else if (tokens[currentIndex] == "wait") {
-                currentData = assembler.getOpcode(tokens[currentIndex]);
+            else if (tokens.at(currentIndex) == "mval64plus") {
+                mnemonic = tokens.at(currentIndex);
+                currentData = assembler.getOpcode(mnemonic);
+                pushData(currentData);
+
+                currentIndex += 1;
+                if (currentIndex >= tokens.size()) {
+                    assembler.error("ASM00005", "Missing descriptors at line " + std::to_string(lineNumber));
+                }
+
+                std::vector<std::string> descriptors = assembler.splitOperandDescriptor(tokens.at(currentIndex));
+                
+                if (descriptors.empty()) {
+                    assembler.error("ASM00005", "Invalid descriptor format at line " + std::to_string(lineNumber));
+                }
+
+                operandDescriptor1 = descriptors.at(0);
+                
+                if (descriptors.size() > 1) {
+                    operandDescriptor2 = descriptors.at(1);
+                } else {
+                    operandDescriptor2 = operandDescriptor1;
+                }
+
+                if (operandDescriptor2 == "<" || operandDescriptor2.empty()) {
+                    operandDescriptor2 = operandDescriptor1;
+                }
+
+                currentData = assembler.getOperandInfoByte(operandDescriptor1);
+                pushData(currentData);
+
+                int size1 = Assembler::operandMapBytes.at(operandDescriptor1).size;
+                std::string type1 = Assembler::operandMapBytes.at(operandDescriptor1).type;
+
+                currentData = assembler.getOperandInfoByte(operandDescriptor2);
+                pushData(currentData);
+
+                int size2 = Assembler::operandMapBytes.at(operandDescriptor2).size;
+                std::string type2 = Assembler::operandMapBytes.at(operandDescriptor2).type;
+
+                if (type2 == "i") {
+                    if (size2 != 0) {
+                        assembler.error("ASM00005", "Immediate must have no size; line " + std::to_string(lineNumber));
+                    }
+                }
+
+                currentIndex += 1;
+                if (currentIndex >= tokens.size()) {
+                    assembler.error("ASM00005", "Missing 1st operand value at line " + std::to_string(lineNumber));
+                }
+
+                currentData = intToBytes(tokens.at(currentIndex), size1);
+
+                if ((type1 == "r" || type1 == "mr") && static_cast<int>(currentData[0]) > assembler.registers64max) {
+                    assembler.error("ASM00005", "No such register; line " + std::to_string(lineNumber));
+                }
+
+                pushData(currentData);
+
+                currentIndex += 1;
+                if (currentIndex >= tokens.size()) {
+                    assembler.error("ASM00005", "Missing 2nd operand value at line " + std::to_string(lineNumber));
+                }
+
+                currentData = intToBytes(tokens.at(currentIndex), size2);
+
+                if ((type2 == "r" || type2 == "mr") && static_cast<int>(currentData[0]) > assembler.registers64max) {
+                    assembler.error("ASM00005", "No such register; line " + std::to_string(lineNumber));
+                }
+
                 pushData(currentData);
             }
 
-            else if (tokens[currentIndex] == "stop") {
-                currentData = assembler.getOpcode(tokens[currentIndex]);
+            else if (tokens.at(currentIndex) == "wait") {
+                currentData = assembler.getOpcode(tokens.at(currentIndex));
                 pushData(currentData);
             }
 
-            else if (tokens[currentIndex] == "sleepms") {
-                currentData = assembler.getOpcode(tokens[currentIndex]);
-                pushData(currentData);
-
-                currentIndex += 1;
-
-                currentData = assembler.getOperandInfoByte(tokens[currentIndex]);
-                pushData(currentData);
-                
-                int size1 = Assembler::operandMapBytes.at(tokens[currentIndex]).size;
-
-                currentIndex += 1;
-                
-                currentData = intToBytes(tokens[currentIndex], size1);
+            else if (tokens.at(currentIndex) == "stop") {
+                currentData = assembler.getOpcode(tokens.at(currentIndex));
                 pushData(currentData);
             }
 
-            else if (tokens[currentIndex] == "sleepsec") {
-                currentData = assembler.getOpcode(tokens[currentIndex]);
+            else if (tokens.at(currentIndex) == "sleepms") {
+                currentData = assembler.getOpcode(tokens.at(currentIndex));
                 pushData(currentData);
 
                 currentIndex += 1;
 
-                currentData = assembler.getOperandInfoByte(tokens[currentIndex]);
+                currentData = assembler.getOperandInfoByte(tokens.at(currentIndex));
                 pushData(currentData);
                 
-                int size1 = Assembler::operandMapBytes.at(tokens[currentIndex]).size;
+                int size1 = Assembler::operandMapBytes.at(tokens.at(currentIndex)).size;
 
                 currentIndex += 1;
                 
-                currentData = intToBytes(tokens[currentIndex], size1);
+                currentData = intToBytes(tokens.at(currentIndex), size1);
+                pushData(currentData);
+            }
+
+            else if (tokens.at(currentIndex) == "sleepsec") {
+                currentData = assembler.getOpcode(tokens.at(currentIndex));
+                pushData(currentData);
+
+                currentIndex += 1;
+
+                currentData = assembler.getOperandInfoByte(tokens.at(currentIndex));
+                pushData(currentData);
+                
+                int size1 = Assembler::operandMapBytes.at(tokens.at(currentIndex)).size;
+
+                currentIndex += 1;
+                
+                currentData = intToBytes(tokens.at(currentIndex), size1);
                 pushData(currentData);
             }
 

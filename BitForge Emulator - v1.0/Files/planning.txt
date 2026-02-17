@@ -1,18 +1,12 @@
 PREFIXES
 
-Operand 1 (mi, mr):
+Operand 1 (r, mi, mr):
 - ws{BITS}b.{OPERAND_1}
-- r is set by the mval move size; for mvalplus it is always 64
 
-Operand 2 (i, mi, mr):
+Operand 2 (r, i, mi, mr):
 - ws{BITS}b.{OPERAND_2}
-- r is set by the mval move size; for mvalplus it is always 64
 
-Operand 1 (mi, mr) again:
-- rb{BITS}b.{OPERAND_1}
-- r is set by mval move size; for mvalplus it is always 64
-
-MVAL8–64:
+mval8–64:
 - Operand 2 can be any size; if >64 bits use mvalplus
 - Cropping: moving bigger value to smaller space removes high bytes (from start)
 - Zero-extension: moving smaller value to bigger space pads with zeros

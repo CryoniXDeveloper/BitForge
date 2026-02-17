@@ -106,36 +106,142 @@ void pushData(std::vector<uint8_t> data) {
 }
 
 std::vector<uint8_t> intToBytes(const std::string& valueStr, int amountOfBytes) {
-    std::vector<uint8_t> result;
-    uint64_t value;
+    if (amountOfBytes <= 0) return std::vector<uint8_t>();
+
+    std::string clean = valueStr;
+    int base = 10;
+    bool isNeg = false;
+    std::vector<uint8_t> result(amountOfBytes, 0);
 
     try {
-        if (valueStr.size() > 2 && valueStr[0] == '0' && valueStr[1] == 'b') {
-            // Binary
-            value = std::stoull(valueStr.substr(2), nullptr, 2);
-        } else if (valueStr.size() > 2 && valueStr[0] == '0' && valueStr[1] == 'x') {
-            // Hex
-            value = std::stoull(valueStr.substr(2), nullptr, 16);
-        } else {
-            // Decimal
-            value = std::stoull(valueStr, nullptr, 10);
+        if (clean.empty()) throw 2;
+        if (clean[0] == '-') { 
+            isNeg = true; 
+            clean = clean.substr(1); 
+            if (clean.empty()) throw 2;
         }
-    } catch (const std::exception& e) {
-        assembler.error("ASM00005", "Invalid number: " + valueStr);
+
+        if (clean.size() > 2 && clean[0] == '0' && (tolower(clean[1]) == 'x' || tolower(clean[1]) == 'b')) {
+            base = (tolower(clean[1]) == 'x') ? 16 : 2;
+            clean = clean.substr(2);
+            if (clean.empty()) throw 2;
+        } else if (!isdigit(clean[0])) {
+            throw 2;
+        }
+
+        for (char c : clean) {
+            if (base == 16 && !isxdigit(c)) throw 2;
+            if (base == 2 && (c != '0' && c != '1')) throw 2;
+            if (base == 10 && !isdigit(c)) throw 2;
+        }
+
+        if (base == 16) {
+            if (((int)clean.size() + 1) / 2 != amountOfBytes) throw 1;
+            if (clean.size() % 2 != 0) clean = "0" + clean;
+            int tidx = 0;
+            for (int i = (int)clean.size() - 2; i >= 0; i -= 2) {
+                result[tidx++] = (uint8_t)std::stoul(clean.substr(i, 2), nullptr, 16);
+            }
+        } 
+        else if (base == 2) {
+            if (((int)clean.size() + 7) / 8 != amountOfBytes) throw 1;
+            int tidx = 0;
+            for (int i = (int)clean.size(); i > 0; i -= 8) {
+                int start = std::max(0, i - 8);
+                result[tidx++] = (uint8_t)std::stoi(clean.substr(start, i - start), nullptr, 2);
+            }
+        } 
+        else {
+            for (char c : clean) {
+                uint32_t carry = c - '0';
+                for (int i = 0; i < amountOfBytes; i++) {
+                    uint32_t val = (uint32_t)result[i] * 10 + carry;
+                    result[i] = val & 0xFF;
+                    carry = val >> 8;
+                }
+                if (carry > 0) throw 1;
+            }
+
+            if (isNeg) {
+                uint16_t carry = 1;
+                for (int i = 0; i < amountOfBytes; i++) {
+                    uint16_t val = (uint16_t)(result[i] ^ 0xFF) + carry;
+                    result[i] = val & 0xFF;
+                    carry = val >> 8;
+                }
+            }
+
+            if (amountOfBytes > 1 && result[amountOfBytes - 1] == 0) {
+                bool allZero = true;
+                for (uint8_t b : result) if (b != 0) allZero = false;
+                if (!allZero) throw 1;
+            }
+        }
+
+        return result;
+
+    } catch (int e) {
+        if (e == 2) {
+            assembler.error("ASM00006", "Invalid value: " + valueStr);
+        } else {
+            assembler.error("ASM00005", "Size mismatch; size expected: " + std::to_string(amountOfBytes) + "; value: " + valueStr);
+        }
+        return std::vector<uint8_t>(amountOfBytes, 0); 
+    }
+}
+
+std::vector<std::string> removeCommentsFromFile(const std::string& filename) {
+    std::ifstream inFile(filename);
+    if (!inFile) {
+        throw std::runtime_error("Cannot open file: " + filename);
     }
 
-    uint64_t maxValue = (amountOfBytes >= 8) ? 0xFFFFFFFFFFFFFFFF : ((1ULL << (8 * amountOfBytes)) - 1);
+    std::vector<std::string> cleanedLines;
+    std::string line;
+    bool inMultiLineComment = false;
 
-    if (value > maxValue) {
-        assembler.error("ASM00005", "Operand value " + valueStr + " too large for " + std::to_string(amountOfBytes) + " byte(s)");
+    while (std::getline(inFile, line)) {
+        std::string result;
+        bool inString = false;
+
+        for (size_t i = 0; i < line.size(); ++i) {
+            if (line[i] == '"' && !inMultiLineComment) {
+                inString = !inString;
+                result += line[i];
+                continue;
+            }
+
+            if (!inString && !inMultiLineComment && i + 1 < line.size() && line[i] == '<' && line[i+1] == '*') {
+                inMultiLineComment = true;
+                ++i;
+                continue;
+            }
+
+            if (!inString && inMultiLineComment && i + 1 < line.size() && line[i] == '*' && line[i+1] == '>') {
+                inMultiLineComment = false;
+                ++i;
+                continue;
+            }
+
+            if (inMultiLineComment) continue;
+
+            if (!inString && i + 1 < line.size() && line[i] == '*' && line[i+1] == '*') {
+                break;
+            }
+
+            result += line[i];
+        }
+
+        size_t start = 0;
+        while (start < result.size() && std::isspace(result[start])) ++start;
+
+        size_t end = result.size();
+        while (end > start && std::isspace(result[end-1])) --end;
+
+        if (start < end) cleanedLines.push_back(result.substr(start, end - start));
     }
 
-    for (int x = 0; x < amountOfBytes; x++) {
-        result.push_back(static_cast<uint8_t>(value & 0xFF));
-        value >>= 8;
-    }
-
-    return result;
+    return cleanedLines;
 }
 
 int main() {
@@ -168,20 +274,21 @@ int main() {
 
     std::cout << "Turning assembly into binary..." << std::endl;
 
-    std::ifstream asmFile(assemblyFile);
-    if (!asmFile) {
-        assembler.error("ASM00004", assemblyFile);
+    size_t lineNumber = 0;
+    std::vector<std::string> lines;
+
+    try {
+        lines = removeCommentsFromFile(assemblyFile);
+    } catch (const std::exception& e) {
+        assembler.error("ASM00004", e.what());
     }
 
-    std::string line;
-    size_t lineNumber = 0;
-
-    while (std::getline(asmFile, line)) {
+    for (const auto& line : lines) {
         ++lineNumber;
 
-        if (line.find_first_not_of(" \t\r\n") == std::string::npos) continue;
+        if (line.empty()) continue;
 
-        std::vector<std::string> tokens = assembler.split(assembler.trim(line));
+        std::vector<std::string> tokens = assembler.split(line);
         if (tokens.empty()) continue;
 
         size_t currentIndex = 0;
@@ -237,14 +344,12 @@ int main() {
                 pushData(currentData);
 
                 int size2 = Assembler::operandMapBytes.at(operandDescriptor2).size;
-                std::string type2 = Assembler::operandMapBytes.at(operandDescriptor2).type;
-
-                if (mnemonic.rfind("mval", 0) == 0 && type2 == "i") {
-                    int expectedSize = std::stoi(mnemonic.substr(4)) / 8;
-                    if (size2 != expectedSize) {
-                        assembler.error("ASM00005", "Immediate type mismatch at line " + std::to_string(lineNumber));
-                    }
+                
+                if (size2 == 0) {
+                    assembler.error("ASM00005", "For moving immediates bigger than 64 bits use mvalplus only; line " + std::to_string(lineNumber));
                 }
+
+                std::string type2 = Assembler::operandMapBytes.at(operandDescriptor2).type;
 
                 currentIndex += 1;
                 if (currentIndex >= tokens.size()) {
@@ -273,7 +378,7 @@ int main() {
                 pushData(currentData);
             }
 
-            else if (tokens.at(currentIndex) == "mval64plus") {
+            else if (tokens.at(currentIndex) == "mvalplus") {
                 mnemonic = tokens.at(currentIndex);
                 currentData = assembler.getOpcode(mnemonic);
                 pushData(currentData);

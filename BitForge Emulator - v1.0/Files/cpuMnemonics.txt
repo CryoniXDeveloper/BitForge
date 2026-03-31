@@ -1,10 +1,10 @@
 0x00 - nac
 0x01 to 0x0F - extended opcode
-0x10 - mval mb8 {descriptor} {address} {value}
-0x11 - mval mb16
-0x12 - mval mb32
-0x13 - mval mb64
-0x14 - mval mb64plus {descriptor} {address} {value}
+0x10 - mval8 {descriptor} {address} {value}
+0x11 - mval16
+0x12 - mval32
+0x13 - mval64
+0x14 - mval64plus {descriptor} {address} {value}
 0xFC - wait
 0xFD - stop
 0xFE - sleepms {descriptor} {value}

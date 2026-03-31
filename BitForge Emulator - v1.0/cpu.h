@@ -49,17 +49,24 @@ struct CPU {
     std::vector<std::vector<uint8_t>> operandsVector;
     uint8_t instructionSize;
 
+    enum OpType {
+        reg,
+        imm,
+        mem_imm,
+        mem_reg
+    };
+
     std::unordered_map<int,int> mnemonicMoveOperandBytes = {
         {0x00,1},{0x01,1},{0x02,2},{0x03,3},{0x04,4},
         {0x05,5},{0x06,6},{0x07,7},{0x08,8},{0x09,1},
         {0x0A,2},{0x0B,3},{0x0C,4},{0x0D,5},{0x0E,6},
         {0x0F,7},{0x10,8},{0x11,1},{0x12,0}
     };
-    std::unordered_map<int,std::string> mnemonicMoveOperandTypes = {
-        {0x00,"r"},{0x01,"i"},{0x02,"i"},{0x03,"i"},{0x04,"i"},{0x05,"i"},
-        {0x06,"i"},{0x07,"i"},{0x08,"i"},{0x09,"mi"},{0x0A,"mi"},{0x0B,"mi"},
-        {0x0C,"mi"},{0x0D,"mi"},{0x0E,"mi"},{0x0F,"mi"},{0x10,"mi"},{0x11,"r"},
-        {0x12,"i"}
+    std::unordered_map<int, OpType> mnemonicMoveOperandTypes = {
+        {0x00,reg},{0x01,imm},{0x02,imm},{0x03,imm},{0x04,imm},{0x05,imm},
+        {0x06,imm},{0x07,imm},{0x08,imm},{0x09,mem_imm},{0x0A,mem_imm},{0x0B,mem_imm},
+        {0x0C,mem_imm},{0x0D,mem_imm},{0x0E,mem_imm},{0x0F,mem_imm},{0x10,mem_imm},{0x11,mem_reg},
+        {0x12,imm}
     };
 
     template<typename T>
@@ -67,8 +74,8 @@ struct CPU {
 
     uint8_t mnemonicType1;
     uint8_t mnemonicType2;
-    std::string op1Type;
-    std::string op2Type;
+    OpType op1Type;
+    OpType op2Type;
     int op1Size;
     int op2Size;
 
@@ -104,6 +111,10 @@ struct CPU {
     uint64_t read64(uint64_t address);
 
     void write8(uint64_t address, uint8_t value);
+    void write16(uint64_t address, uint16_t value);
+    void write32(uint64_t address, uint32_t value);
+    void write64(uint64_t address, uint64_t value);
+    
     std::vector<uint8_t> readBytesVector(uint64_t start, size_t length);
     void writeBytesVector(uint64_t start, const std::vector<uint8_t>& data);
 

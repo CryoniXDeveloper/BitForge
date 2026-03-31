@@ -87,16 +87,52 @@ void RAM::write8(uint64_t address, uint8_t value) {
     }
 }
 
+void RAM::write16(uint64_t start, uint16_t value) {
+    uint64_t address = start - Motherboard::RAM_START;
+
+    if (start < Motherboard::RAM_START || address + 1 > Motherboard::RAM_SIZE - 1) {
+        error("RA07AOOB", "Absolute address: " + std::to_string(start) + " + length (2)");
+        return;
+    }
+
+    for (size_t i = 0; i < 2; i++)
+        memory[address + i] = (value >> (8 * i)) & 0xFF;
+}
+
+void RAM::write32(uint64_t start, uint32_t value) {
+    uint64_t address = start - Motherboard::RAM_START;
+
+    if (start < Motherboard::RAM_START || address + 3 > Motherboard::RAM_SIZE - 1) {
+        error("RA08AOOB", "Absolute address: " + std::to_string(start) + " + length (4)");
+        return;
+    }
+
+    for (size_t i = 0; i < 4; i++)
+        memory[address + i] = (value >> (8 * i)) & 0xFF;
+}
+
+void RAM::write64(uint64_t start, uint64_t value) {
+    uint64_t address = start - Motherboard::RAM_START;
+
+    if (start < Motherboard::RAM_START || address + 7 > Motherboard::RAM_SIZE - 1) {
+        error("RA09AOOB", "Absolute address: " + std::to_string(start) + " + length (8)");
+        return;
+    }
+
+    for (size_t i = 0; i < 8; i++)
+        memory[address + i] = (value >> (8 * i)) & 0xFF;
+}
+
 void RAM::writeBytesVector(uint64_t start, const std::vector<uint8_t>& data) {
     if (start < Motherboard::RAM_START) {
-        error("RA07AOOB", "Absolute address: " + std::to_string(start) + " + data size (" + std::to_string(data.size()) + ")");
+        error("RA10AOOB", "Absolute address: " + std::to_string(start) + " + data size (" + std::to_string(data.size()) + ")");
         return; 
     }
 
     uint64_t address = start - Motherboard::RAM_START;
 
     if (address + data.size() > Motherboard::RAM_SIZE) {
-        error("RA07AOOB", "Absolute address: " + std::to_string(start) + " + data size (" + std::to_string(data.size()) + ")");
+        error("RA10AOOB", "Absolute address: " + std::to_string(start) + " + data size (" + std::to_string(data.size()) + ")");
         return;
     }
 

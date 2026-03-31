@@ -32,6 +32,10 @@ struct RAM {
     std::vector<uint8_t> readBytesVector(uint64_t start, size_t length);
 
     void write8(uint64_t address, uint8_t value);
+    void write16(uint64_t address, uint16_t value);
+    void write32(uint64_t address, uint32_t value);
+    void write64(uint64_t address, uint64_t value);
+    
     void writeBytesVector(uint64_t start, const std::vector<uint8_t>& data);
 
     void error(std::string errorType, std::string info = "");

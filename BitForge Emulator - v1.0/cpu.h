@@ -57,20 +57,16 @@ struct CPU {
     };
 
     std::unordered_map<int,int> mnemonicMoveOperandBytes = {
-        {0x00,1},{0x01,1},{0x02,2},{0x03,3},{0x04,4},
-        {0x05,5},{0x06,6},{0x07,7},{0x08,8},{0x09,1},
-        {0x0A,2},{0x0B,3},{0x0C,4},{0x0D,5},{0x0E,6},
-        {0x0F,7},{0x10,8},{0x11,1},{0x12,0}
+        {0x00,1},{0x01,1},{0x02,2},{0x03,4},
+        {0x04,8},{0x05,1},{0x06,2},{0x07,4},
+        {0x08,8},{0x09,1},{0x0A,0}
     };
     std::unordered_map<int, OpType> mnemonicMoveOperandTypes = {
-        {0x00,reg},{0x01,imm},{0x02,imm},{0x03,imm},{0x04,imm},{0x05,imm},
-        {0x06,imm},{0x07,imm},{0x08,imm},{0x09,mem_imm},{0x0A,mem_imm},{0x0B,mem_imm},
-        {0x0C,mem_imm},{0x0D,mem_imm},{0x0E,mem_imm},{0x0F,mem_imm},{0x10,mem_imm},{0x11,mem_reg},
-        {0x12,imm}
+        {0x00,reg},{0x01,imm},{0x02,imm},{0x03,imm},{0x04,imm},
+        {0x05,mem_imm},{0x06,mem_imm},{0x07,mem_imm},
+        {0x08,mem_imm},{0x09,mem_reg},
+        {0x0A,imm}
     };
-
-    template<typename T>
-    void pushData(T& data, size_t length);
 
     uint8_t mnemonicType1;
     uint8_t mnemonicType2;
@@ -83,13 +79,21 @@ struct CPU {
     int op16Index;
     int op32Index;
     int op64Index;
+    int opVectorIndex;
     
     void resetOpIndexes() {
         op8Index = 0;
         op16Index = 0;
         op32Index = 0;
         op64Index = 0;
+        opVectorIndex = 0;
     }
+
+    uint64_t dest;
+    uint64_t value;
+    uint64_t addr;
+    std::vector<uint8_t>* VectorOfBytesPointer = nullptr;
+    std::vector<uint8_t> VectorOfBytes;
 
     inline void setFlagBit(CPU::flagNames flagName, bool state) {
         if (state) {
@@ -114,7 +118,7 @@ struct CPU {
     void write16(uint64_t address, uint16_t value);
     void write32(uint64_t address, uint32_t value);
     void write64(uint64_t address, uint64_t value);
-    
+
     std::vector<uint8_t> readBytesVector(uint64_t start, size_t length);
     void writeBytesVector(uint64_t start, const std::vector<uint8_t>& data);
 

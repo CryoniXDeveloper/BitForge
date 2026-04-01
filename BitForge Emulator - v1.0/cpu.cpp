@@ -90,8 +90,14 @@ void CPU::decode() {
             op2Type = mnemonicMoveOperandTypes[mnemonicType2];
             op2Size = mnemonicMoveOperandBytes[mnemonicType2];
 
-            if (op2Size == 0) {
-                op2Size = read16(instructionPointer);
+            if (opcode == 0x14) {
+                if (op2Size == 0) {
+                    op2Size = read16(instructionPointer);
+                }
+                
+                else {
+                    op2VectorSize = read16(instructionPointer);
+                }
 
                 instructionPointer += 2;
             }
@@ -515,7 +521,7 @@ void CPU::execute() {
                         case 8: addr = operands64[op64Index]; break;
                     }
 
-                    VectorOfBytes = readBytesVector(addr, op2Size);
+                    VectorOfBytes = readBytesVector(addr, op2VectorSize);
                     VectorOfBytesPointer = &VectorOfBytes;
                     break;
 
@@ -527,7 +533,7 @@ void CPU::execute() {
                         case 8: addr = registers[operands64[op64Index]]; break;
                     }
 
-                    VectorOfBytes = readBytesVector(addr, op2Size);
+                    VectorOfBytes = readBytesVector(addr, op2VectorSize);
                     VectorOfBytesPointer = &VectorOfBytes;
                     break;
             }
@@ -637,11 +643,6 @@ uint8_t CPU::read8(uint64_t address) {
     else if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END) {
         return memory->read8(address);
     }
-
-    else {
-        error("CP03AOOB", "Absolute address: " + std::to_string(address));
-        return 0;
-    }
 }
 
 uint16_t CPU::read16(uint64_t address) {
@@ -651,11 +652,6 @@ uint16_t CPU::read16(uint64_t address) {
     
     else if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END) {
         return memory->read16(address);
-    }
-    
-    else {
-        error("CP04AOOB", "Absolute address: " + std::to_string(address));
-        return 0;
     }
 }
 
@@ -667,11 +663,6 @@ uint32_t CPU::read32(uint64_t address) {
     else if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END) {
         return memory->read32(address);
     }
-    
-    else {
-        error("CP05AOOB", "Absolute address: " + std::to_string(address));
-        return 0;
-    }
 }
 
 uint64_t CPU::read64(uint64_t address) {
@@ -681,11 +672,6 @@ uint64_t CPU::read64(uint64_t address) {
     
     else if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END) {
         return memory->read64(address);
-    }
-    
-    else {
-        error("CP06AOOB", "Absolute address: " + std::to_string(address));
-        return 0;
     }
 }
 
@@ -697,11 +683,6 @@ std::vector<uint8_t> CPU::readBytesVector(uint64_t start, size_t length) {
     else if (start >= Motherboard::RAM_START && start <= Motherboard::RAM_END) {
         return memory->readBytesVector(start, length);
     }
-    
-    else {
-        error("CP07AOOB", "Absolute address: " + std::to_string(start));
-        return {0};
-    }
 }
 
 void CPU::write8(uint64_t address, uint8_t value) {
@@ -711,10 +692,6 @@ void CPU::write8(uint64_t address, uint8_t value) {
     
     else if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END) {
         memory->write8(address, value);
-    }
-    
-    else {
-        error("CP08AOOB", "Absolute address: " + std::to_string(address));
     }
 }
 
@@ -726,10 +703,6 @@ void CPU::write16(uint64_t address, uint16_t value) {
     else if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END) {
         memory->write16(address, value);
     }
-    
-    else {
-        error("CP09AOOB", "Absolute address: " + std::to_string(address));
-    }
 }
 
 void CPU::write32(uint64_t address, uint32_t value) {
@@ -739,10 +712,6 @@ void CPU::write32(uint64_t address, uint32_t value) {
     
     else if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END) {
         memory->write32(address, value);
-    }
-    
-    else {
-        error("CP10AOOB", "Absolute address: " + std::to_string(address));
     }
 }
 
@@ -754,10 +723,6 @@ void CPU::write64(uint64_t address, uint64_t value) {
     else if (address >= Motherboard::RAM_START && address <= Motherboard::RAM_END) {
         memory->write64(address, value);
     }
-    
-    else {
-        error("CP11AOOB", "Absolute address: " + std::to_string(address));
-    }
 }
 
 void CPU::writeBytesVector(uint64_t start, const std::vector<uint8_t>& data) {
@@ -767,10 +732,6 @@ void CPU::writeBytesVector(uint64_t start, const std::vector<uint8_t>& data) {
     
     else if (start >= Motherboard::RAM_START && start <= Motherboard::RAM_END) {
         memory->writeBytesVector(start, data);
-    }
-    
-    else {
-        error("CP12AOOB", "Absolute address: " + std::to_string(start));
     }
 }
 

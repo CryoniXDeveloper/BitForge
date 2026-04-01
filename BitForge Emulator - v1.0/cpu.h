@@ -56,16 +56,15 @@ struct CPU {
         mem_reg
     };
 
-    std::unordered_map<int,int> mnemonicMoveOperandBytes = {
-        {0x00,1},{0x01,1},{0x02,2},{0x03,4},
-        {0x04,8},{0x05,1},{0x06,2},{0x07,4},
-        {0x08,8},{0x09,1},{0x0A,0}
+    static constexpr uint8_t mnemonicMoveOperandBytes[11] = {
+        1,1,2,4,8,1,2,4,8,1,0
     };
-    std::unordered_map<int, OpType> mnemonicMoveOperandTypes = {
-        {0x00,reg},{0x01,imm},{0x02,imm},{0x03,imm},{0x04,imm},
-        {0x05,mem_imm},{0x06,mem_imm},{0x07,mem_imm},
-        {0x08,mem_imm},{0x09,mem_reg},
-        {0x0A,imm}
+
+    static constexpr OpType mnemonicMoveOperandTypes[11] = {
+        reg, imm, imm, imm, imm,
+        mem_imm, mem_imm, mem_imm, mem_imm,
+        mem_reg,
+        imm
     };
 
     uint8_t mnemonicType1;
@@ -74,6 +73,7 @@ struct CPU {
     OpType op2Type;
     int op1Size;
     int op2Size;
+    int op2VectorSize;
 
     int op8Index;
     int op16Index;

@@ -30,6 +30,7 @@ CP09AOOB - Address out of bounds on write16 request.               Info is addre
 CP10AOOB - Address out of bounds on write32 request.               Info is address.
 CP11AOOB - Address out of bounds on write64 request.               Info is address.
 CP12AOOB - Address out of bounds on writeBytesVector request.      Info is address.
+CP13CWTR - Cannot write into a non existent register.              Info is starting.
 
 Assembler:
 ASM00001 - File is corrupted or empty.                             Info is file name.

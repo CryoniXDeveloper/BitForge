@@ -1,11 +1,26 @@
-0x00 - nac
-0x01 to 0x0F - extended opcode
-0x10 - mval8 {descriptor} {address} {value}
-0x11 - mval16
-0x12 - mval32
-0x13 - mval64
-0x14 - mval64plus {descriptor} {address} {value}
-0xFC - wait
-0xFD - stop
-0xFE - sleepms {descriptor} {value}
-0xFF - sleepsec {descriptor} {value}
+; ── Special ────────────────────────────────────────────────────
+0x00        - nac
+0x01-0x0F   - extended opcode
+
+; ── Memory Write ───────────────────────────────────────────────
+0x10        - mval8      [DESC] [DST] [SRC]
+0x11        - mval16     [DESC] [DST] [SRC]
+0x12        - mval32     [DESC] [DST] [SRC]
+0x13        - mval64     [DESC] [DST] [SRC]
+0x14        - mval64plus [DESC] [DST] [SRC]
+
+; ── Integer Add ────────────────────────────────────────────────
+0x15        - sadd8      [DESC] [DST] [SRC1] [SRC2]
+0x16        - uadd8      [DESC] [DST] [SRC1] [SRC2]
+0x17        - sadd16     [DESC] [DST] [SRC1] [SRC2]
+0x18        - uadd16     [DESC] [DST] [SRC1] [SRC2]
+0x19        - sadd32     [DESC] [DST] [SRC1] [SRC2]
+0x1A        - uadd32     [DESC] [DST] [SRC1] [SRC2]
+0x1B        - sadd64     [DESC] [DST] [SRC1] [SRC2]
+0x1C        - uadd64     [DESC] [DST] [SRC1] [SRC2]
+
+; ── Control Flow ───────────────────────────────────────────────
+0xFC        - wait
+0xFD        - stop
+0xFE        - sleepms    [DESC] [SRC]
+0xFF        - sleepsec   [DESC] [SRC]

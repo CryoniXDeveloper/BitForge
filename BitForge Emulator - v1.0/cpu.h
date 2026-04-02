@@ -43,10 +43,10 @@ struct CPU {
     };
 
     uint16_t opcode;
-    std::vector<uint8_t> operands8;
-    std::vector<uint16_t> operands16;
-    std::vector<uint32_t> operands32;
-    std::vector<uint64_t> operands64;
+    uint8_t  operands8[4];
+    uint16_t operands16[4];
+    uint32_t operands32[4];
+    uint64_t operands64[4];
     std::vector<std::vector<uint8_t>> operandsVector;
     uint8_t instructionSize;
 
@@ -70,11 +70,15 @@ struct CPU {
 
     uint8_t mnemonicType1;
     uint8_t mnemonicType2;
+    uint8_t mnemonicType3;
     OpType op1Type;
     OpType op2Type;
+    OpType op3Type;
     int op1Size;
     int op2Size;
+    int op3Size;
     int op2VectorSize;
+    int registersNeeded;
 
     int op8Index;
     int op16Index;
@@ -92,18 +96,14 @@ struct CPU {
 
     uint64_t dest;
     uint64_t value;
+    uint64_t value1;
+    uint64_t value2;
     uint64_t addr;
     std::vector<uint8_t>* VectorOfBytesPointer = nullptr;
     std::vector<uint8_t> VectorOfBytes;
 
     inline void setFlagBit(CPU::flagNames flagName, bool state) {
-        if (state) {
-            flags |= flagName;
-
-        } else {
-            flags &= ~flagName;
-
-        }
+        flags = (flags & ~flagName) | (state ? flagName : 0);
     }
 
     inline bool getFlagBit(CPU::flagNames flagName) {

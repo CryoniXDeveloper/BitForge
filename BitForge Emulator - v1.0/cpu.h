@@ -25,6 +25,7 @@ struct CPU {
     uint16_t flags = 0;
 
     bool running = false;
+    uint64_t cycles = 0;
     int sleepCounter = 0;
     double CPURunTime = 0.0;
 

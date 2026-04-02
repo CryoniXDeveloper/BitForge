@@ -8,65 +8,55 @@
 #include <unordered_set>
 #include "../rom.h"
 
-struct operandInfo {
-    std::string type;
-    int size;
-};
-
 struct Assembler {
     std::vector<uint8_t> binaryToWrite;
     int registers64max = 63;
 
-    inline static const std::unordered_map<std::string, std::vector<uint8_t>> operandByte = {
-        {"r8<",    {0x00}},
-        {"i8<",    {0x01}},
-        {"i16<",   {0x02}},
-        {"i32<",   {0x04}},
-        {"i64<",   {0x08}},
-        {"mi8<",   {0x09}},
-        {"mi16<",  {0x0A}},
-        {"mi32<",  {0x0C}},
-        {"mi64<",  {0x10}},
-        {"mr8<",   {0x11}},
-        {"i<",     {0x12}},
+    enum OperandKind : uint8_t {
+        r8, i8, i16, i32, i64,
+        mi8, mi16, mi32, mi64,
+        mr8, i,
+        OPERAND_KIND_COUNT
     };
 
-    inline static const std::unordered_map<std::string, operandInfo> operandMapBits = {
-        {"r8<",    {"r", 8}},    
-        {"i8<",    {"i", 8}},    
-        {"i16<",   {"i", 16}},   
-        {"i32<",   {"i", 32}},   
-        {"i64<",   {"i", 64}},   
-        {"mi8<",   {"mi", 8}},   
-        {"mi16<",  {"mi", 16}},  
-        {"mi32<",  {"mi", 32}},  
-        {"mi64<",  {"mi", 64}},  
-        {"mr8<",   {"mr", 8}},   
-        {"i<",     {"i", 0}}
+    static constexpr uint8_t operandByte[OPERAND_KIND_COUNT] = {
+        0x00, 0x01, 0x02, 0x03, 0x04,
+        0x05, 0x06, 0x07, 0x08,
+        0x09, 0x0A
     };
 
-    inline static const std::unordered_map<std::string, operandInfo> operandMapBytes = {
-        {"r8<",    {"r", 1}},    
-        {"i8<",    {"i", 1}},    
-        {"i16<",   {"i", 2}},   
-        {"i32<",   {"i", 4}},   
-        {"i64<",   {"i", 8}},   
-        {"mi8<",   {"mi", 1}},   
-        {"mi16<",  {"mi", 2}},  
-        {"mi32<",  {"mi", 4}},  
-        {"mi64<",  {"mi", 8}},  
-        {"mr8<",   {"mr", 1}},   
-        {"i<",     {"i", 0}},
+    enum OperandType : uint8_t { reg, imm, mem_imm, mem_reg };
+
+    struct operandInfo {
+        OperandType type;
+        uint8_t size;
     };
 
-    inline static const std::unordered_set<std::string> mvalMnemonics = {
-        "mval8", "mval16" "mval32", "mval64"
+    static constexpr operandInfo operandMapBits[OPERAND_KIND_COUNT] = {
+        {reg,     8},  {imm,     8},  {imm,  16}, {imm,  32}, {imm,  64},
+        {mem_imm, 8},  {mem_imm, 16}, {mem_imm, 32}, {mem_imm, 64},
+        {mem_reg, 8},  {imm,     0}
     };
 
-    std::unordered_map<std::string, std::vector<uint8_t>> mnemonicOpcode = {
-        {"nac", {0x00}}, {"mval8", {0x10}}, {"mval16", {0x11}},
-        {"mval32", {0x12}}, {"mval64", {0x13}}, {"wait", {0xFC}}, {"stop", {0xFD}}, 
-        {"sleepms", {0xFE}}, {"sleepsec", {0xFF}},
+    static constexpr operandInfo operandMapBytes[OPERAND_KIND_COUNT] = {
+        {reg,     1},  {imm,     1},  {imm,  2},  {imm,  4},  {imm,  8},
+        {mem_imm, 1},  {mem_imm, 2},  {mem_imm, 4},  {mem_imm, 8},
+        {mem_reg, 1},  {imm,     0}
+    };
+    enum Mnemonic : uint8_t {
+        nac, mval8, mval16, mval32, mval64, mval64plus,
+        wait, stop, sleepms, sleepsec,
+        MNEMONIC_COUNT
+    };
+
+    static constexpr uint8_t mnemonicOpcode[MNEMONIC_COUNT] = {
+        0x00, 0x10, 0x11, 0x12, 0x13, 0x14,
+        0xFC, 0xFD, 0xFE, 0xFF
+    };
+
+    static constexpr bool isMvalMnemonic[MNEMONIC_COUNT] = {
+        false, true, true, true, true, false,
+        false, false, false, false
     };
 
     std::vector<uint8_t> intToBytes(std::string value, int amountOfBytes);

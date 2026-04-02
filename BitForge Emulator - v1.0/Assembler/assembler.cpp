@@ -136,8 +136,10 @@ std::vector<uint8_t> intToBytes(const std::string& valueStr, int amountOfBytes) 
         }
 
         if (base == 16) {
-            if (((int)clean.size() + 1) / 2 != amountOfBytes) throw 1;
-            if (clean.size() % 2 != 0) clean = "0" + clean;
+            if (((int)clean.size() + 1) / 2 > amountOfBytes) throw 1;
+            while ((int)clean.size() < amountOfBytes * 2) {
+                clean = "00" + clean;
+            }
             int tidx = 0;
             for (int i = (int)clean.size() - 2; i >= 0; i -= 2) {
                 result[tidx++] = (uint8_t)std::stoul(clean.substr(i, 2), nullptr, 16);
@@ -169,12 +171,6 @@ std::vector<uint8_t> intToBytes(const std::string& valueStr, int amountOfBytes) 
                     result[i] = val & 0xFF;
                     carry = val >> 8;
                 }
-            }
-
-            if (amountOfBytes > 1 && result[amountOfBytes - 1] == 0) {
-                bool allZero = true;
-                for (uint8_t b : result) if (b != 0) allZero = false;
-                if (!allZero) throw 1;
             }
         }
 
@@ -378,7 +374,7 @@ int main() {
                 pushData(currentData);
             }
 
-            else if (tokens.at(currentIndex) == "mvalplus") {
+            else if (tokens.at(currentIndex) == "mval64plus") {
                 mnemonic = tokens.at(currentIndex);
                 currentData = assembler.getOpcode(mnemonic);
                 pushData(currentData);
@@ -514,5 +510,41 @@ int main() {
     outFile.close();
 
     std::cout << "Binary successfully written to " << outputFile << std::endl;
+
+    std::cout << "\nDo you want to patch rom.bin? (y/n): ";
+    char choice;
+    std::cin >> choice;
+
+    if (choice == 'y' || choice == 'Y') {
+        std::cout << "Enter start address (decimal or hex with 0x): ";
+        std::string addrStr;
+        std::cin >> addrStr;
+
+        uint64_t address = 0;
+
+        try {
+            address = std::stoull(addrStr, nullptr, 0);
+        } catch (...) {
+            assembler.error("ASM00006", "Invalid address input");
+        }
+
+        std::fstream romFile("../rom.bin", std::ios::in | std::ios::out | std::ios::binary);
+
+        if (!romFile) {
+            assembler.error("ASM00007", "rom.bin not found");
+        }
+
+        romFile.seekp(address);
+
+        romFile.write(
+            reinterpret_cast<const char*>(assembler.binaryToWrite.data()),
+            assembler.binaryToWrite.size()
+        );
+
+        romFile.close();
+
+        std::cout << "Patched rom.bin at address " << address << " with "
+                << assembler.binaryToWrite.size() << " bytes.\n";
+    }
     return 0;
 }

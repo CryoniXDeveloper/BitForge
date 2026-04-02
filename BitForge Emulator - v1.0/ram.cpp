@@ -24,45 +24,43 @@ uint16_t RAM::read16(uint64_t start) {
     uint64_t address = start - Motherboard::RAM_START;
 
     if (start < Motherboard::RAM_START || address + 1 > Motherboard::RAM_SIZE - 1) {
-        error("RA02AOOB", "Absolute address: " + std::to_string(start) + " + length (" + std::to_string(2) + ")");
+        error("RA02AOOB", "Absolute address: " + std::to_string(start) + " + length (2)");
         return 0;
-
-    } else {
-        uint16_t result = 0; 
-        for (size_t i = 0; i < 2; i++)
-        result |= ((uint16_t)memory[address + i]) << (8 * i);
-        return result;
     }
+    return static_cast<uint16_t>(memory[address]) |
+        (static_cast<uint16_t>(memory[address + 1]) << 8);
 }
 
 uint32_t RAM::read32(uint64_t start) {
     uint64_t address = start - Motherboard::RAM_START;
 
     if (start < Motherboard::RAM_START || address + 3 > Motherboard::RAM_SIZE - 1) {
-        error("RA03AOOB", "Absolute address: " + std::to_string(start) + " + length (" + std::to_string(4) + ")");
+        error("RA03AOOB", "Absolute address: " + std::to_string(start) + " + length (4)");
         return 0;
-
-    } else {
-        uint32_t result = 0;
-        for (size_t i = 0; i < 4; i++)
-        result |= ((uint32_t)memory[address + i]) << (8 * i);
-        return result;
     }
+
+    return static_cast<uint32_t>(memory[address]) |
+        (static_cast<uint32_t>(memory[address + 1]) << 8) |
+        (static_cast<uint32_t>(memory[address + 2]) << 16) |
+        (static_cast<uint32_t>(memory[address + 3]) << 24);
 }
 
 uint64_t RAM::read64(uint64_t start) {
     uint64_t address = start - Motherboard::RAM_START;
 
     if (start < Motherboard::RAM_START || address + 7 > Motherboard::RAM_SIZE - 1) {
-        error("RA04AOOB", "Absolute address: " + std::to_string(start) + " + length (" + std::to_string(8) + ")");
+        error("RA04AOOB", "Absolute address: " + std::to_string(start) + " + length (8)");
         return 0;
-
-    } else {
-        uint64_t result = 0;
-        for (size_t i = 0; i < 8; i++)
-        result |= ((uint64_t)memory[address + i]) << (8 * i);
-        return result;
     }
+
+    return static_cast<uint64_t>(memory[address]) |
+        (static_cast<uint64_t>(memory[address + 1]) << 8) |
+        (static_cast<uint64_t>(memory[address + 2]) << 16) |
+        (static_cast<uint64_t>(memory[address + 3]) << 24) |
+        (static_cast<uint64_t>(memory[address + 4]) << 32) |
+        (static_cast<uint64_t>(memory[address + 5]) << 40) |
+        (static_cast<uint64_t>(memory[address + 6]) << 48) |
+        (static_cast<uint64_t>(memory[address + 7]) << 56);
 }
 
 std::vector<uint8_t> RAM::readBytesVector(uint64_t start, size_t length) {

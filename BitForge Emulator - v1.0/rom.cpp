@@ -34,11 +34,8 @@ uint16_t ROM::read16(uint64_t start) {
     if (start < Motherboard::ROM_START || address + 1 > Motherboard::ROM_SIZE - 1)
         error("RO05AOOB", "Absolute address: " + std::to_string(start) + " + length (2)");
 
-    uint16_t result = 0;
-    for (size_t i = 0; i < 2; i++)
-        result |= ((uint16_t)data[address + i]) << (8 * i);
-
-    return result;
+    return static_cast<uint16_t>(data[address]) |
+        (static_cast<uint16_t>(data[address + 1]) << 8);
 }
 
 uint32_t ROM::read32(uint64_t start) {
@@ -47,11 +44,10 @@ uint32_t ROM::read32(uint64_t start) {
     if (start < Motherboard::ROM_START || address + 3 > Motherboard::ROM_SIZE - 1)
         error("RO06AOOB", "Absolute address: " + std::to_string(start) + " + length (4)");
 
-    uint32_t result = 0;
-    for (size_t i = 0; i < 4; i++)
-        result |= ((uint32_t)data[address + i]) << (8 * i);
-
-    return result;
+    return static_cast<uint32_t>(data[address]) |
+        (static_cast<uint32_t>(data[address + 1]) << 8) |
+        (static_cast<uint32_t>(data[address + 2]) << 16) |
+        (static_cast<uint32_t>(data[address + 3]) << 24);
 }
 
 uint64_t ROM::read64(uint64_t start) {
@@ -60,11 +56,14 @@ uint64_t ROM::read64(uint64_t start) {
     if (start < Motherboard::ROM_START || address + 7 > Motherboard::ROM_SIZE - 1)
         error("RO07AOOB", "Absolute address: " + std::to_string(start) + " + length (8)");
 
-    uint64_t result = 0;
-    for (size_t i = 0; i < 8; i++)
-        result |= ((uint64_t)data[address + i]) << (8 * i);
-
-    return result;
+    return static_cast<uint64_t>(data[address]) |
+        (static_cast<uint64_t>(data[address + 1]) << 8) |
+        (static_cast<uint64_t>(data[address + 2]) << 16) |
+        (static_cast<uint64_t>(data[address + 3]) << 24) |
+        (static_cast<uint64_t>(data[address + 4]) << 32) |
+        (static_cast<uint64_t>(data[address + 5]) << 40) |
+        (static_cast<uint64_t>(data[address + 6]) << 48) |
+        (static_cast<uint64_t>(data[address + 7]) << 56);
 }
 
 std::vector<uint8_t> ROM::readBytesVector(uint64_t start, size_t length) {

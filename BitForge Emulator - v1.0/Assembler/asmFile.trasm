@@ -1,1 +1,4 @@
-mval64 r8<i64< 0x30 -13
+mval8 r8<i8< 20 0xFF
+mval32 mi32<i16< 0xBFFFFF 0xDEEA
+mval64 mi32<i64< 0xFFFFFF 100000000000
+stop

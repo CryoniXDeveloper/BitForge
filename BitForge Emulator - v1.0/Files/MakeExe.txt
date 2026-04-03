@@ -1,6 +1,6 @@
 Emulator:
     cd "C:\Users\Admin\Desktop\Prog. 2026\BitForge Emulator - v1.0"
-    g++ *.cpp -o computer.exe -std=c++23
+    g++ -O3 -march=native -flto *.cpp -o computer.exe -std=c++23
 
 Testing:
     cd "C:\Users\Admin\Desktop\Prog. 2026\BitForge Emulator - v1.0\Testing"

@@ -28,6 +28,7 @@ struct CPU {
     uint64_t cycles = 0;
     int sleepCounter = 0;
     double CPURunTime = 0.0;
+    volatile uint8_t warmup = 0;
 
     Timer timer;
 
@@ -129,6 +130,4 @@ struct CPU {
     void execute();
 
     void error(std::string errorType, std::string info = "") const;
-
-    void sleepMicroseconds(uint64_t microseconds);
 };

@@ -19,6 +19,48 @@
 0x1B        - sadd64     [DESC] [DST] [SRC1] [SRC2]
 0x1C        - uadd64     [DESC] [DST] [SRC1] [SRC2]
 
+; ── Integer Sub ────────────────────────────────────────────────
+0x1D        - ssub8      [DESC] [DST] [SRC1] [SRC2]
+0x1E        - usub8      [DESC] [DST] [SRC1] [SRC2]
+0x1F        - ssub16     [DESC] [DST] [SRC1] [SRC2]
+0x20        - usub16     [DESC] [DST] [SRC1] [SRC2]
+0x21        - ssub32     [DESC] [DST] [SRC1] [SRC2]
+0x22        - usub32     [DESC] [DST] [SRC1] [SRC2]
+0x23        - ssub64     [DESC] [DST] [SRC1] [SRC2]
+0x24        - usub64     [DESC] [DST] [SRC1] [SRC2]
+
+; ── Integer Mul ────────────────────────────────────────────────
+0x25        - smul8      [DESC] [DST] [SRC1] [SRC2]
+0x26        - umul8      [DESC] [DST] [SRC1] [SRC2]
+0x27        - smul16     [DESC] [DST] [SRC1] [SRC2]
+0x28        - umul16     [DESC] [DST] [SRC1] [SRC2]
+0x29        - smul32     [DESC] [DST] [SRC1] [SRC2]
+0x2A        - umul32     [DESC] [DST] [SRC1] [SRC2]
+0x2B        - smul64     [DESC] [DST] [SRC1] [SRC2]
+0x2C        - umul64     [DESC] [DST] [SRC1] [SRC2]
+
+; ── Integer Div ────────────────────────────────────────────────
+0x2D        - sdiv8      [DESC] [DST] [SRC1] [SRC2]
+0x2E        - udiv8      [DESC] [DST] [SRC1] [SRC2]
+0x2F        - sdiv16     [DESC] [DST] [SRC1] [SRC2]
+0x30        - udiv16     [DESC] [DST] [SRC1] [SRC2]
+0x31        - sdiv32     [DESC] [DST] [SRC1] [SRC2]
+0x32        - udiv32     [DESC] [DST] [SRC1] [SRC2]
+0x33        - sdiv64     [DESC] [DST] [SRC1] [SRC2]
+0x34        - udiv64     [DESC] [DST] [SRC1] [SRC2]
+
+; ── Increment ──────────────────────────────────────────────────
+0x35        - inc8       [DESC] [DST]
+0x36        - inc16      [DESC] [DST]
+0x37        - inc32      [DESC] [DST]
+0x38        - inc64      [DESC] [DST]
+
+; ── Decrement ──────────────────────────────────────────────────
+0x39        - dec8       [DESC] [DST]
+0x3A        - dec16      [DESC] [DST]
+0x3B        - dec32      [DESC] [DST]
+0x3C        - dec64      [DESC] [DST]
+
 ; ── Control Flow ───────────────────────────────────────────────
 0xFC        - wait
 0xFD        - stop

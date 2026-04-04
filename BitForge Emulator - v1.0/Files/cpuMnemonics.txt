@@ -61,6 +61,22 @@
 0x3B        - dec32      [DESC] [DST]
 0x3C        - dec64      [DESC] [DST]
 
+; ── Integer Mod ────────────────────────────────────────────────
+0x3D        - smod8      [DESC] [DST] [SRC1] [SRC2]
+0x3E        - umod8      [DESC] [DST] [SRC1] [SRC2]
+0x3F        - smod16     [DESC] [DST] [SRC1] [SRC2]
+0x40        - umod16     [DESC] [DST] [SRC1] [SRC2]
+0x41        - smod32     [DESC] [DST] [SRC1] [SRC2]
+0x42        - umod32     [DESC] [DST] [SRC1] [SRC2]
+0x43        - smod64     [DESC] [DST] [SRC1] [SRC2]
+0x44        - umod64     [DESC] [DST] [SRC1] [SRC2]
+
+; ── Negation ───────────────────────────────────────────────────
+0x45        - neg8       [DESC] [DST]
+0x46        - neg16      [DESC] [DST]
+0x47        - neg32      [DESC] [DST]
+0x48        - neg64      [DESC] [DST]
+
 ; ── Control Flow ───────────────────────────────────────────────
 0xFC        - wait
 0xFD        - stop

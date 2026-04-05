@@ -100,8 +100,11 @@ struct CPU {
     uint64_t value1;
     uint64_t value2;
     uint64_t addr;
+    uint64_t sh;
     std::vector<uint8_t>* VectorOfBytesPointer = nullptr;
     std::vector<uint8_t> VectorOfBytes;
+    int64_t high64;
+    int64_t low64;
 
     inline void setFlagBit(CPU::flagNames flagName, bool state) {
         flags = (flags & ~flagName) | (state ? flagName : 0);

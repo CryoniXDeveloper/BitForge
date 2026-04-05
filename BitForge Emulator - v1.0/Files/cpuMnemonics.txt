@@ -3,82 +3,237 @@
 0x01-0x0F   - extended opcode
 
 ; ── Memory Write ───────────────────────────────────────────────
-0x10        - mval8      [DESC] [DST] [SRC]
-0x11        - mval16     [DESC] [DST] [SRC]
-0x12        - mval32     [DESC] [DST] [SRC]
-0x13        - mval64     [DESC] [DST] [SRC]
-0x14        - mval64plus [DESC] [DST] [SRC]
+0x10        - mval8      [DESC] [VALUE1] [VALUE2]
+0x11        - mval16     [DESC] [VALUE1] [VALUE2]
+0x12        - mval32     [DESC] [VALUE1] [VALUE2]
+0x13        - mval64     [DESC] [VALUE1] [VALUE2]
+0x14        - mval64plus [DESC] [VALUE1] [VALUE2]
 
 ; ── Integer Add ────────────────────────────────────────────────
-0x15        - sadd8      [DESC] [DST] [SRC1] [SRC2]
-0x16        - uadd8      [DESC] [DST] [SRC1] [SRC2]
-0x17        - sadd16     [DESC] [DST] [SRC1] [SRC2]
-0x18        - uadd16     [DESC] [DST] [SRC1] [SRC2]
-0x19        - sadd32     [DESC] [DST] [SRC1] [SRC2]
-0x1A        - uadd32     [DESC] [DST] [SRC1] [SRC2]
-0x1B        - sadd64     [DESC] [DST] [SRC1] [SRC2]
-0x1C        - uadd64     [DESC] [DST] [SRC1] [SRC2]
+0x15        - sadd8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x16        - uadd8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x17        - sadd16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x18        - uadd16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x19        - sadd32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x1A        - uadd32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x1B        - sadd64     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x1C        - uadd64     [DESC] [VALUE1] [VALUE2] [VALUE3]
 
 ; ── Integer Sub ────────────────────────────────────────────────
-0x1D        - ssub8      [DESC] [DST] [SRC1] [SRC2]
-0x1E        - usub8      [DESC] [DST] [SRC1] [SRC2]
-0x1F        - ssub16     [DESC] [DST] [SRC1] [SRC2]
-0x20        - usub16     [DESC] [DST] [SRC1] [SRC2]
-0x21        - ssub32     [DESC] [DST] [SRC1] [SRC2]
-0x22        - usub32     [DESC] [DST] [SRC1] [SRC2]
-0x23        - ssub64     [DESC] [DST] [SRC1] [SRC2]
-0x24        - usub64     [DESC] [DST] [SRC1] [SRC2]
+0x1D        - ssub8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x1E        - usub8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x1F        - ssub16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x20        - usub16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x21        - ssub32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x22        - usub32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x23        - ssub64     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x24        - usub64     [DESC] [VALUE1] [VALUE2] [VALUE3]
 
 ; ── Integer Mul ────────────────────────────────────────────────
-0x25        - smul8      [DESC] [DST] [SRC1] [SRC2]
-0x26        - umul8      [DESC] [DST] [SRC1] [SRC2]
-0x27        - smul16     [DESC] [DST] [SRC1] [SRC2]
-0x28        - umul16     [DESC] [DST] [SRC1] [SRC2]
-0x29        - smul32     [DESC] [DST] [SRC1] [SRC2]
-0x2A        - umul32     [DESC] [DST] [SRC1] [SRC2]
-0x2B        - smul64     [DESC] [DST] [SRC1] [SRC2]
-0x2C        - umul64     [DESC] [DST] [SRC1] [SRC2]
+0x25        - smul8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x26        - umul8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x27        - smul16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x28        - umul16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x29        - smul32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x2A        - umul32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x2B        - smul64     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x2C        - umul64     [DESC] [VALUE1] [VALUE2] [VALUE3]
 
 ; ── Integer Div ────────────────────────────────────────────────
-0x2D        - sdiv8      [DESC] [DST] [SRC1] [SRC2]
-0x2E        - udiv8      [DESC] [DST] [SRC1] [SRC2]
-0x2F        - sdiv16     [DESC] [DST] [SRC1] [SRC2]
-0x30        - udiv16     [DESC] [DST] [SRC1] [SRC2]
-0x31        - sdiv32     [DESC] [DST] [SRC1] [SRC2]
-0x32        - udiv32     [DESC] [DST] [SRC1] [SRC2]
-0x33        - sdiv64     [DESC] [DST] [SRC1] [SRC2]
-0x34        - udiv64     [DESC] [DST] [SRC1] [SRC2]
+0x2D        - sdiv8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x2E        - udiv8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x2F        - sdiv16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x30        - udiv16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x31        - sdiv32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x32        - udiv32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x33        - sdiv64     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x34        - udiv64     [DESC] [VALUE1] [VALUE2] [VALUE3]
 
 ; ── Increment ──────────────────────────────────────────────────
-0x35        - inc8       [DESC] [DST]
-0x36        - inc16      [DESC] [DST]
-0x37        - inc32      [DESC] [DST]
-0x38        - inc64      [DESC] [DST]
+0x35        - inc8       [DESC] [VALUE1]
+0x36        - inc16      [DESC] [VALUE1]
+0x37        - inc32      [DESC] [VALUE1]
+0x38        - inc64      [DESC] [VALUE1]
 
 ; ── Decrement ──────────────────────────────────────────────────
-0x39        - dec8       [DESC] [DST]
-0x3A        - dec16      [DESC] [DST]
-0x3B        - dec32      [DESC] [DST]
-0x3C        - dec64      [DESC] [DST]
+0x39        - dec8       [DESC] [VALUE1]
+0x3A        - dec16      [DESC] [VALUE1]
+0x3B        - dec32      [DESC] [VALUE1]
+0x3C        - dec64      [DESC] [VALUE1]
 
 ; ── Integer Mod ────────────────────────────────────────────────
-0x3D        - smod8      [DESC] [DST] [SRC1] [SRC2]
-0x3E        - umod8      [DESC] [DST] [SRC1] [SRC2]
-0x3F        - smod16     [DESC] [DST] [SRC1] [SRC2]
-0x40        - umod16     [DESC] [DST] [SRC1] [SRC2]
-0x41        - smod32     [DESC] [DST] [SRC1] [SRC2]
-0x42        - umod32     [DESC] [DST] [SRC1] [SRC2]
-0x43        - smod64     [DESC] [DST] [SRC1] [SRC2]
-0x44        - umod64     [DESC] [DST] [SRC1] [SRC2]
+0x3D        - smod8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x3E        - umod8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x3F        - smod16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x40        - umod16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x41        - smod32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x42        - umod32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x43        - smod64     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x44        - umod64     [DESC] [VALUE1] [VALUE2] [VALUE3]
 
 ; ── Negation ───────────────────────────────────────────────────
-0x45        - neg8       [DESC] [DST]
-0x46        - neg16      [DESC] [DST]
-0x47        - neg32      [DESC] [DST]
-0x48        - neg64      [DESC] [DST]
+0x45        - neg8       [DESC] [VALUE1]
+0x46        - neg16      [DESC] [VALUE1]
+0x47        - neg32      [DESC] [VALUE1]
+0x48        - neg64      [DESC] [VALUE1]
+
+; ── Compare ────────────────────────────────────────────────────
+0x49        - scmp8      [DESC] [VALUE1] [VALUE2]
+0x4A        - ucmp8      [DESC] [VALUE1] [VALUE2]
+0x4B        - scmp16     [DESC] [VALUE1] [VALUE2]
+0x4C        - ucmp16     [DESC] [VALUE1] [VALUE2]
+0x4D        - scmp32     [DESC] [VALUE1] [VALUE2]
+0x4E        - ucmp32     [DESC] [VALUE1] [VALUE2]
+0x4F        - scmp64     [DESC] [VALUE1] [VALUE2]
+0x50        - ucmp64     [DESC] [VALUE1] [VALUE2]
+
+; ── Test ───────────────────────────────────────────────────────
+0x51        - test8      [DESC] [VALUE1] [VALUE2]
+0x52        - test16     [DESC] [VALUE1] [VALUE2]
+0x53        - test32     [DESC] [VALUE1] [VALUE2]
+0x54        - test64     [DESC] [VALUE1] [VALUE2]
+
+; ── Bitwise AND ────────────────────────────────────────────────
+0x55        - and8       [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x56        - and16      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x57        - and32      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x58        - and64      [DESC] [VALUE1] [VALUE2] [VALUE3]
+
+; ── Bitwise OR ─────────────────────────────────────────────────
+0x59        - or8        [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x5A        - or16       [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x5B        - or32       [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x5C        - or64       [DESC] [VALUE1] [VALUE2] [VALUE3]
+
+; ── Bitwise XOR ────────────────────────────────────────────────
+0x5D        - xor8       [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x5E        - xor16      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x5F        - xor32      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x60        - xor64      [DESC] [VALUE1] [VALUE2] [VALUE3]
+
+; ── Bitwise NOT ────────────────────────────────────────────────
+0x61        - not8       [DESC] [VALUE1]
+0x62        - not16      [DESC] [VALUE1]
+0x63        - not32      [DESC] [VALUE1]
+0x64        - not64      [DESC] [VALUE1]
+
+; ── Shift Left ─────────────────────────────────────────────────
+0x65        - shl8       [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x66        - shl16      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x67        - shl32      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x68        - shl64      [DESC] [VALUE1] [VALUE2] [VALUE3]
+
+; ── Shift Right ────────────────────────────────────────────────
+0x69        - shr8       [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x6A        - shr16      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x6B        - shr32      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x6C        - shr64      [DESC] [VALUE1] [VALUE2] [VALUE3]
+
+; ── Shift Arithmetic Right ─────────────────────────────────────
+0x6D        - sar8       [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x6E        - sar16      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x6F        - sar32      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x70        - sar64      [DESC] [VALUE1] [VALUE2] [VALUE3]
+
+; ── AND NOT ────────────────────────────────────────────────────
+0x71        - andn8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x72        - andn16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x73        - andn32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x74        - andn64     [DESC] [VALUE1] [VALUE2] [VALUE3]
+
+; ── Bit Set ────────────────────────────────────────────────────
+0x75        - bset8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x76        - bset16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x77        - bset32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x78        - bset64     [DESC] [VALUE1] [VALUE2] [VALUE3]
+
+; ── Bit Clear ──────────────────────────────────────────────────
+0x79        - bclr8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x7A        - bclr16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x7B        - bclr32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x7C        - bclr64     [DESC] [VALUE1] [VALUE2] [VALUE3]
+
+; ── Bit Flip ───────────────────────────────────────────────────
+0x7D        - bflip8     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x7E        - bflip16    [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x7F        - bflip32    [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x80        - bflip64    [DESC] [VALUE1] [VALUE2] [VALUE3]
+
+; ── Bit Test ───────────────────────────────────────────────────
+0x81        - btst8      [DESC] [VALUE1] [VALUE2]
+0x82        - btst16     [DESC] [VALUE1] [VALUE2]
+0x83        - btst32     [DESC] [VALUE1] [VALUE2]
+0x84        - btst64     [DESC] [VALUE1] [VALUE2]
+
+; ── Byte Swap ──────────────────────────────────────────────────
+0x85        - bswap16    [DESC] [VALUE1]
+0x86        - bswap32    [DESC] [VALUE1]
+0x87        - bswap64    [DESC] [VALUE1]
 
 ; ── Control Flow ───────────────────────────────────────────────
 0xFC        - wait
 0xFD        - stop
-0xFE        - sleepms    [DESC] [SRC]
-0xFF        - sleepsec   [DESC] [SRC]
+0xFE        - sleepms    [DESC] [VALUE1]
+0xFF        - sleepsec   [DESC] [VALUE1]
+
+; ── Extended Opcodes (PREFIX 0x01) ─────────────────────────────
+
+; ── Bitwise NAND ───────────────────────────────────────────────
+0x01 0x00   - nand8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x01 0x01   - nand16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x01 0x02   - nand32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x01 0x03   - nand64     [DESC] [VALUE1] [VALUE2] [VALUE3]
+
+; ── Bitwise NOR ────────────────────────────────────────────────
+0x01 0x04   - nor8       [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x01 0x05   - nor16      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x01 0x06   - nor32      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x01 0x07   - nor64      [DESC] [VALUE1] [VALUE2] [VALUE3]
+
+; ── Bitwise XNOR ───────────────────────────────────────────────
+0x01 0x08   - xnor8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x01 0x09   - xnor16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x01 0x0A   - xnor32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x01 0x0B   - xnor64     [DESC] [VALUE1] [VALUE2] [VALUE3]
+
+; ── Rotate Left ────────────────────────────────────────────────
+0x01 0x0C   - rol8       [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x01 0x0D   - rol16      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x01 0x0E   - rol32      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x01 0x0F   - rol64      [DESC] [VALUE1] [VALUE2] [VALUE3]
+
+; ── Rotate Right ───────────────────────────────────────────────
+0x01 0x10   - ror8       [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x01 0x11   - ror16      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x01 0x12   - ror32      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x01 0x13   - ror64      [DESC] [VALUE1] [VALUE2] [VALUE3]
+
+; ── Population Count ───────────────────────────────────────────
+0x01 0x14   - popcnt8    [DESC] [VALUE1] [VALUE2]
+0x01 0x15   - popcnt16   [DESC] [VALUE1] [VALUE2]
+0x01 0x16   - popcnt32   [DESC] [VALUE1] [VALUE2]
+0x01 0x17   - popcnt64   [DESC] [VALUE1] [VALUE2]
+
+; ── Count Leading Zeros ────────────────────────────────────────
+0x01 0x18   - clz8       [DESC] [VALUE1] [VALUE2]
+0x01 0x19   - clz16      [DESC] [VALUE1] [VALUE2]
+0x01 0x1A   - clz32      [DESC] [VALUE1] [VALUE2]
+0x01 0x1B   - clz64      [DESC] [VALUE1] [VALUE2]
+
+; ── Count Trailing Zeros ───────────────────────────────────────
+0x01 0x1C   - ctz8       [DESC] [VALUE1] [VALUE2]
+0x01 0x1D   - ctz16      [DESC] [VALUE1] [VALUE2]
+0x01 0x1E   - ctz32      [DESC] [VALUE1] [VALUE2]
+0x01 0x1F   - ctz64      [DESC] [VALUE1] [VALUE2]
+
+; ── Bit Scan Forward ───────────────────────────────────────────
+0x01 0x20   - bsf8       [DESC] [VALUE1] [VALUE2]
+0x01 0x21   - bsf16      [DESC] [VALUE1] [VALUE2]
+0x01 0x22   - bsf32      [DESC] [VALUE1] [VALUE2]
+0x01 0x23   - bsf64      [DESC] [VALUE1] [VALUE2]
+
+; ── Bit Scan Reverse ───────────────────────────────────────────
+0x01 0x24   - bsr8       [DESC] [VALUE1] [VALUE2]
+0x01 0x25   - bsr16      [DESC] [VALUE1] [VALUE2]
+0x01 0x26   - bsr32      [DESC] [VALUE1] [VALUE2]
+0x01 0x27   - bsr64      [DESC] [VALUE1] [VALUE2]

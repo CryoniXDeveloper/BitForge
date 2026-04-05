@@ -103,6 +103,7 @@ struct CPU {
     uint64_t sh;
     std::vector<uint8_t>* VectorOfBytesPointer = nullptr;
     std::vector<uint8_t> VectorOfBytes;
+    int64_t result64;
     int64_t high64;
     int64_t low64;
 

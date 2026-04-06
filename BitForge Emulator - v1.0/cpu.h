@@ -32,6 +32,9 @@ struct CPU {
 
     Timer timer;
 
+    void triggerInterrupt(uint8_t vector);
+    void checkInterrupts();
+
     enum flagNames : uint8_t {
         FLAG_CARRY      = 1 << 7,
         FLAG_ZERO       = 1 << 6,
@@ -72,12 +75,15 @@ struct CPU {
     uint8_t mnemonicType1;
     uint8_t mnemonicType2;
     uint8_t mnemonicType3;
+    uint8_t mnemonicType4;
     OpType op1Type;
     OpType op2Type;
     OpType op3Type;
+    OpType op4Type;
     int op1Size;
     int op2Size;
     int op3Size;
+    int op4Size;
     int op2VectorSize;
     int registersNeeded;
 
@@ -109,6 +115,10 @@ struct CPU {
     uint64_t carry;
     uint64_t sum;
     unsigned char c_out;
+
+    bool pendingInterrupt = false;
+    bool pendingNMI = false;
+    uint8_t interruptNumber = 0;
 
     inline void setFlagBit(CPU::flagNames flagName, bool state) {
         flags = (flags & ~flagName) | (state ? flagName : 0);

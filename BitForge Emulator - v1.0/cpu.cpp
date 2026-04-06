@@ -27,6 +27,7 @@ void CPU::start() {
     timer.start();
 
     while (running) {
+        checkInterrupts();
         if (sleepCounter > 0) {
             sleepCounter--;
         } else {
@@ -101,6 +102,34 @@ void CPU::start() {
     std::cin.get();
 }
 
+void CPU::triggerInterrupt(uint8_t vector) {
+    stackPointer -= 8;
+    write64(stackPointer, instructionPointer);
+
+    stackPointer -= 1;
+    write8(stackPointer, flags);
+
+    setFlagBit(FLAG_SUPERVISOR, true);
+    setFlagBit(FLAG_INTERRUPT, false);
+
+    uint64_t handlerAddress = read64(Motherboard::IVT_START + (uint64_t)vector * 8);
+    instructionPointer = handlerAddress;
+}
+
+void CPU::checkInterrupts() {
+    if (pendingNMI) {
+        triggerInterrupt(0);
+        pendingNMI = false;
+        return;
+    }
+
+    if (!pendingInterrupt) return;
+    if (!getFlagBit(FLAG_INTERRUPT)) return;
+
+    triggerInterrupt(interruptNumber);
+    pendingInterrupt = false;
+}
+
 void CPU::fetch() {
     opcode = read8(instructionPointer);
 
@@ -126,10 +155,15 @@ void CPU::decode() {
     op1Size = 0;
     op2Size = 0;
     op3Size = 0;
+    op4Size = 0;
 
     switch (opcode) {
         case 0x00: case 0xAF: case 0xB8:
         case 0xB9: case 0xBA: case 0xBB:
+        case 0xBC: case 0xBD: case 0xBE:
+        case 0xBF: case 0xC0: case 0xC1:
+        case 0xC2: case 0xDE: case 0xDF:
+        case 0xFC:
             break;
 
         case 0x10: case 0x11: case 0x12: case 0x13:
@@ -142,7 +176,8 @@ void CPU::decode() {
         case 0x011C: case 0x011D: case 0x011E: case 0x011F:
         case 0x0120: case 0x0121: case 0x0122: case 0x0123:
         case 0x0124: case 0x0125: case 0x0126: case 0x0127:
-        case 0xAD:
+        case 0xAD: case 0xC3: case 0xE0: case 0xE1:
+        case 0xE2: case 0xE3: case 0xE4: case 0xE5:
             mnemonicType1 = read8(instructionPointer);
             instructionPointer++;
             mnemonicType2 = read8(instructionPointer);
@@ -274,6 +309,11 @@ void CPU::decode() {
         case 0x8C: case 0x8D: case 0x8E: case 0x8F:
         case 0x90: case 0x91: case 0x92: case 0x93:
         case 0x94: case 0x95: case 0x96: case 0x97:
+        case 0xC4: case 0xC5: case 0xC6: case 0xC7:
+        case 0xC8: case 0xC9: case 0xCA: case 0xCB:
+        case 0xCC: case 0xCD: case 0xCE: case 0xCF:
+        case 0xD0: case 0xD1: case 0xD2: case 0xD3:
+        case 0xD4: case 0xD5:
             mnemonicType1 = read8(instructionPointer);
             instructionPointer++;
             mnemonicType2 = read8(instructionPointer);
@@ -369,6 +409,90 @@ void CPU::decode() {
             }
 
             instructionPointer += op1Size;
+            break;
+
+        case 0xD6: case 0xD7: case 0xD8: case 0xD9:
+        case 0xDA: case 0xDB: case 0xDC: case 0xDD:
+            mnemonicType1 = read8(instructionPointer);
+            instructionPointer++;
+            mnemonicType2 = read8(instructionPointer);
+            instructionPointer++;
+            mnemonicType3 = read8(instructionPointer);
+            instructionPointer++;
+            mnemonicType4 = read8(instructionPointer);
+            instructionPointer++;
+
+            op1Type = mnemonicMoveOperandTypes[mnemonicType1];
+            op1Size = mnemonicMoveOperandBytes[mnemonicType1];
+
+            op2Type = mnemonicMoveOperandTypes[mnemonicType2];
+            op2Size = mnemonicMoveOperandBytes[mnemonicType2];
+
+            op3Type = mnemonicMoveOperandTypes[mnemonicType3];
+            op3Size = mnemonicMoveOperandBytes[mnemonicType3];
+
+            op4Type = mnemonicMoveOperandTypes[mnemonicType4];
+            op4Size = mnemonicMoveOperandBytes[mnemonicType4];
+
+            if (op1Size == 1) {
+                operands8[op8Index++] = read8(instructionPointer);
+
+            } else if (op1Size == 2) {
+                operands16[op16Index++] = read16(instructionPointer);
+
+            } else if (op1Size == 4) {
+                operands32[op32Index++] = read32(instructionPointer);
+
+            } else if (op1Size == 8) {
+                operands64[op64Index++] = read64(instructionPointer);
+            }
+
+            instructionPointer += op1Size;
+
+            if (op2Size == 1) {
+                operands8[op8Index++] = read8(instructionPointer);
+
+            } else if (op2Size == 2) {
+                operands16[op16Index++] = read16(instructionPointer);
+
+            } else if (op2Size == 4) {
+                operands32[op32Index++] = read32(instructionPointer);
+
+            } else if (op2Size == 8) {
+                operands64[op64Index++] = read64(instructionPointer);
+            }
+
+            instructionPointer += op2Size;
+
+            if (op3Size == 1) {
+                operands8[op8Index++] = read8(instructionPointer);
+
+            } else if (op3Size == 2) {
+                operands16[op16Index++] = read16(instructionPointer);
+
+            } else if (op3Size == 4) {
+                operands32[op32Index++] = read32(instructionPointer);
+
+            } else if (op3Size == 8) {
+                operands64[op64Index++] = read64(instructionPointer);
+            }
+
+            instructionPointer += op3Size;
+
+            if (op4Size == 1) {
+                operands8[op8Index++] = read8(instructionPointer);
+
+            } else if (op4Size == 2) {
+                operands16[op16Index++] = read16(instructionPointer);
+
+            } else if (op4Size == 4) {
+                operands32[op32Index++] = read32(instructionPointer);
+
+            } else if (op4Size == 8) {
+                operands64[op64Index++] = read64(instructionPointer);
+            }
+
+            instructionPointer += op4Size;
             break;
 
         case 0xFD:
@@ -15150,6 +15274,105 @@ void CPU::execute() {
         case 0xBB:
             stackPointer += 1;
             flags = read8(stackPointer);
+            break;
+
+        case 0xBC:
+            flags &= ~(1 << 7);
+            break;
+
+        case 0xBD:
+            flags |=  (1 << 7);
+            break;
+
+        case 0xBE:
+            flags &= ~(1 << 1);
+            break;
+        case 0xBF:
+            flags |=  (1 << 1);
+            break;
+
+        case 0xC0:
+            flags &= ~(1 << 3);
+            break;
+
+        case 0xC1:
+            flags |=  (1 << 3);
+            break;
+
+        case 0xC2:
+            flags &= ~(1 << 4);
+            break;
+
+        case 0xC3:
+            resetOpIndexes();
+
+            switch (op1Type) {
+                case reg:
+                    value1 = registers[operands8[op8Index++]];
+                    break;
+
+                case imm:
+                    value1 = operands8[op8Index++];
+                    break;
+
+                case mem_imm:
+                    switch (op1Size) {
+                        case 1: dest = operands8[op8Index++]; break;
+                        case 2: dest = operands16[op16Index++]; break;
+                        case 4: dest = operands32[op32Index++]; break;
+                        case 8: dest = operands64[op64Index++]; break;
+                    }
+
+                    value1 = read8(dest);
+                    break;
+
+                case mem_reg:
+                    switch (op1Size) {
+                        case 1: dest = registers[operands8[op8Index++]]; break;
+                        case 2: dest = registers[operands16[op16Index++]]; break;
+                        case 4: dest = registers[operands32[op32Index++]]; break;
+                        case 8: dest = registers[operands64[op64Index++]]; break;
+                    }
+
+                    value1 = read8(dest);
+                    break;
+            }
+
+            switch (op2Type) {
+                case reg:
+                    value2 = registers[operands8[op8Index]];
+                    break;
+
+                case imm:
+                    value2 = operands8[op8Index];
+                    break;
+
+                case mem_imm:
+                    switch (op2Size) {
+                        case 1: dest = operands8[op8Index]; break;
+                        case 2: dest = operands16[op16Index]; break;
+                        case 4: dest = operands32[op32Index]; break;
+                        case 8: dest = operands64[op64Index]; break;
+                    }
+
+                    value2 = read8(dest);
+                    break;
+
+                case mem_reg:
+                    switch (op2Size) {
+                        case 1: dest = registers[operands8[op8Index]]; break;
+                        case 2: dest = registers[operands16[op16Index]]; break;
+                        case 4: dest = registers[operands32[op32Index]]; break;
+                        case 8: dest = registers[operands64[op64Index]]; break;
+                    }
+
+                    value2 = read8(dest);
+                    break;
+            }
+
+            value = registers[value1];
+            registers[value1] = registers[value2];
+            registers[value2] = value;
 
             break;
 

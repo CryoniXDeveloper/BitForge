@@ -255,7 +255,7 @@
 0xBF        - std
 0xC0        - cli
 0xC1        - sti
-0xC2        - clv
+0xC2        - clo
 
 ; ── Exchange ───────────────────────────────────────────────────
 0xC3        - xchg       [DESC] [VALUE1] [VALUE2]

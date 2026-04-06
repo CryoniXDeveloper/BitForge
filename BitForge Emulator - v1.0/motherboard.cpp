@@ -10,7 +10,7 @@ Motherboard::Motherboard() {
     cpu->rom = &rom;
     cpu->memory = &memory;
     cpu->instructionPointer = ROM_START;
-    cpu->stackPointer = RAM_END;
+    cpu->stackPointer = STACK_START;
 }
 
 Motherboard::~Motherboard() {

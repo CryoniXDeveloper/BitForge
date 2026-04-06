@@ -170,6 +170,142 @@
 0x86        - bswap32    [DESC] [VALUE1]
 0x87        - bswap64    [DESC] [VALUE1]
 
+; ── Add with Carry ─────────────────────────────────────────────
+0x88        - sadc8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x89        - uadc8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x8A        - sadc16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x8B        - uadc16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x8C        - sadc32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x8D        - uadc32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x8E        - sadc64     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x8F        - uadc64     [DESC] [VALUE1] [VALUE2] [VALUE3]
+
+; ── Subtract with Borrow ───────────────────────────────────────
+0x90        - ssbc8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x91        - usbc8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x92        - ssbc16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x93        - usbc16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x94        - ssbc32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x95        - usbc32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x96        - ssbc64     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0x97        - usbc64     [DESC] [VALUE1] [VALUE2] [VALUE3]
+
+; ── Absolute Value ─────────────────────────────────────────────
+0x98        - abs8       [DESC] [VALUE1]
+0x99        - abs16      [DESC] [VALUE1]
+0x9A        - abs32      [DESC] [VALUE1]
+0x9B        - abs64      [DESC] [VALUE1]
+
+; ── Unconditional Jump ─────────────────────────────────────────
+0x9C        - jmp        [DESC] [VALUE1]
+
+; ── Zero Flag Jumps ────────────────────────────────────────────
+0x9D        - jz         [DESC] [VALUE1]
+0x9E        - jnz        [DESC] [VALUE1]
+
+; ── Signed Comparison Jumps ────────────────────────────────────
+0x9F        - jl         [DESC] [VALUE1]
+0xA0        - jg         [DESC] [VALUE1]
+0xA1        - jle        [DESC] [VALUE1]
+0xA2        - jge        [DESC] [VALUE1]
+
+; ── Unsigned Comparison Jumps ──────────────────────────────────
+0xA3        - jb         [DESC] [VALUE1]
+0xA4        - ja         [DESC] [VALUE1]
+0xA5        - jbe        [DESC] [VALUE1]
+0xA6        - jae        [DESC] [VALUE1]
+
+; ── Flag Jumps ─────────────────────────────────────────────────
+0xA7        - jo         [DESC] [VALUE1]
+0xA8        - jno        [DESC] [VALUE1]
+0xA9        - js         [DESC] [VALUE1]
+0xAA        - jns        [DESC] [VALUE1]
+0xAB        - jc         [DESC] [VALUE1]
+0xAC        - jnc        [DESC] [VALUE1]
+
+; ── Loop / Call / Ret ──────────────────────────────────────────
+0xAD        - loop       [DESC] [VALUE1] [VALUE2]
+0xAE        - call       [DESC] [VALUE1]
+0xAF        - ret
+
+; ── Push ───────────────────────────────────────────────────────
+0xB0        - push8      [DESC] [VALUE1]
+0xB1        - push16     [DESC] [VALUE1]
+0xB2        - push32     [DESC] [VALUE1]
+0xB3        - push64     [DESC] [VALUE1]
+
+; ── Pop ────────────────────────────────────────────────────────
+0xB4        - pop8       [DESC] [VALUE1]
+0xB5        - pop16      [DESC] [VALUE1]
+0xB6        - pop32      [DESC] [VALUE1]
+0xB7        - pop64      [DESC] [VALUE1]
+
+; ── Push/Pop All Registers ─────────────────────────────────────
+0xB8        - pusha
+0xB9        - popa
+
+; ── Push/Pop Flags ─────────────────────────────────────────────
+0xBA        - pushf
+0xBB        - popf
+
+; ── Flag Manipulation ──────────────────────────────────────────
+0xBC        - clc
+0xBD        - stc
+0xBE        - cld
+0xBF        - std
+0xC0        - cli
+0xC1        - sti
+0xC2        - clv
+
+; ── Exchange ───────────────────────────────────────────────────
+0xC3        - xchg       [DESC] [VALUE1] [VALUE2]
+
+; ── Multiply High ──────────────────────────────────────────────
+0xC4        - smulhi64   [DESC] [VALUE1] [VALUE2] [VALUE3]
+0xC5        - umulhi64   [DESC] [VALUE1] [VALUE2] [VALUE3]
+
+; ── Min/Max ────────────────────────────────────────────────────
+0xC6        - smin8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0xC7        - umin8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0xC8        - smax8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0xC9        - umax8      [DESC] [VALUE1] [VALUE2] [VALUE3]
+0xCA        - smin16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0xCB        - umin16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0xCC        - smax16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0xCD        - umax16     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0xCE        - smin32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0xCF        - umin32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0xD0        - smax32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0xD1        - umax32     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0xD2        - smin64     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0xD3        - umin64     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0xD4        - smax64     [DESC] [VALUE1] [VALUE2] [VALUE3]
+0xD5        - umax64     [DESC] [VALUE1] [VALUE2] [VALUE3]
+
+; ── Clamp ──────────────────────────────────────────────────────
+0xD6        - sclamp8    [DESC] [VALUE1] [VALUE2] [VALUE3] [VALUE4]
+0xD7        - uclamp8    [DESC] [VALUE1] [VALUE2] [VALUE3] [VALUE4]
+0xD8        - sclamp16   [DESC] [VALUE1] [VALUE2] [VALUE3] [VALUE4]
+0xD9        - uclamp16   [DESC] [VALUE1] [VALUE2] [VALUE3] [VALUE4]
+0xDA        - sclamp32   [DESC] [VALUE1] [VALUE2] [VALUE3] [VALUE4]
+0xDB        - uclamp32   [DESC] [VALUE1] [VALUE2] [VALUE3] [VALUE4]
+0xDC        - sclamp64   [DESC] [VALUE1] [VALUE2] [VALUE3] [VALUE4]
+0xDD        - uclamp64   [DESC] [VALUE1] [VALUE2] [VALUE3] [VALUE4]
+
+; ── Enter / Leave ──────────────────────────────────────────────
+0xDE        - enter
+0xDF        - leave
+
+; ── Sign Extension ─────────────────────────────────────────────
+0xE0        - sext8      [DESC] [VALUE1] [VALUE2]
+0xE1        - sext16     [DESC] [VALUE1] [VALUE2]
+0xE2        - sext32     [DESC] [VALUE1] [VALUE2]
+
+; ── Zero Extension ─────────────────────────────────────────────
+0xE3        - zext8      [DESC] [VALUE1] [VALUE2]
+0xE4        - zext16     [DESC] [VALUE1] [VALUE2]
+0xE5        - zext32     [DESC] [VALUE1] [VALUE2]
+
 ; ── Control Flow ───────────────────────────────────────────────
 0xFC        - wait
 0xFD        - stop

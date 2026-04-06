@@ -22,7 +22,7 @@ struct CPU {
     uint64_t stackPointer = 0;
     int instructionCounter = 0;
     uint64_t registers[64]{};
-    uint16_t flags = 0;
+    uint8_t flags = 0;
 
     bool running = false;
     uint64_t cycles = 0;
@@ -106,6 +106,9 @@ struct CPU {
     int64_t result64;
     int64_t high64;
     int64_t low64;
+    uint64_t carry;
+    uint64_t sum;
+    unsigned char c_out;
 
     inline void setFlagBit(CPU::flagNames flagName, bool state) {
         flags = (flags & ~flagName) | (state ? flagName : 0);

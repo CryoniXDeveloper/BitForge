@@ -11,6 +11,7 @@ Motherboard::Motherboard() {
     cpu->memory = &memory;
     cpu->instructionPointer = ROM_START;
     cpu->stackPointer = STACK_START;
+    cpu->basePointer = STACK_START;
 }
 
 Motherboard::~Motherboard() {

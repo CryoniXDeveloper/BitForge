@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <Windows.h>
 #include <unordered_map>
+#include <atomic>
 
 class Motherboard;
 class ROM;
@@ -20,13 +21,13 @@ struct CPU {
 
     uint64_t instructionPointer = 0;
     uint64_t stackPointer = 0;
+    uint64_t basePointer = 0;
     int instructionCounter = 0;
     uint64_t registers[64]{};
     uint8_t flags = 0;
 
     bool running = false;
     uint64_t cycles = 0;
-    int sleepCounter = 0;
     double CPURunTime = 0.0;
     volatile uint8_t warmup = 0;
 
@@ -105,19 +106,21 @@ struct CPU {
     uint64_t value;
     uint64_t value1;
     uint64_t value2;
+    uint64_t value3;
     uint64_t addr;
     uint64_t sh;
     std::vector<uint8_t>* VectorOfBytesPointer = nullptr;
     std::vector<uint8_t> VectorOfBytes;
     int64_t result64;
     int64_t high64;
+    uint64_t uhigh64;
     int64_t low64;
     uint64_t carry;
     uint64_t sum;
     unsigned char c_out;
 
-    bool pendingInterrupt = false;
-    bool pendingNMI = false;
+    std::atomic<bool> pendingInterrupt = false;
+    std::atomic<bool> pendingNMI = false;
     uint8_t interruptNumber = 0;
 
     inline void setFlagBit(CPU::flagNames flagName, bool state) {

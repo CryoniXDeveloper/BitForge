@@ -112,10 +112,10 @@
 0x60        - xor64      [DESC] [VALUE1] [VALUE2] [VALUE3]
 
 ; ── Bitwise NOT ────────────────────────────────────────────────
-0x61        - not8       [DESC] [VALUE1]
-0x62        - not16      [DESC] [VALUE1]
-0x63        - not32      [DESC] [VALUE1]
-0x64        - not64      [DESC] [VALUE1]
+0x61        - bnot8       [DESC] [VALUE1]
+0x62        - bnot16      [DESC] [VALUE1]
+0x63        - bnot32      [DESC] [VALUE1]
+0x64        - bnot64      [DESC] [VALUE1]
 
 ; ── Shift Left ─────────────────────────────────────────────────
 0x65        - shl8       [DESC] [VALUE1] [VALUE2] [VALUE3]

@@ -34,6 +34,19 @@ public:
     static constexpr uint64_t RAM_USABLE_START = RAM_START;
     static constexpr uint64_t RAM_USABLE_END   = IVT_START - 1;
 
+    static constexpr uint32_t IO_PORT_COUNT = 65536;
+    uint8_t ioPorts[IO_PORT_COUNT]{};
+
+    uint8_t  readPort8 (uint16_t port);
+    uint16_t readPort16(uint16_t port);
+    uint32_t readPort32(uint16_t port);
+    uint64_t readPort64(uint16_t port);
+
+    void writePort8 (uint16_t port, uint8_t  value);
+    void writePort16(uint16_t port, uint16_t value);
+    void writePort32(uint16_t port, uint32_t value);
+    void writePort64(uint16_t port, uint64_t value);
+
     Motherboard();
     ~Motherboard();
     void run();

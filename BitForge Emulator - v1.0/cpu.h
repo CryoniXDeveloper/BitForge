@@ -44,7 +44,7 @@ struct CPU {
         FLAG_INTERRUPT  = 1 << 3,
         FLAG_SLEEP      = 1 << 2,
         FLAG_DIRECTION  = 1 << 1,
-        FLAG_SUPERVISOR = 1 << 0
+        FLAG_IOACK      = 1 << 0
     };
 
     uint16_t opcode;

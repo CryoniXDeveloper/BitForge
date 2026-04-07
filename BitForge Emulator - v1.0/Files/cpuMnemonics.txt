@@ -306,6 +306,20 @@
 0xE4        - zext16     [DESC] [VALUE1] [VALUE2]
 0xE5        - zext32     [DESC] [VALUE1] [VALUE2]
 
+; ── Interrupt ──────────────────────────────────────────────────
+0xE6        - int        [DESC] [VALUE1]
+0xE7        - iret
+
+; ── I/O ────────────────────────────────────────────────────────
+0xE8        - in8        [DESC] [VALUE1] [VALUE2]
+0xE9        - in16       [DESC] [VALUE1] [VALUE2]
+0xEA        - in32       [DESC] [VALUE1] [VALUE2]
+0xEB        - in64       [DESC] [VALUE1] [VALUE2]
+0xEC        - out8       [DESC] [VALUE1] [VALUE2]
+0xED        - out16      [DESC] [VALUE1] [VALUE2]
+0xEE        - out32      [DESC] [VALUE1] [VALUE2]
+0xEF        - out64      [DESC] [VALUE1] [VALUE2]
+
 ; ── Control Flow ───────────────────────────────────────────────
 0xFC        - wait
 0xFD        - stop

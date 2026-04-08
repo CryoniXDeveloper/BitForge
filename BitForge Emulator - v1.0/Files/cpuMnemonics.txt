@@ -1,4 +1,10 @@
 ; ── Special ────────────────────────────────────────────────────
+single line
+comments    - ** [COMMENT]
+multi-line
+comments    - <* [COMMENT] *>
+label       - ![LABEL_NAME]:
+using label - [INSTRUCTION] ![LABEL_NAME]
 0x00        - nac
 0x01-0x0F   - extended opcode
 

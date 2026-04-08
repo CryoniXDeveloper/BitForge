@@ -16,7 +16,7 @@ void CPU::start() {
     size_t STACK_SIZE = Motherboard::STACK_SIZE;
     size_t STACK_START = Motherboard::STACK_START;
     size_t STACK_END = Motherboard::STACK_END;
-    stackPointer = STACK_START;
+    stackPointer = STACK_END;
     running = true;
 
     for (int i = 0; i < 1000; i++) {

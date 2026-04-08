@@ -1,550 +1,302 @@
 #include "assembler.h"
-#include <string>
-#include <vector>
 #include <fstream>
 #include <iostream>
-#include <sstream>
 #include <cctype>
-#include <cstdint>
 #include <cstdlib>
 
 Assembler assembler;
 
-void Assembler::checkFileExtension(std::string fileName, std::string fileExtension) {
-    size_t dotPosition = fileName.rfind('.');
-
-    if (dotPosition == std::string::npos) {
-        assembler.error("ASM00002", fileName);
-    }
-
-    std::string extractedString = fileName.substr(dotPosition + 1);
-
-    if (extractedString != fileExtension) {
-        assembler.error("ASM00003", fileName + "; extension expected: ." + fileExtension);
-    }
+std::string Assembler::trim(const std::string& s) {
+    size_t a = 0, b = s.size();
+    while (a < b && std::isspace(s[a])) ++a;
+    while (b > a && std::isspace(s[b-1])) --b;
+    return s.substr(a, b - a);
 }
 
-std::string Assembler::trim(const std::string& str) {
-    size_t start = 0;
-    while (start < str.size() && std::isspace(str[start])) ++start;
-
-    size_t end = str.size();
-    while (end > start && std::isspace(str[end - 1])) --end;
-
-    return str.substr(start, end - start);
-}
-
-std::vector<std::string> Assembler::splitOperandDescriptor(const std::string& str) {
-    std::vector<std::string> parts;
-    size_t start = 0;
-    size_t pos = str.find('<');
-
-    while (pos != std::string::npos) {
-        parts.push_back(str.substr(start, pos - start + 1));
-        start = pos + 1;
-        pos = str.find('<', start);
-    }
-
-    if (start < str.size()) {
-        parts.push_back(str.substr(start));
-    }
-
-    return parts;
-}
-
-std::vector<std::string> Assembler::split(const std::string& str) {
-    std::vector<std::string> tokens;
+std::vector<std::string> Assembler::split(const std::string& s) {
+    std::vector<std::string> out;
     size_t i = 0;
-
-    while (i < str.size()) {
-        while (i < str.size() && std::isspace(str[i])) ++i;
-        if (i >= str.size()) break;
-
-        if (str[i] == '"') {
-            ++i;
-            size_t start = i;
-            while (i < str.size() && str[i] != '"') ++i;
-            tokens.push_back(str.substr(start, i - start));
-            if (i < str.size() && str[i] == '"') ++i;
-
+    while (i < s.size()) {
+        while (i < s.size() && std::isspace(s[i])) ++i;
+        if (i >= s.size()) break;
+        if (s[i] == '"') {
+            size_t start = ++i;
+            while (i < s.size() && s[i] != '"') ++i;
+            out.push_back(s.substr(start, i - start));
+            if (i < s.size()) ++i;
         } else {
             size_t start = i;
-            while (i < str.size() && !std::isspace(str[i])) ++i;
-            tokens.push_back(str.substr(start, i - start));
+            while (i < s.size() && !std::isspace(s[i])) ++i;
+            std::string token = s.substr(start, i - start);
+            if (token.find('<') != std::string::npos) {
+                auto parts = parseDescriptor(token);
+                for (const auto& p : parts) out.push_back(p);
+            } else {
+                out.push_back(token);
+            }
+        }
+    }
+    return out;
+}
+
+std::vector<std::string> Assembler::parseDescriptor(const std::string& desc) {
+    std::vector<std::string> parts;
+    std::string current;
+    for (char c : desc) {
+        if (c == '<') {
+            parts.push_back(current);
+            current = "";
+        } else {
+            current += c;
         }
     }
 
-    return tokens;
+    std::vector<std::string> result;
+    std::string last;
+    for (const auto& part : parts) {
+        if (part.empty()) {
+            result.push_back(last);
+        } else {
+            result.push_back(part);
+            last = part;
+        }
+    }
+    return result;
 }
 
-std::vector<uint8_t> Assembler::getOpcode(std::string mnemonic) {
-    return mnemonicOpcode.at(mnemonic);
+std::vector<std::string> Assembler::readFile(const std::string& filename) {
+    std::ifstream f(filename);
+    if (!f) throw std::runtime_error("Cannot open: " + filename);
+    std::vector<std::string> lines;
+    std::string line;
+    bool inBlock = false;
+    while (std::getline(f, line)) {
+        std::string result;
+        bool inStr = false;
+        for (size_t i = 0; i < line.size(); ++i) {
+            if (line[i] == '"' && !inBlock) { inStr = !inStr; result += line[i]; continue; }
+            if (!inStr && !inBlock && i+1 < line.size() && line[i] == '<' && line[i+1] == '*') { inBlock = true; ++i; continue; }
+            if (!inStr && inBlock  && i+1 < line.size() && line[i] == '*' && line[i+1] == '>') { inBlock = false; ++i; continue; }
+            if (inBlock) continue;
+            if (!inStr && i+1 < line.size() && line[i] == '*' && line[i+1] == '*') break;
+            result += line[i];
+        }
+        result = trim(result);
+        if (!result.empty()) lines.push_back(result);
+    }
+    return lines;
 }
 
-std::vector<uint8_t> Assembler::getOperandInfoByte(std::string operandDescriptor) {
-    return operandByte.at(operandDescriptor);
-}
-
-void Assembler::error(std::string errorType, std::string info) const {
-    std::string returnString = "ERROR [" + errorType + "]";
-    if (info != "")
-        returnString += " - More info: " + info;
-    returnString += "\n\nFind out more in errorTypes.txt.\nStopping execution...\n";
-    
-    std::cout << returnString << std::endl; 
-    
-    std::cin.get();
+void Assembler::error(const std::string& type, const std::string& info) const {
+    std::cout << "ERROR [" << type << "]";
+    if (!info.empty()) std::cout << " - " << info;
+    std::cout << "\nStopping...\n";
     exit(0);
 }
 
-void pushData(std::vector<uint8_t> data) {
-    assembler.binaryToWrite.insert(
-        assembler.binaryToWrite.end(),
-        data.begin(),
-        data.end()
-    );
+uint8_t Assembler::descriptorByte(const std::string& type) {
+    if (type == "r8")  return 0x00;
+    if (type == "i8")  return 0x01;
+    if (type == "i16") return 0x02;
+    if (type == "i32") return 0x03;
+    if (type == "i64") return 0x04;
+    if (type == "mi8")  return 0x05;
+    if (type == "mi16") return 0x06;
+    if (type == "mi32") return 0x07;
+    if (type == "mi64") return 0x08;
+    if (type == "mr8")  return 0x09;
+    if (type == "i")    return 0x0A;
+    if (type == "lbl") return 0x04;
+    if (type == "str")    return 0x0A;
+    error("ASM00005", "Unknown operand type: " + type);
+    return 0;
 }
 
-std::vector<uint8_t> intToBytes(const std::string& valueStr, int amountOfBytes) {
-    if (amountOfBytes <= 0) return std::vector<uint8_t>();
+int Assembler::operandSize(const std::string& type) {
+    if (type == "r8" || type == "i8" || type == "mi8" || type == "mr8") return 1;
+    if (type == "i16" || type == "mi16") return 2;
+    if (type == "i32" || type == "mi32") return 4;
+    if (type == "i64" || type == "mi64") return 8;
+    if (type == "i") return 0;
+    if (type == "lbl") return 8;
+    if (type == "str") return 0;
+    error("ASM00005", "Unknown operand size: " + type);
+    return 0;
+}
 
-    std::string clean = valueStr;
-    int base = 10;
-    bool isNeg = false;
-    std::vector<uint8_t> result(amountOfBytes, 0);
-
-    try {
-        if (clean.empty()) throw 2;
-        if (clean[0] == '-') { 
-            isNeg = true; 
-            clean = clean.substr(1); 
-            if (clean.empty()) throw 2;
-        }
-
-        if (clean.size() > 2 && clean[0] == '0' && (tolower(clean[1]) == 'x' || tolower(clean[1]) == 'b')) {
-            base = (tolower(clean[1]) == 'x') ? 16 : 2;
-            clean = clean.substr(2);
-            if (clean.empty()) throw 2;
-        } else if (!isdigit(clean[0])) {
-            throw 2;
-        }
-
-        for (char c : clean) {
-            if (base == 16 && !isxdigit(c)) throw 2;
-            if (base == 2 && (c != '0' && c != '1')) throw 2;
-            if (base == 10 && !isdigit(c)) throw 2;
-        }
-
-        if (base == 16) {
-            if (((int)clean.size() + 1) / 2 > amountOfBytes) throw 1;
-            while ((int)clean.size() < amountOfBytes * 2) {
-                clean = "00" + clean;
-            }
-            int tidx = 0;
-            for (int i = (int)clean.size() - 2; i >= 0; i -= 2) {
-                result[tidx++] = (uint8_t)std::stoul(clean.substr(i, 2), nullptr, 16);
-            }
-        } 
-        else if (base == 2) {
-            if (((int)clean.size() + 7) / 8 != amountOfBytes) throw 1;
-            int tidx = 0;
-            for (int i = (int)clean.size(); i > 0; i -= 8) {
-                int start = std::max(0, i - 8);
-                result[tidx++] = (uint8_t)std::stoi(clean.substr(start, i - start), nullptr, 2);
-            }
-        } 
-        else {
-            for (char c : clean) {
-                uint32_t carry = c - '0';
-                for (int i = 0; i < amountOfBytes; i++) {
-                    uint32_t val = (uint32_t)result[i] * 10 + carry;
-                    result[i] = val & 0xFF;
-                    carry = val >> 8;
-                }
-                if (carry > 0) throw 1;
-            }
-
-            if (isNeg) {
-                uint16_t carry = 1;
-                for (int i = 0; i < amountOfBytes; i++) {
-                    uint16_t val = (uint16_t)(result[i] ^ 0xFF) + carry;
-                    result[i] = val & 0xFF;
-                    carry = val >> 8;
-                }
-            }
-        }
-
-        return result;
-
-    } catch (int e) {
-        if (e == 2) {
-            assembler.error("ASM00006", "Invalid value: " + valueStr);
-        } else {
-            assembler.error("ASM00005", "Size mismatch; size expected: " + std::to_string(amountOfBytes) + "; value: " + valueStr);
-        }
-        return std::vector<uint8_t>(amountOfBytes, 0); 
+void Assembler::encodeOperand(const std::string& type, const std::string& valueToken) {
+    int size = operandSize(type);
+    uint64_t value = std::stoull(valueToken, nullptr, 0);
+    for (int i = 0; i < size; i++) {
+        output.push_back((value >> (i * 8)) & 0xFF);
     }
 }
 
-std::vector<std::string> removeCommentsFromFile(const std::string& filename) {
-    std::ifstream inFile(filename);
-    if (!inFile) {
-        throw std::runtime_error("Cannot open file: " + filename);
+std::vector<uint8_t> Assembler::autoSizeBytes(const std::string& valueToken) {
+    std::vector<uint8_t> bytes;
+    std::string num = valueToken;
+
+    while (num != "0" && !num.empty()) {
+        int rem = 0;
+        std::string next;
+        for (char c : num) {
+            rem = rem * 10 + (c - '0');
+            if (!next.empty() || rem / 256) next += (char)('0' + rem / 256);
+            rem %= 256;
+        }
+        bytes.push_back(rem);
+        num = next.empty() ? "0" : next;
     }
 
-    std::vector<std::string> cleanedLines;
-    std::string line;
-    bool inMultiLineComment = false;
+    return bytes;
+}
 
-    while (std::getline(inFile, line)) {
-        std::string result;
-        bool inString = false;
+void Assembler::secondPass(const std::vector<std::string>& lines) {
+    size_t lineNumber = 0;
+    for (const auto& line : lines) {
+        ++lineNumber;
+        if (line.empty()) continue;
 
-        for (size_t i = 0; i < line.size(); ++i) {
-            if (line[i] == '"' && !inMultiLineComment) {
-                inString = !inString;
-                result += line[i];
-                continue;
-            }
+        std::vector<std::string> tokens = split(line);
+        if (tokens.empty()) continue;
 
-            if (!inString && !inMultiLineComment && i + 1 < line.size() && line[i] == '<' && line[i+1] == '*') {
-                inMultiLineComment = true;
-                ++i;
-                continue;
-            }
-
-            if (!inString && inMultiLineComment && i + 1 < line.size() && line[i] == '*' && line[i+1] == '>') {
-                inMultiLineComment = false;
-                ++i;
-                continue;
-            }
-
-            if (inMultiLineComment) continue;
-
-            if (!inString && i + 1 < line.size() && line[i] == '*' && line[i+1] == '*') {
-                break;
-            }
-
-            result += line[i];
+        if (tokens[0][0] == '!') {
+            std::string name = tokens[0].substr(1, tokens[0].size() - 2);
+            labels.push_back({name, (uint32_t)output.size()});
+            continue;
         }
 
-        size_t start = 0;
-        while (start < result.size() && std::isspace(result[start])) ++start;
+        else if (general0Operands.count(tokens[0])) {
+            output.push_back(general0Operands.at(tokens[0]));
+        }
 
-        size_t end = result.size();
-        while (end > start && std::isspace(result[end-1])) --end;
+        else if (general1Operands.count(tokens[0])) {
+            output.push_back(general1Operands.at(tokens[0]));
+            output.push_back(descriptorByte(tokens[1]));
+            encodeOperand(tokens[1], tokens[2]);
+        }
 
-        if (start < end) cleanedLines.push_back(result.substr(start, end - start));
+        else if (general3Operands.count(tokens[0])) {
+            const auto& opcode = general3Operands.at(tokens[0]);
+            for (auto b : opcode) output.push_back(b);
+            output.push_back(descriptorByte(tokens[1]));
+            output.push_back(descriptorByte(tokens[2]));
+            output.push_back(descriptorByte(tokens[3]));
+            encodeOperand(tokens[1], tokens[4]);
+            encodeOperand(tokens[2], tokens[5]);
+            encodeOperand(tokens[3], tokens[6]);
+        }
+
+        else if (general2Operands.count(tokens[0])) {
+            const auto& opcode = general2Operands.at(tokens[0]);
+            for (auto b : opcode) output.push_back(b);
+            output.push_back(descriptorByte(tokens[1]));
+            output.push_back(descriptorByte(tokens[2]));
+            encodeOperand(tokens[1], tokens[3]);
+            encodeOperand(tokens[2], tokens[4]);
+        }
+
+        else if (tokens[0] == "mval64plus") {
+            output.push_back(0x14);
+            output.push_back(descriptorByte(tokens[1]));
+            output.push_back(descriptorByte(tokens[2]));
+            encodeOperand(tokens[1], tokens[3]);
+
+            if (tokens[4] == "auto") {
+                auto bytes = autoSizeBytes(tokens[5]);
+                uint16_t size = bytes.size();
+                output.push_back(size & 0xFF);
+                output.push_back((size >> 8) & 0xFF);
+                for (auto b : bytes) output.push_back(b);
+
+            } else if (tokens[4] == "set") {
+                uint16_t size = (uint16_t)std::stoull(tokens[5], nullptr, 0) / 8;
+                output.push_back(size & 0xFF);
+                output.push_back((size >> 8) & 0xFF);
+                auto bytes = autoSizeBytes(tokens[6]);
+                bytes.resize(size, 0);
+                for (auto b : bytes) output.push_back(b);
+            }
+        }
+
+        else if (tokens[0] == "mvalstr") {
+            output.push_back(0x14);
+            output.push_back(descriptorByte(tokens[1]));
+            output.push_back(descriptorByte(tokens[2]));
+
+            encodeOperand(tokens[1], tokens[3]);
+
+            std::string str = tokens[4];
+            uint16_t size = str.size();
+            output.push_back(size & 0xFF);
+            output.push_back((size >> 8) & 0xFF);
+            for (char c : str) output.push_back((uint8_t)c);
+        }
+
+        else if (generalJumps.count(tokens[0])) {
+            output.push_back(generalJumps.at(tokens[0]));
+            output.push_back(descriptorByte(tokens[1]));
+            if (tokens[2][0] == '!') {
+                std::string name = tokens[2].substr(1);
+                uint64_t addr = 0;
+                for (const auto& l : labels)
+                    if (l.name == name) { addr = l.address; break; }
+                for (int b = 0; b < 8; b++) output.push_back((addr >> (b * 8)) & 0xFF);
+            } else {
+                encodeOperand(tokens[1], tokens[2]);
+            }
+        }
+
+        else if (general4Operands.count(tokens[0])) {
+            output.push_back(general4Operands.at(tokens[0]));
+            output.push_back(descriptorByte(tokens[1]));
+            output.push_back(descriptorByte(tokens[2]));
+            output.push_back(descriptorByte(tokens[3]));
+            output.push_back(descriptorByte(tokens[4]));
+            encodeOperand(tokens[1], tokens[5]);
+            encodeOperand(tokens[2], tokens[6]);
+            encodeOperand(tokens[3], tokens[7]);
+            encodeOperand(tokens[4], tokens[8]);
+        }
     }
+}
 
-    return cleanedLines;
+void Assembler::writeOutput(const std::string& filename) {
+    std::ofstream f(filename, std::ios::binary | std::ios::trunc);
+    if (!f) error("ASM00007", filename);
+    f.write(reinterpret_cast<const char*>(output.data()), output.size());
+    f.close();
 }
 
 int main() {
-    std::cout << "Enter the path of the assembly file to be converted into binary: ";
+    std::string inputFile, outputFile;
 
-    std::string assemblyFile;
-    std::getline(std::cin, assemblyFile);
+    std::cout << "Enter assembly file path: ";
+    std::getline(std::cin, inputFile);
+    if (inputFile.empty()) inputFile = "asmFile.trasm";
 
-    if (assemblyFile.empty()) {
-        assemblyFile = "asmFile.trasm";
-    }
-
-    std::ifstream inFile(assemblyFile);
-    if (!inFile) {
-        assembler.error("ASM00001", assemblyFile);
-    }
-
-    assembler.checkFileExtension(assemblyFile, "trasm");
-
-    std::cout << std::endl << "Enter the path of the output file where the binary should be saved: ";
-
-    std::string outputFile;
+    std::cout << "Enter output file path: ";
     std::getline(std::cin, outputFile);
+    if (outputFile.empty()) outputFile = "rom.bin";
 
-    if (outputFile.empty()) {
-        outputFile = "output.bin";
-    }
-
-    assembler.checkFileExtension(outputFile, "bin");
-
-    std::cout << "Turning assembly into binary..." << std::endl;
-
-    size_t lineNumber = 0;
     std::vector<std::string> lines;
-
     try {
-        lines = removeCommentsFromFile(assemblyFile);
+        lines = assembler.readFile(inputFile);
     } catch (const std::exception& e) {
-        assembler.error("ASM00004", e.what());
+        assembler.error("ASM00001", e.what());
     }
 
-    for (const auto& line : lines) {
-        ++lineNumber;
+    std::cout << "Assembling...\n";
 
-        if (line.empty()) continue;
+    assembler.secondPass(lines);
+    const size_t ROM_SIZE = 32 * 1024;
+    while (assembler.output.size() < ROM_SIZE)
+        assembler.output.push_back(0x00);
 
-        std::vector<std::string> tokens = assembler.split(line);
-        if (tokens.empty()) continue;
+    assembler.writeOutput(outputFile);
+    std::cout << "Done! Written to " << outputFile << " (padded to 32KB)\n";
 
-        size_t currentIndex = 0;
-        size_t toAdd = 0;
-        std::vector<uint8_t> currentData;
-        std::string mnemonic;
-
-        std::string operandDescriptor1;
-        std::string operandDescriptor2;
-
-        try {
-
-            if (tokens.at(currentIndex) == "nac") {
-                currentData = assembler.getOpcode(tokens.at(currentIndex));
-                pushData(currentData);
-            }
-
-            else if (Assembler::mvalMnemonics.find(tokens.at(currentIndex)) != Assembler::mvalMnemonics.end()) {
-                mnemonic = tokens.at(currentIndex);
-                currentData = assembler.getOpcode(mnemonic);
-                pushData(currentData);
-
-                currentIndex += 1;
-                if (currentIndex >= tokens.size()) {
-                    assembler.error("ASM00005", "Missing descriptors at line " + std::to_string(lineNumber));
-                }
-
-                std::vector<std::string> descriptors = assembler.splitOperandDescriptor(tokens.at(currentIndex));
-                
-                if (descriptors.empty()) {
-                    assembler.error("ASM00005", "Invalid descriptor format at line " + std::to_string(lineNumber));
-                }
-
-                operandDescriptor1 = descriptors.at(0);
-                
-                if (descriptors.size() > 1) {
-                    operandDescriptor2 = descriptors.at(1);
-                } else {
-                    operandDescriptor2 = operandDescriptor1;
-                }
-
-                if (operandDescriptor2 == "<" || operandDescriptor2.empty()) {
-                    operandDescriptor2 = operandDescriptor1;
-                }
-
-                currentData = assembler.getOperandInfoByte(operandDescriptor1);
-                pushData(currentData);
-
-                int size1 = Assembler::operandMapBytes.at(operandDescriptor1).size;
-                std::string type1 = Assembler::operandMapBytes.at(operandDescriptor1).type;
-
-                currentData = assembler.getOperandInfoByte(operandDescriptor2);
-                pushData(currentData);
-
-                int size2 = Assembler::operandMapBytes.at(operandDescriptor2).size;
-                
-                if (size2 == 0) {
-                    assembler.error("ASM00005", "For moving immediates bigger than 64 bits use mvalplus only; line " + std::to_string(lineNumber));
-                }
-
-                std::string type2 = Assembler::operandMapBytes.at(operandDescriptor2).type;
-
-                currentIndex += 1;
-                if (currentIndex >= tokens.size()) {
-                    assembler.error("ASM00005", "Missing 1st operand value at line " + std::to_string(lineNumber));
-                }
-
-                currentData = intToBytes(tokens.at(currentIndex), size1);
-
-                if ((type1 == "r" || type1 == "mr") && static_cast<int>(currentData[0]) > assembler.registers64max) {
-                    assembler.error("ASM00005", "No such register; line " + std::to_string(lineNumber));
-                }
-
-                pushData(currentData);
-
-                currentIndex += 1;
-                if (currentIndex >= tokens.size()) {
-                    assembler.error("ASM00005", "Missing 2nd operand value at line " + std::to_string(lineNumber));
-                }
-
-                currentData = intToBytes(tokens.at(currentIndex), size2);
-
-                if ((type2 == "r" || type2 == "mr") && static_cast<int>(currentData[0]) > assembler.registers64max) {
-                    assembler.error("ASM00005", "No such register; line " + std::to_string(lineNumber));
-                }
-
-                pushData(currentData);
-            }
-
-            else if (tokens.at(currentIndex) == "mval64plus") {
-                mnemonic = tokens.at(currentIndex);
-                currentData = assembler.getOpcode(mnemonic);
-                pushData(currentData);
-
-                currentIndex += 1;
-                if (currentIndex >= tokens.size()) {
-                    assembler.error("ASM00005", "Missing descriptors at line " + std::to_string(lineNumber));
-                }
-
-                std::vector<std::string> descriptors = assembler.splitOperandDescriptor(tokens.at(currentIndex));
-                
-                if (descriptors.empty()) {
-                    assembler.error("ASM00005", "Invalid descriptor format at line " + std::to_string(lineNumber));
-                }
-
-                operandDescriptor1 = descriptors.at(0);
-                
-                if (descriptors.size() > 1) {
-                    operandDescriptor2 = descriptors.at(1);
-                } else {
-                    operandDescriptor2 = operandDescriptor1;
-                }
-
-                if (operandDescriptor2 == "<" || operandDescriptor2.empty()) {
-                    operandDescriptor2 = operandDescriptor1;
-                }
-
-                currentData = assembler.getOperandInfoByte(operandDescriptor1);
-                pushData(currentData);
-
-                int size1 = Assembler::operandMapBytes.at(operandDescriptor1).size;
-                std::string type1 = Assembler::operandMapBytes.at(operandDescriptor1).type;
-
-                currentData = assembler.getOperandInfoByte(operandDescriptor2);
-                pushData(currentData);
-
-                int size2 = Assembler::operandMapBytes.at(operandDescriptor2).size;
-                std::string type2 = Assembler::operandMapBytes.at(operandDescriptor2).type;
-
-                if (type2 == "i") {
-                    if (size2 != 0) {
-                        assembler.error("ASM00005", "Immediate must have no size; line " + std::to_string(lineNumber));
-                    }
-                }
-
-                currentIndex += 1;
-                if (currentIndex >= tokens.size()) {
-                    assembler.error("ASM00005", "Missing 1st operand value at line " + std::to_string(lineNumber));
-                }
-
-                currentData = intToBytes(tokens.at(currentIndex), size1);
-
-                if ((type1 == "r" || type1 == "mr") && static_cast<int>(currentData[0]) > assembler.registers64max) {
-                    assembler.error("ASM00005", "No such register; line " + std::to_string(lineNumber));
-                }
-
-                pushData(currentData);
-
-                currentIndex += 1;
-                if (currentIndex >= tokens.size()) {
-                    assembler.error("ASM00005", "Missing 2nd operand value at line " + std::to_string(lineNumber));
-                }
-
-                currentData = intToBytes(tokens.at(currentIndex), size2);
-
-                if ((type2 == "r" || type2 == "mr") && static_cast<int>(currentData[0]) > assembler.registers64max) {
-                    assembler.error("ASM00005", "No such register; line " + std::to_string(lineNumber));
-                }
-
-                pushData(currentData);
-            }
-
-            else if (tokens.at(currentIndex) == "wait") {
-                currentData = assembler.getOpcode(tokens.at(currentIndex));
-                pushData(currentData);
-            }
-
-            else if (tokens.at(currentIndex) == "stop") {
-                currentData = assembler.getOpcode(tokens.at(currentIndex));
-                pushData(currentData);
-            }
-
-            else if (tokens.at(currentIndex) == "sleepms") {
-                currentData = assembler.getOpcode(tokens.at(currentIndex));
-                pushData(currentData);
-
-                currentIndex += 1;
-
-                currentData = assembler.getOperandInfoByte(tokens.at(currentIndex));
-                pushData(currentData);
-                
-                int size1 = Assembler::operandMapBytes.at(tokens.at(currentIndex)).size;
-
-                currentIndex += 1;
-                
-                currentData = intToBytes(tokens.at(currentIndex), size1);
-                pushData(currentData);
-            }
-
-            else if (tokens.at(currentIndex) == "sleepsec") {
-                currentData = assembler.getOpcode(tokens.at(currentIndex));
-                pushData(currentData);
-
-                currentIndex += 1;
-
-                currentData = assembler.getOperandInfoByte(tokens.at(currentIndex));
-                pushData(currentData);
-                
-                int size1 = Assembler::operandMapBytes.at(tokens.at(currentIndex)).size;
-
-                currentIndex += 1;
-                
-                currentData = intToBytes(tokens.at(currentIndex), size1);
-                pushData(currentData);
-            }
-
-            else {
-                assembler.error("ASM00005", assemblyFile + "; line: " + std::to_string(lineNumber));
-            }
-        }
-
-        catch (const std::exception& e) {
-            assembler.error("ASM00006", assemblyFile + "; line: " + std::to_string(lineNumber) + "; " + e.what());
-        }
-    }
-
-    std::ofstream outFile(outputFile, std::ios::binary | std::ios::trunc);
-    if (!outFile) {
-        assembler.error("ASM00007", outputFile);
-    }
-
-    outFile.write(reinterpret_cast<const char*>(assembler.binaryToWrite.data()), assembler.binaryToWrite.size());
-    outFile.close();
-
-    std::cout << "Binary successfully written to " << outputFile << std::endl;
-
-    std::cout << "\nDo you want to patch rom.bin? (y/n): ";
-    char choice;
-    std::cin >> choice;
-
-    if (choice == 'y' || choice == 'Y') {
-        std::cout << "Enter start address (decimal or hex with 0x): ";
-        std::string addrStr;
-        std::cin >> addrStr;
-
-        uint64_t address = 0;
-
-        try {
-            address = std::stoull(addrStr, nullptr, 0);
-        } catch (...) {
-            assembler.error("ASM00006", "Invalid address input");
-        }
-
-        std::fstream romFile("../rom.bin", std::ios::in | std::ios::out | std::ios::binary);
-
-        if (!romFile) {
-            assembler.error("ASM00007", "rom.bin not found");
-        }
-
-        romFile.seekp(address);
-
-        romFile.write(
-            reinterpret_cast<const char*>(assembler.binaryToWrite.data()),
-            assembler.binaryToWrite.size()
-        );
-
-        romFile.close();
-
-        std::cout << "Patched rom.bin at address " << address << " with "
-                << assembler.binaryToWrite.size() << " bytes.\n";
-    }
+    std::cout << "Done! " << assembler.output.size() << " bytes written to " << outputFile << "\n";
+    std::cin.get();
     return 0;
 }

@@ -1,4 +1,61 @@
-mval8 r8<i8< 20 0xFF
-mval32 mi32<i16< 0xBFFFFF 0xDEEA
-mval64 mi32<i64< 0xFFFFFF 100000000000
+** setup values
+mval32 r8<i32< 1 100
+mval32 r8<i32< 2 37
+mval32 r8<i32< 3 0
+
+** add
+sadd32 r8<r8<r8< 3 1 2
+** reg 3 = 137
+
+** subtract
+ssub32 r8<r8<r8< 4 1 2
+** reg 4 = 63
+
+** multiply
+smul32 r8<r8<r8< 5 1 2
+** reg 5 = 3700
+
+** divide
+sdiv32 r8<r8<r8< 6 1 2
+** reg 6 = 2
+
+** mod
+smod32 r8<r8<r8< 7 1 2
+** reg 7 = 26
+
+** bitwise AND
+and32 r8<r8<r8< 8 1 2
+** reg 8 = 100 AND 37 = 36
+
+** bitwise OR
+or32 r8<r8<r8< 9 1 2
+** reg 9 = 100 OR 37 = 101
+
+** bitwise XOR
+xor32 r8<r8<r8< 10 1 2
+** reg 10 = 100 XOR 37 = 65
+
+** shift left
+shl32 r8<r8<i32< 11 1 2
+** reg 11 = 100 << 2 = 400
+
+** shift right
+shr32 r8<r8<i32< 12 1 2
+** reg 12 = 100 >> 2 = 25
+
+** min and max
+smin32 r8<r8<r8< 13 1 2
+smax32 r8<r8<r8< 14 1 2
+** reg 13 = 37, reg 14 = 100
+
+** negate
+neg32 r8< 15
+mval32 r8<i32< 15 50
+neg32 r8< 15
+** reg 15 = -50
+
+** abs
+abs32 r8< 15
+** reg 15 = 50
+
 stop

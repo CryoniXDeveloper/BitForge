@@ -2,7 +2,7 @@
 
 The CPU is now finished for its current stage, and the first version of the TrASM assembler is complete and working.
 This is a major milestone for the project — the system can now go from human-readable assembly code → compiled binary → executed by the CPU with correct results and flags.
-The current ISA includes ~246 mnemonics, covering arithmetic, bitwise operations, control flow, stack handling, I/O, and extended instructions. Initial testing shows correct behavior across multiple instruction categories, including arithmetic, logic, shifts, and flag handling.
+The current ISA includes 264 mnemonics, covering arithmetic, bitwise operations, control flow, stack handling, I/O, and extended instructions. Initial testing shows correct behavior across multiple instruction categories, including arithmetic, logic, shifts, and flag handling.
 This marks the transition from a standalone CPU into a functional toolchain, which is a huge step toward a fully self-contained system.
 There will of course be many improvements, optimizations, and additional features moving forward — including more extensive testing, refinement of the assembler, and eventually a self-hosted assembler running inside the emulator.
 

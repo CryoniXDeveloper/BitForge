@@ -1,5 +1,7 @@
 🚀 UPDATE: BIG BIG NEWS!
 
+Update 2: Right now im working in the documentation for TrASM, so thats why there hasnt been any updates lately.
+
 The CPU is now finished for its current stage, and the first version of the TrASM assembler is complete and working.
 This is a major milestone for the project — the system can now go from human-readable assembly code → compiled binary → executed by the CPU with correct results and flags.
 The current ISA includes 264 mnemonics, covering arithmetic, bitwise operations, control flow, stack handling, I/O, and extended instructions. Initial testing shows correct behavior across multiple instruction categories, including arithmetic, logic, shifts, and flag handling.

@@ -18,6 +18,10 @@ struct CPU {
     Motherboard* motherboard = nullptr;
     ROM* rom = nullptr;
     RAM* memory = nullptr;
+    size_t STACK_SIZE = Motherboard::STACK_SIZE;
+    uint64_t STACK_START = Motherboard::STACK_START;
+    uint64_t STACK_END = Motherboard::STACK_END;
+    uint64_t RAM_START = Motherboard::RAM_START;
 
     uint64_t instructionPointer = 0;
     uint64_t stackPointer = 0;
@@ -94,7 +98,7 @@ struct CPU {
     int op64Index;
     int opVectorIndex;
     
-    void resetOpIndexes() {
+    inline void resetOpIndexes() {
         op8Index = 0;
         op16Index = 0;
         op32Index = 0;

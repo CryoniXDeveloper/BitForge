@@ -2,6 +2,7 @@
 #include "motherboard.h"
 #include "rom.h"
 #include "ram.h"
+#include "storage.h"
 #include <iostream>
 #include <string>
 #include <thread>
@@ -13,9 +14,6 @@
 #include <immintrin.h>
 
 void CPU::start() {
-    size_t STACK_SIZE = Motherboard::STACK_SIZE;
-    size_t STACK_START = Motherboard::STACK_START;
-    size_t STACK_END = Motherboard::STACK_END;
     stackPointer = STACK_END;
     running = true;
 
@@ -170,6 +168,8 @@ void CPU::decode() {
         case 0xE2: case 0xE3: case 0xE4: case 0xE5:
         case 0xE8: case 0xE9: case 0xEA: case 0xEB:
         case 0xEC: case 0xED: case 0xEE: case 0xEF:
+        case 0x012A: case 0x012B: case 0x012C: case 0x012D:
+        case 0x012E: case 0x012F: case 0x0130: case 0x0131:
             op1Size = 0;
             op2Size = 0;
 
@@ -307,7 +307,7 @@ void CPU::decode() {
         case 0xC8: case 0xC9: case 0xCA: case 0xCB:
         case 0xCC: case 0xCD: case 0xCE: case 0xCF:
         case 0xD0: case 0xD1: case 0xD2: case 0xD3:
-        case 0xD4: case 0xD5:
+        case 0xD4: case 0xD5: case 0x0128: case 0x0129:
             op1Size = 0;
             op2Size = 0;
             op3Size = 0;
@@ -3646,10 +3646,18 @@ void CPU::execute() {
                     break;
             }
 
-            value = (int8_t)value1 / (int8_t)value2;
-            setFlagBit(FLAG_ZERO,     (value & 0xFF) == 0);
+            if (!(value2 & 0xFF)) return triggerInterrupt(0x00);
+
+            if ((int8_t)value1 == -128 && (int8_t)value2 == -1) {
+                setFlagBit(FLAG_OVERFLOW, 1);
+                value = -128;
+            } else {
+                setFlagBit(FLAG_OVERFLOW, 0);
+                value = (int8_t)value1 / (int8_t)value2;
+            }
+
+            setFlagBit(FLAG_ZERO, !(value & 0xFF));
             setFlagBit(FLAG_NEGATIVE, value & 0x80);
-            setFlagBit(FLAG_OVERFLOW, (int8_t)value1 == -128 && (int8_t)value2 == -1);
             value &= 0xFF;
 
             switch (op1Type) {
@@ -3751,8 +3759,9 @@ void CPU::execute() {
                     break;
             }
 
-            value = (value1 & 0xFF) / (value2 & 0xFF);
-            setFlagBit(FLAG_ZERO, (value & 0xFF) == 0);
+            if (!(value2 & 0xFF)) return triggerInterrupt(0x00);
+            value = (uint8_t)value1 / (uint8_t)value2;
+            setFlagBit(FLAG_ZERO, !(value & 0xFF));
             value &= 0xFF;
 
             switch (op1Type) {
@@ -3860,10 +3869,18 @@ void CPU::execute() {
                     break;
             }
 
-            value = (int16_t)value1 / (int16_t)value2;
-            setFlagBit(FLAG_ZERO,     (value & 0xFFFF) == 0);
+            if (!(value2 & 0xFFFF)) return triggerInterrupt(0x00);
+
+            if ((int16_t)value1 == -32768 && (int16_t)value2 == -1) {
+                setFlagBit(FLAG_OVERFLOW, 1);
+                value = -32768;
+            } else {
+                setFlagBit(FLAG_OVERFLOW, 0);
+                value = (int16_t)value1 / (int16_t)value2;
+            }
+
+            setFlagBit(FLAG_ZERO, !(value & 0xFFFF));
             setFlagBit(FLAG_NEGATIVE, value & 0x8000);
-            setFlagBit(FLAG_OVERFLOW, (int16_t)value1 == -32768 && (int16_t)value2 == -1);
             value &= 0xFFFF;
 
             switch (op1Type) {
@@ -3971,8 +3988,9 @@ void CPU::execute() {
                     break;
             }
 
-            value = (value1 & 0xFFFF) / (value2 & 0xFFFF);
-            setFlagBit(FLAG_ZERO, (value & 0xFFFF) == 0);
+            if (!(value2 & 0xFFFF)) return triggerInterrupt(0x00);
+            value = (uint16_t)value1 / (uint16_t)value2;
+            setFlagBit(FLAG_ZERO, !(value & 0xFFFF));
             value &= 0xFFFF;
 
             switch (op1Type) {
@@ -4082,10 +4100,18 @@ void CPU::execute() {
                     break;
             }
 
-            value = (int32_t)value1 / (int32_t)value2;
-            setFlagBit(FLAG_ZERO,     (value & 0xFFFFFFFF) == 0);
+            if (!(value2 & 0xFFFFFFFF)) return triggerInterrupt(0x00);
+
+            if ((int32_t)value1 == -2147483648 && (int32_t)value2 == -1) {
+                setFlagBit(FLAG_OVERFLOW, 1);
+                value = -2147483648;
+            } else {
+                setFlagBit(FLAG_OVERFLOW, 0);
+                value = (int32_t)value1 / (int32_t)value2;
+            }
+
+            setFlagBit(FLAG_ZERO, !(value & 0xFFFFFFFF));
             setFlagBit(FLAG_NEGATIVE, value & 0x80000000);
-            setFlagBit(FLAG_OVERFLOW, (int32_t)value1 == INT32_MIN && (int32_t)value2 == -1);
             value &= 0xFFFFFFFF;
 
             switch (op1Type) {
@@ -4195,8 +4221,9 @@ void CPU::execute() {
                     break;
             }
 
-            value = (value1 & 0xFFFFFFFF) / (value2 & 0xFFFFFFFF);
-            setFlagBit(FLAG_ZERO, (value & 0xFFFFFFFF) == 0);
+            if (!(value2 & 0xFFFFFFFF)) return triggerInterrupt(0x00);
+            value = (uint32_t)value1 / (uint32_t)value2;
+            setFlagBit(FLAG_ZERO, !(value & 0xFFFFFFFF));
             value &= 0xFFFFFFFF;
 
             switch (op1Type) {
@@ -4308,10 +4335,18 @@ void CPU::execute() {
                     break;
             }
 
-            value = (int64_t)value1 / (int64_t)value2;
-            setFlagBit(FLAG_ZERO,     value == 0);
-            setFlagBit(FLAG_NEGATIVE, value & 0x8000000000000000ULL);
-            setFlagBit(FLAG_OVERFLOW, (int64_t)value1 == INT64_MIN && (int64_t)value2 == -1);
+            if (!value2) return triggerInterrupt(0x00);
+
+            if ((int64_t)value1 == (int64_t)0x8000000000000000 && (int64_t)value2 == -1) {
+                setFlagBit(FLAG_OVERFLOW, 1);
+                value = value1;
+            } else {
+                setFlagBit(FLAG_OVERFLOW, 0);
+                value = (int64_t)value1 / (int64_t)value2;
+            }
+
+            setFlagBit(FLAG_ZERO, !value);
+            setFlagBit(FLAG_NEGATIVE, value & 0x8000000000000000);
 
             switch (op1Type) {
                 case reg:
@@ -4422,8 +4457,9 @@ void CPU::execute() {
                     break;
             }
 
-            value = value1 / value2;
-            setFlagBit(FLAG_ZERO, value == 0);
+            if (!value2) return triggerInterrupt(0x00);
+            value = (uint64_t)value1 / (uint64_t)value2;
+            setFlagBit(FLAG_ZERO, !value);
 
             switch (op1Type) {
                 case reg:
@@ -4435,17 +4471,17 @@ void CPU::execute() {
                     write64(dest, value);
                     break;
             }
+
             break;
 
         case 0x35:
             resetOpIndexes();
-
             switch (op1Type) {
                 case reg:
                     dest = operands8[op8Index];
                     registers[dest] = (registers[dest] & ~0xFFULL) | ((registers[dest] + 1) & 0xFF);
+                    setFlagBit(FLAG_ZERO, (registers[dest] & 0xFF) == 0);
                     break;
-
                 case mem_imm:
                     switch (op1Size) {
                         case 1: dest = operands8[op8Index]; break;
@@ -4453,10 +4489,8 @@ void CPU::execute() {
                         case 4: dest = operands32[op32Index]; break;
                         case 8: dest = operands64[op64Index]; break;
                     }
-
-                    write8(dest, read8(dest) + 1);
+                    { uint8_t value1 = read8(dest) + 1; write8(dest, value1); setFlagBit(FLAG_ZERO, value1 == 0); }
                     break;
-
                 case mem_reg:
                     switch (op1Size) {
                         case 1: dest = registers[operands8[op8Index]]; break;
@@ -4464,11 +4498,9 @@ void CPU::execute() {
                         case 4: dest = registers[operands32[op32Index]]; break;
                         case 8: dest = registers[operands64[op64Index]]; break;
                     }
-                    
-                    write8(dest, read8(dest) + 1);
+                    { uint8_t value1 = read8(dest) + 1; write8(dest, value1); setFlagBit(FLAG_ZERO, value1 == 0); }
                     break;
             }
-
             break;
 
         case 0x36:
@@ -4477,6 +4509,7 @@ void CPU::execute() {
                 case reg:
                     dest = operands8[op8Index];
                     registers[dest] = (registers[dest] & ~0xFFFFULL) | ((registers[dest] + 1) & 0xFFFF);
+                    setFlagBit(FLAG_ZERO, (registers[dest] & 0xFFFF) == 0);
                     break;
                 case mem_imm:
                     switch (op1Size) {
@@ -4485,7 +4518,7 @@ void CPU::execute() {
                         case 4: dest = operands32[op32Index]; break;
                         case 8: dest = operands64[op64Index]; break;
                     }
-                    write16(dest, read16(dest) + 1);
+                    { uint16_t value1 = read16(dest) + 1; write16(dest, value1); setFlagBit(FLAG_ZERO, value1 == 0); }
                     break;
                 case mem_reg:
                     switch (op1Size) {
@@ -4494,7 +4527,7 @@ void CPU::execute() {
                         case 4: dest = registers[operands32[op32Index]]; break;
                         case 8: dest = registers[operands64[op64Index]]; break;
                     }
-                    write16(dest, read16(dest) + 1);
+                    { uint16_t value1 = read16(dest) + 1; write16(dest, value1); setFlagBit(FLAG_ZERO, value1 == 0); }
                     break;
             }
             break;
@@ -4505,6 +4538,7 @@ void CPU::execute() {
                 case reg:
                     dest = operands8[op8Index];
                     registers[dest] = (registers[dest] & ~0xFFFFFFFFULL) | ((registers[dest] + 1) & 0xFFFFFFFF);
+                    setFlagBit(FLAG_ZERO, (registers[dest] & 0xFFFFFFFF) == 0);
                     break;
                 case mem_imm:
                     switch (op1Size) {
@@ -4513,7 +4547,7 @@ void CPU::execute() {
                         case 4: dest = operands32[op32Index]; break;
                         case 8: dest = operands64[op64Index]; break;
                     }
-                    write32(dest, read32(dest) + 1);
+                    { uint32_t value1 = read32(dest) + 1; write32(dest, value1); setFlagBit(FLAG_ZERO, value1 == 0); }
                     break;
                 case mem_reg:
                     switch (op1Size) {
@@ -4522,7 +4556,7 @@ void CPU::execute() {
                         case 4: dest = registers[operands32[op32Index]]; break;
                         case 8: dest = registers[operands64[op64Index]]; break;
                     }
-                    write32(dest, read32(dest) + 1);
+                    { uint32_t value1 = read32(dest) + 1; write32(dest, value1); setFlagBit(FLAG_ZERO, value1 == 0); }
                     break;
             }
             break;
@@ -4531,7 +4565,9 @@ void CPU::execute() {
             resetOpIndexes();
             switch (op1Type) {
                 case reg:
-                    registers[operands8[op8Index]]++;
+                    dest = operands8[op8Index];
+                    registers[dest]++;
+                    setFlagBit(FLAG_ZERO, registers[dest] == 0);
                     break;
                 case mem_imm:
                     switch (op1Size) {
@@ -4540,7 +4576,7 @@ void CPU::execute() {
                         case 4: dest = operands32[op32Index]; break;
                         case 8: dest = operands64[op64Index]; break;
                     }
-                    write64(dest, read64(dest) + 1);
+                    { uint64_t value1 = read64(dest) + 1; write64(dest, value1); setFlagBit(FLAG_ZERO, value1 == 0); }
                     break;
                 case mem_reg:
                     switch (op1Size) {
@@ -4549,7 +4585,7 @@ void CPU::execute() {
                         case 4: dest = registers[operands32[op32Index]]; break;
                         case 8: dest = registers[operands64[op64Index]]; break;
                     }
-                    write64(dest, read64(dest) + 1);
+                    { uint64_t value1 = read64(dest) + 1; write64(dest, value1); setFlagBit(FLAG_ZERO, value1 == 0); }
                     break;
             }
             break;
@@ -4560,6 +4596,7 @@ void CPU::execute() {
                 case reg:
                     dest = operands8[op8Index];
                     registers[dest] = (registers[dest] & ~0xFFULL) | ((registers[dest] - 1) & 0xFF);
+                    setFlagBit(FLAG_ZERO, (registers[dest] & 0xFF) == 0);
                     break;
                 case mem_imm:
                     switch (op1Size) {
@@ -4568,7 +4605,7 @@ void CPU::execute() {
                         case 4: dest = operands32[op32Index]; break;
                         case 8: dest = operands64[op64Index]; break;
                     }
-                    write8(dest, read8(dest) - 1);
+                    { uint8_t value1 = read8(dest) - 1; write8(dest, value1); setFlagBit(FLAG_ZERO, value1 == 0); }
                     break;
                 case mem_reg:
                     switch (op1Size) {
@@ -4577,7 +4614,7 @@ void CPU::execute() {
                         case 4: dest = registers[operands32[op32Index]]; break;
                         case 8: dest = registers[operands64[op64Index]]; break;
                     }
-                    write8(dest, read8(dest) - 1);
+                    { uint8_t value1 = read8(dest) - 1; write8(dest, value1); setFlagBit(FLAG_ZERO, value1 == 0); }
                     break;
             }
             break;
@@ -4588,6 +4625,7 @@ void CPU::execute() {
                 case reg:
                     dest = operands8[op8Index];
                     registers[dest] = (registers[dest] & ~0xFFFFULL) | ((registers[dest] - 1) & 0xFFFF);
+                    setFlagBit(FLAG_ZERO, (registers[dest] & 0xFFFF) == 0);
                     break;
                 case mem_imm:
                     switch (op1Size) {
@@ -4596,7 +4634,7 @@ void CPU::execute() {
                         case 4: dest = operands32[op32Index]; break;
                         case 8: dest = operands64[op64Index]; break;
                     }
-                    write16(dest, read16(dest) - 1);
+                    { uint16_t value1 = read16(dest) - 1; write16(dest, value1); setFlagBit(FLAG_ZERO, value1 == 0); }
                     break;
                 case mem_reg:
                     switch (op1Size) {
@@ -4605,7 +4643,7 @@ void CPU::execute() {
                         case 4: dest = registers[operands32[op32Index]]; break;
                         case 8: dest = registers[operands64[op64Index]]; break;
                     }
-                    write16(dest, read16(dest) - 1);
+                    { uint16_t value1 = read16(dest) - 1; write16(dest, value1); setFlagBit(FLAG_ZERO, value1 == 0); }
                     break;
             }
             break;
@@ -4616,6 +4654,7 @@ void CPU::execute() {
                 case reg:
                     dest = operands8[op8Index];
                     registers[dest] = (registers[dest] & ~0xFFFFFFFFULL) | ((registers[dest] - 1) & 0xFFFFFFFF);
+                    setFlagBit(FLAG_ZERO, (registers[dest] & 0xFFFFFFFF) == 0);
                     break;
                 case mem_imm:
                     switch (op1Size) {
@@ -4624,7 +4663,7 @@ void CPU::execute() {
                         case 4: dest = operands32[op32Index]; break;
                         case 8: dest = operands64[op64Index]; break;
                     }
-                    write32(dest, read32(dest) - 1);
+                    { uint32_t value1 = read32(dest) - 1; write32(dest, value1); setFlagBit(FLAG_ZERO, value1 == 0); }
                     break;
                 case mem_reg:
                     switch (op1Size) {
@@ -4633,7 +4672,7 @@ void CPU::execute() {
                         case 4: dest = registers[operands32[op32Index]]; break;
                         case 8: dest = registers[operands64[op64Index]]; break;
                     }
-                    write32(dest, read32(dest) - 1);
+                    { uint32_t value1 = read32(dest) - 1; write32(dest, value1); setFlagBit(FLAG_ZERO, value1 == 0); }
                     break;
             }
             break;
@@ -4642,7 +4681,9 @@ void CPU::execute() {
             resetOpIndexes();
             switch (op1Type) {
                 case reg:
-                    registers[operands8[op8Index]]--;
+                    dest = operands8[op8Index];
+                    registers[dest]--;
+                    setFlagBit(FLAG_ZERO, registers[dest] == 0);
                     break;
                 case mem_imm:
                     switch (op1Size) {
@@ -4651,7 +4692,7 @@ void CPU::execute() {
                         case 4: dest = operands32[op32Index]; break;
                         case 8: dest = operands64[op64Index]; break;
                     }
-                    write64(dest, read64(dest) - 1);
+                    { uint64_t value1 = read64(dest) - 1; write64(dest, value1); setFlagBit(FLAG_ZERO, value1 == 0); }
                     break;
                 case mem_reg:
                     switch (op1Size) {
@@ -4660,7 +4701,7 @@ void CPU::execute() {
                         case 4: dest = registers[operands32[op32Index]]; break;
                         case 8: dest = registers[operands64[op64Index]]; break;
                     }
-                    write64(dest, read64(dest) - 1);
+                    { uint64_t value1 = read64(dest) - 1; write64(dest, value1); setFlagBit(FLAG_ZERO, value1 == 0); }
                     break;
             }
             break;
@@ -4757,6 +4798,7 @@ void CPU::execute() {
                     break;
             }
 
+            if (!value2) return triggerInterrupt(0x00);
             value = (int8_t)value1 % (int8_t)value2;
             setFlagBit(FLAG_ZERO, (value & 0xFF) == 0);
             setFlagBit(FLAG_NEGATIVE, value & 0x80);
@@ -4867,6 +4909,7 @@ void CPU::execute() {
                     break;
             }
 
+            if (!value2) return triggerInterrupt(0x00);
             value = (value1 & 0xFF) % (value2 & 0xFF);
             setFlagBit(FLAG_ZERO, (value & 0xFF) == 0);
             value &= 0xFF;
@@ -4982,6 +5025,7 @@ void CPU::execute() {
                     break;
             }
 
+            if (!value2) return triggerInterrupt(0x00);
             value = (int16_t)value1 % (int16_t)value2;
             setFlagBit(FLAG_ZERO, (value & 0xFFFF) == 0);
             setFlagBit(FLAG_NEGATIVE, value & 0x8000);
@@ -5098,6 +5142,7 @@ void CPU::execute() {
                     break;
             }
 
+            if (!value2) return triggerInterrupt(0x00);
             value = (value1 & 0xFFFF) % (value2 & 0xFFFF);
             setFlagBit(FLAG_ZERO, (value & 0xFFFF) == 0);
             value &= 0xFFFF;
@@ -5215,6 +5260,7 @@ void CPU::execute() {
                     break;
             }
 
+            if (!value2) return triggerInterrupt(0x00);
             value = (int32_t)value1 % (int32_t)value2;
             setFlagBit(FLAG_ZERO, (value & 0xFFFFFFFF) == 0);
             setFlagBit(FLAG_NEGATIVE, value & 0x80000000);
@@ -5333,6 +5379,7 @@ void CPU::execute() {
                     break;
             }
 
+            if (!value2) return triggerInterrupt(0x00);
             value = (value1 & 0xFFFFFFFF) % (value2 & 0xFFFFFFFF);
             setFlagBit(FLAG_ZERO, (value & 0xFFFFFFFF) == 0);
             value &= 0xFFFFFFFF;
@@ -5451,7 +5498,8 @@ void CPU::execute() {
                     value2 = read64(addr);
                     break;
             }
-
+            
+            if (!value2) return triggerInterrupt(0x00);
             value = (int64_t)value1 % (int64_t)value2;
             setFlagBit(FLAG_ZERO, value == 0);
             setFlagBit(FLAG_NEGATIVE, value & 0x8000000000000000);
@@ -5571,6 +5619,7 @@ void CPU::execute() {
                     break;
             }
 
+            if (!value2) return triggerInterrupt(0x00);
             value = (uint64_t)value1 % (uint64_t)value2;
             setFlagBit(FLAG_ZERO, value == 0);
 
@@ -19732,10 +19781,6 @@ void CPU::execute() {
             setFlagBit(FLAG_SLEEP, true);
             break;
 
-        case 0xFD:
-            running = false;
-            break;
-
         case 0xFE:
             resetOpIndexes();
             
@@ -23707,6 +23752,7 @@ void CPU::execute() {
                         case 4: value1 = operands32[op32Index]; break;
                         case 8: value1 = operands64[op64Index]; break;
                     }
+
                     break;
 
                 case mem_imm:
@@ -23749,6 +23795,883 @@ void CPU::execute() {
                     break;
             }
 
+            break;
+
+        case 0x0128:
+            resetOpIndexes();
+
+            switch (op1Type) {
+                case reg:
+                    dest = registers[operands8[op8Index++]];
+                    break;
+
+                case imm:
+                    switch (op1Size) {
+                        case 1: dest = operands8[op8Index++]; break;
+                        case 2: dest = operands16[op16Index++]; break;
+                        case 4: dest = operands32[op32Index++]; break;
+                        case 8: dest = operands64[op64Index++]; break;
+                    }
+                    break;
+
+                case mem_imm:
+                    switch (op1Size) {
+                        case 1: addr = operands8[op8Index++]; break;
+                        case 2: addr = operands16[op16Index++]; break;
+                        case 4: addr = operands32[op32Index++]; break;
+                        case 8: addr = operands64[op64Index++]; break;
+                    }
+
+                    dest = read64(addr);
+                    break;
+
+                case mem_reg:
+                    switch (op1Size) {
+                        case 1: addr = registers[operands8[op8Index++]]; break;
+                        case 2: addr = registers[operands16[op16Index++]]; break;
+                        case 4: addr = registers[operands32[op32Index++]]; break;
+                        case 8: addr = registers[operands64[op64Index++]]; break;
+                    }
+
+                    dest = read64(addr);
+                    break;
+            }
+
+            switch (op2Type) {
+                case reg:
+                    value1 = registers[operands8[op8Index++]];
+                    break;
+
+                case imm:
+                    switch (op3Size) {
+                        case 1: value1 = operands8[op8Index++]; break;
+                        case 2: value1 = operands16[op16Index++]; break;
+                        case 4: value1 = operands32[op32Index++]; break;
+                        case 8: value1 = operands64[op64Index++]; break;
+                    }
+                    break;
+
+                case mem_imm:
+                    switch (op2Size) {
+                        case 1: addr = operands8[op8Index++]; break;
+                        case 2: addr = operands16[op16Index++]; break;
+                        case 4: addr = operands32[op32Index++]; break;
+                        case 8: addr = operands64[op64Index++]; break;
+                    }
+
+                    value1 = read64(addr);
+                    break;
+
+                case mem_reg:
+                    switch (op2Size) {
+                        case 1: addr = registers[operands8[op8Index++]]; break;
+                        case 2: addr = registers[operands16[op16Index++]]; break;
+                        case 4: addr = registers[operands32[op32Index++]]; break;
+                        case 8: addr = registers[operands64[op64Index++]]; break;
+                    }
+
+                    value1 = read64(addr);
+                    break;
+            }
+
+            switch (op3Type) {
+                case reg:
+                    value2 = registers[operands8[op8Index]];
+                    break;
+
+                case imm:
+                    switch (op3Size) {
+                        case 1: value2 = operands8[op8Index]; break;
+                        case 2: value2 = operands16[op16Index]; break;
+                        case 4: value2 = operands32[op32Index]; break;
+                        case 8: value2 = operands64[op64Index]; break;
+                    }
+                    break;
+
+                case mem_imm:
+                    switch (op3Size) {
+                        case 1: addr = operands8[op8Index]; break;
+                        case 2: addr = operands16[op16Index]; break;
+                        case 4: addr = operands32[op32Index]; break;
+                        case 8: addr = operands64[op64Index]; break;
+                    }
+
+                    value2 = read64(addr);
+                    break;
+
+                case mem_reg:
+                    switch (op3Size) {
+                        case 1: addr = registers[operands8[op8Index]]; break;
+                        case 2: addr = registers[operands16[op16Index]]; break;
+                        case 4: addr = registers[operands32[op32Index]]; break;
+                        case 8: addr = registers[operands64[op64Index]]; break;
+                    }
+
+                    value2 = read64(addr);
+                    break;
+            }
+
+            storage.mvtram(dest, value1, value2);
+
+            break;
+
+        case 0x0129:
+            resetOpIndexes();
+
+            switch (op1Type) {
+                case reg:
+                    dest = registers[operands8[op8Index++]];
+                    break;
+
+                case imm:
+                    switch (op1Size) {
+                        case 1: dest = operands8[op8Index++]; break;
+                        case 2: dest = operands16[op16Index++]; break;
+                        case 4: dest = operands32[op32Index++]; break;
+                        case 8: dest = operands64[op64Index++]; break;
+                    }
+                    break;
+
+                case mem_imm:
+                    switch (op1Size) {
+                        case 1: addr = operands8[op8Index++]; break;
+                        case 2: addr = operands16[op16Index++]; break;
+                        case 4: addr = operands32[op32Index++]; break;
+                        case 8: addr = operands64[op64Index++]; break;
+                    }
+
+                    dest = read64(addr);
+                    break;
+
+                case mem_reg:
+                    switch (op1Size) {
+                        case 1: addr = registers[operands8[op8Index++]]; break;
+                        case 2: addr = registers[operands16[op16Index++]]; break;
+                        case 4: addr = registers[operands32[op32Index++]]; break;
+                        case 8: addr = registers[operands64[op64Index++]]; break;
+                    }
+
+                    dest = read64(addr);
+                    break;
+            }
+
+            switch (op2Type) {
+                case reg:
+                    value1 = registers[operands8[op8Index++]];
+                    break;
+
+                case imm:
+                    switch (op3Size) {
+                        case 1: value1 = operands8[op8Index++]; break;
+                        case 2: value1 = operands16[op16Index++]; break;
+                        case 4: value1 = operands32[op32Index++]; break;
+                        case 8: value1 = operands64[op64Index++]; break;
+                    }
+                    break;
+
+                case mem_imm:
+                    switch (op2Size) {
+                        case 1: addr = operands8[op8Index++]; break;
+                        case 2: addr = operands16[op16Index++]; break;
+                        case 4: addr = operands32[op32Index++]; break;
+                        case 8: addr = operands64[op64Index++]; break;
+                    }
+
+                    value1 = read64(addr);
+                    break;
+
+                case mem_reg:
+                    switch (op2Size) {
+                        case 1: addr = registers[operands8[op8Index++]]; break;
+                        case 2: addr = registers[operands16[op16Index++]]; break;
+                        case 4: addr = registers[operands32[op32Index++]]; break;
+                        case 8: addr = registers[operands64[op64Index++]]; break;
+                    }
+
+                    value1 = read64(addr);
+                    break;
+            }
+
+            switch (op3Type) {
+                case reg:
+                    value2 = registers[operands8[op8Index]];
+                    break;
+
+                case imm:
+                    switch (op3Size) {
+                        case 1: value2 = operands8[op8Index]; break;
+                        case 2: value2 = operands16[op16Index]; break;
+                        case 4: value2 = operands32[op32Index]; break;
+                        case 8: value2 = operands64[op64Index]; break;
+                    }
+                    break;
+
+                case mem_imm:
+                    switch (op3Size) {
+                        case 1: addr = operands8[op8Index]; break;
+                        case 2: addr = operands16[op16Index]; break;
+                        case 4: addr = operands32[op32Index]; break;
+                        case 8: addr = operands64[op64Index]; break;
+                    }
+
+                    value2 = read64(addr);
+                    break;
+
+                case mem_reg:
+                    switch (op3Size) {
+                        case 1: addr = registers[operands8[op8Index]]; break;
+                        case 2: addr = registers[operands16[op16Index]]; break;
+                        case 4: addr = registers[operands32[op32Index]]; break;
+                        case 8: addr = registers[operands64[op64Index]]; break;
+                    }
+
+                    value2 = read64(addr);
+                    break;
+            }
+
+            storage.mvtdisk(dest, value1, value2);
+
+            break;
+
+        case 0x012A:
+            resetOpIndexes();
+            
+            switch (op1Type) {
+                case reg:
+                    dest = operands8[op8Index++];
+                    break;
+
+                case mem_imm:
+                    switch (op1Size) {
+                        case 1: dest = operands8[op8Index++]; break;
+                        case 2: dest = operands16[op16Index++]; break;
+                        case 4: dest = operands32[op32Index++]; break;
+                        case 8: dest = operands64[op64Index++]; break;
+                    }
+                    break;
+
+                case mem_reg:
+                    switch (op1Size) {
+                        case 1: dest = registers[operands8[op8Index++]]; break;
+                        case 2: dest = registers[operands16[op16Index++]]; break;
+                        case 4: dest = registers[operands32[op32Index++]]; break;
+                        case 8: dest = registers[operands64[op64Index++]]; break;
+                    }
+                    break;
+            }
+
+            switch (op2Type) {
+                case reg:
+                    value1 = registers[operands8[op8Index++]];
+                    break;
+
+                case imm:
+                    switch (op2Size) {
+                        case 1: value1 = operands8[op8Index++]; break;
+                        case 2: value1 = operands16[op16Index++]; break;
+                        case 4: value1 = operands32[op32Index++]; break;
+                        case 8: value1 = operands64[op64Index++]; break;
+                    }
+
+                    break;
+
+                case mem_imm:
+                    switch (op2Size) {
+                        case 1: addr = operands8[op8Index++]; break;
+                        case 2: addr = operands16[op16Index++]; break;
+                        case 4: addr = operands32[op32Index++]; break;
+                        case 8: addr = operands64[op64Index++]; break;
+                    }
+
+                    value1 = read64(addr);
+                    break;
+
+                case mem_reg:
+                    switch (op2Size) {
+                        case 1: addr = registers[operands8[op8Index++]]; break;
+                        case 2: addr = registers[operands16[op16Index++]]; break;
+                        case 4: addr = registers[operands32[op32Index++]]; break;
+                        case 8: addr = registers[operands64[op64Index++]]; break;
+                    }
+
+                    value1 = read64(addr);
+                    break;
+            }
+
+            value = storage.readbytes8(value1);
+            
+            switch (op1Type) {
+                case reg:
+                    registers[dest] = value;
+                    break;
+
+                case mem_imm:
+                case mem_reg:
+                    write8(dest, value);
+                    break;
+            }
+
+            break;
+
+        case 0x012B:
+            resetOpIndexes();
+            
+            switch (op1Type) {
+                case reg:
+                    dest = operands8[op8Index++];
+                    break;
+
+                case mem_imm:
+                    switch (op1Size) {
+                        case 1: dest = operands8[op8Index++]; break;
+                        case 2: dest = operands16[op16Index++]; break;
+                        case 4: dest = operands32[op32Index++]; break;
+                        case 8: dest = operands64[op64Index++]; break;
+                    }
+                    break;
+
+                case mem_reg:
+                    switch (op1Size) {
+                        case 1: dest = registers[operands8[op8Index++]]; break;
+                        case 2: dest = registers[operands16[op16Index++]]; break;
+                        case 4: dest = registers[operands32[op32Index++]]; break;
+                        case 8: dest = registers[operands64[op64Index++]]; break;
+                    }
+                    break;
+            }
+
+            switch (op2Type) {
+                case reg:
+                    value1 = registers[operands8[op8Index++]];
+                    break;
+
+                case imm:
+                    switch (op2Size) {
+                        case 1: value1 = operands8[op8Index++]; break;
+                        case 2: value1 = operands16[op16Index++]; break;
+                        case 4: value1 = operands32[op32Index++]; break;
+                        case 8: value1 = operands64[op64Index++]; break;
+                    }
+
+                    break;
+
+                case mem_imm:
+                    switch (op2Size) {
+                        case 1: addr = operands8[op8Index++]; break;
+                        case 2: addr = operands16[op16Index++]; break;
+                        case 4: addr = operands32[op32Index++]; break;
+                        case 8: addr = operands64[op64Index++]; break;
+                    }
+
+                    value1 = read64(addr);
+                    break;
+
+                case mem_reg:
+                    switch (op2Size) {
+                        case 1: addr = registers[operands8[op8Index++]]; break;
+                        case 2: addr = registers[operands16[op16Index++]]; break;
+                        case 4: addr = registers[operands32[op32Index++]]; break;
+                        case 8: addr = registers[operands64[op64Index++]]; break;
+                    }
+
+                    value1 = read64(addr);
+                    break;
+            }
+
+            value = storage.readbytes16(value1);
+            
+            switch (op1Type) {
+                case reg:
+                    registers[dest] = value;
+                    break;
+
+                case mem_imm:
+                case mem_reg:
+                    write16(dest, value);
+                    break;
+            }
+
+            break;
+
+        case 0x012C:
+            resetOpIndexes();
+            
+            switch (op1Type) {
+                case reg:
+                    dest = operands8[op8Index++];
+                    break;
+
+                case mem_imm:
+                    switch (op1Size) {
+                        case 1: dest = operands8[op8Index++]; break;
+                        case 2: dest = operands16[op16Index++]; break;
+                        case 4: dest = operands32[op32Index++]; break;
+                        case 8: dest = operands64[op64Index++]; break;
+                    }
+                    break;
+
+                case mem_reg:
+                    switch (op1Size) {
+                        case 1: dest = registers[operands8[op8Index++]]; break;
+                        case 2: dest = registers[operands16[op16Index++]]; break;
+                        case 4: dest = registers[operands32[op32Index++]]; break;
+                        case 8: dest = registers[operands64[op64Index++]]; break;
+                    }
+                    break;
+            }
+
+            switch (op2Type) {
+                case reg:
+                    value1 = registers[operands8[op8Index++]];
+                    break;
+
+                case imm:
+                    switch (op2Size) {
+                        case 1: value1 = operands8[op8Index++]; break;
+                        case 2: value1 = operands16[op16Index++]; break;
+                        case 4: value1 = operands32[op32Index++]; break;
+                        case 8: value1 = operands64[op64Index++]; break;
+                    }
+
+                    break;
+
+                case mem_imm:
+                    switch (op2Size) {
+                        case 1: addr = operands8[op8Index++]; break;
+                        case 2: addr = operands16[op16Index++]; break;
+                        case 4: addr = operands32[op32Index++]; break;
+                        case 8: addr = operands64[op64Index++]; break;
+                    }
+
+                    value1 = read64(addr);
+                    break;
+
+                case mem_reg:
+                    switch (op2Size) {
+                        case 1: addr = registers[operands8[op8Index++]]; break;
+                        case 2: addr = registers[operands16[op16Index++]]; break;
+                        case 4: addr = registers[operands32[op32Index++]]; break;
+                        case 8: addr = registers[operands64[op64Index++]]; break;
+                    }
+
+                    value1 = read64(addr);
+                    break;
+            }
+
+            value = storage.readbytes32(value1);
+            
+            switch (op1Type) {
+                case reg:
+                    registers[dest] = value;
+                    break;
+
+                case mem_imm:
+                case mem_reg:
+                    write32(dest, value);
+                    break;
+            }
+
+            break;
+
+        case 0x012D:
+            resetOpIndexes();
+            
+            switch (op1Type) {
+                case reg:
+                    dest = operands8[op8Index++];
+                    break;
+
+                case mem_imm:
+                    switch (op1Size) {
+                        case 1: dest = operands8[op8Index++]; break;
+                        case 2: dest = operands16[op16Index++]; break;
+                        case 4: dest = operands32[op32Index++]; break;
+                        case 8: dest = operands64[op64Index++]; break;
+                    }
+                    break;
+
+                case mem_reg:
+                    switch (op1Size) {
+                        case 1: dest = registers[operands8[op8Index++]]; break;
+                        case 2: dest = registers[operands16[op16Index++]]; break;
+                        case 4: dest = registers[operands32[op32Index++]]; break;
+                        case 8: dest = registers[operands64[op64Index++]]; break;
+                    }
+                    break;
+            }
+
+            switch (op2Type) {
+                case reg:
+                    value1 = registers[operands8[op8Index++]];
+                    break;
+
+                case imm:
+                    switch (op2Size) {
+                        case 1: value1 = operands8[op8Index++]; break;
+                        case 2: value1 = operands16[op16Index++]; break;
+                        case 4: value1 = operands32[op32Index++]; break;
+                        case 8: value1 = operands64[op64Index++]; break;
+                    }
+
+                    break;
+
+                case mem_imm:
+                    switch (op2Size) {
+                        case 1: addr = operands8[op8Index++]; break;
+                        case 2: addr = operands16[op16Index++]; break;
+                        case 4: addr = operands32[op32Index++]; break;
+                        case 8: addr = operands64[op64Index++]; break;
+                    }
+
+                    value1 = read64(addr);
+                    break;
+
+                case mem_reg:
+                    switch (op2Size) {
+                        case 1: addr = registers[operands8[op8Index++]]; break;
+                        case 2: addr = registers[operands16[op16Index++]]; break;
+                        case 4: addr = registers[operands32[op32Index++]]; break;
+                        case 8: addr = registers[operands64[op64Index++]]; break;
+                    }
+
+                    value1 = read64(addr);
+                    break;
+            }
+
+            value = storage.readbytes64(value1);
+            
+            switch (op1Type) {
+                case reg:
+                    registers[dest] = value;
+                    break;
+
+                case mem_imm:
+                case mem_reg:
+                    write64(dest, value);
+                    break;
+            }
+
+            break;
+
+        case 0x012E:
+            resetOpIndexes();
+            
+            switch (op1Type) {
+                case reg:
+                    dest = registers[operands8[op8Index++]];
+                    break;
+
+                case imm:
+                    switch (op1Size) {
+                        case 1: dest = operands8[op8Index++]; break;
+                        case 2: dest = operands16[op16Index++]; break;
+                        case 4: dest = operands32[op32Index++]; break;
+                        case 8: dest = operands64[op64Index++]; break;
+                    }
+                    break;
+
+                case mem_imm:
+                    switch (op1Size) {
+                        case 1: addr = operands8[op8Index++]; break;
+                        case 2: addr = operands16[op16Index++]; break;
+                        case 4: addr = operands32[op32Index++]; break;
+                        case 8: addr = operands64[op64Index++]; break;
+                    }
+
+                    dest = read64(addr);
+                    break;
+
+                case mem_reg:
+                    switch (op1Size) {
+                        case 1: addr = registers[operands8[op8Index++]]; break;
+                        case 2: addr = registers[operands16[op16Index++]]; break;
+                        case 4: addr = registers[operands32[op32Index++]]; break;
+                        case 8: addr = registers[operands64[op64Index++]]; break;
+                    }
+
+                    dest = read64(addr);
+                    break;
+            }
+
+            switch (op2Type) {
+                case reg:
+                    value1 = registers[operands8[op8Index++]] & 0xFF;
+                    break;
+
+                case imm:
+                    value1 = operands8[op8Index++];
+                    break;
+
+                case mem_imm:
+                    switch (op2Size) {
+                        case 1: addr = operands8[op8Index++]; break;
+                        case 2: addr = operands16[op16Index++]; break;
+                        case 4: addr = operands32[op32Index++]; break;
+                        case 8: addr = operands64[op64Index++]; break;
+                    }
+
+                    value1 = read8(addr);
+                    break;
+
+                case mem_reg:
+                    switch (op2Size) {
+                        case 1: addr = registers[operands8[op8Index++]]; break;
+                        case 2: addr = registers[operands16[op16Index++]]; break;
+                        case 4: addr = registers[operands32[op32Index++]]; break;
+                        case 8: addr = registers[operands64[op64Index++]]; break;
+                    }
+
+                    value1 = read8(addr);
+                    break;
+            }
+
+            storage.writebytes8(dest, value1);
+
+            break;
+
+        case 0x012F:
+            resetOpIndexes();
+            
+            switch (op1Type) {
+                case reg:
+                    dest = registers[operands8[op8Index++]];
+                    break;
+
+                case imm:
+                    switch (op1Size) {
+                        case 1: dest = operands8[op8Index++]; break;
+                        case 2: dest = operands16[op16Index++]; break;
+                        case 4: dest = operands32[op32Index++]; break;
+                        case 8: dest = operands64[op64Index++]; break;
+                    }
+                    break;
+
+                case mem_imm:
+                    switch (op1Size) {
+                        case 1: addr = operands8[op8Index++]; break;
+                        case 2: addr = operands16[op16Index++]; break;
+                        case 4: addr = operands32[op32Index++]; break;
+                        case 8: addr = operands64[op64Index++]; break;
+                    }
+
+                    dest = read64(addr);
+                    break;
+
+                case mem_reg:
+                    switch (op1Size) {
+                        case 1: addr = registers[operands8[op8Index++]]; break;
+                        case 2: addr = registers[operands16[op16Index++]]; break;
+                        case 4: addr = registers[operands32[op32Index++]]; break;
+                        case 8: addr = registers[operands64[op64Index++]]; break;
+                    }
+
+                    dest = read64(addr);
+                    break;
+            }
+
+            switch (op2Type) {
+                case reg:
+                    value1 = registers[operands8[op8Index++]] & 0xFFFF;
+                    break;
+
+                case imm:
+                    switch (op2Size) {
+                        case 1: value1 = operands8[op8Index++]; break;
+                        case 2: value1 = operands16[op16Index++]; break;
+                    }
+
+                    break;
+
+                case mem_imm:
+                    switch (op2Size) {
+                        case 1: addr = operands8[op8Index++]; break;
+                        case 2: addr = operands16[op16Index++]; break;
+                        case 4: addr = operands32[op32Index++]; break;
+                        case 8: addr = operands64[op64Index++]; break;
+                    }
+
+                    value1 = read16(addr);
+                    break;
+
+                case mem_reg:
+                    switch (op2Size) {
+                        case 1: addr = registers[operands8[op8Index++]]; break;
+                        case 2: addr = registers[operands16[op16Index++]]; break;
+                        case 4: addr = registers[operands32[op32Index++]]; break;
+                        case 8: addr = registers[operands64[op64Index++]]; break;
+                    }
+
+                    value1 = read16(addr);
+                    break;
+            }
+
+            storage.writebytes16(dest, value1);
+            break;
+
+        case 0x0130:
+            resetOpIndexes();
+            
+            switch (op1Type) {
+                case reg:
+                    dest = registers[operands8[op8Index++]];
+                    break;
+
+                case imm:
+                    switch (op1Size) {
+                        case 1: dest = operands8[op8Index++]; break;
+                        case 2: dest = operands16[op16Index++]; break;
+                        case 4: dest = operands32[op32Index++]; break;
+                        case 8: dest = operands64[op64Index++]; break;
+                    }
+                    break;
+
+                case mem_imm:
+                    switch (op1Size) {
+                        case 1: addr = operands8[op8Index++]; break;
+                        case 2: addr = operands16[op16Index++]; break;
+                        case 4: addr = operands32[op32Index++]; break;
+                        case 8: addr = operands64[op64Index++]; break;
+                    }
+
+                    dest = read64(addr);
+                    break;
+
+                case mem_reg:
+                    switch (op1Size) {
+                        case 1: addr = registers[operands8[op8Index++]]; break;
+                        case 2: addr = registers[operands16[op16Index++]]; break;
+                        case 4: addr = registers[operands32[op32Index++]]; break;
+                        case 8: addr = registers[operands64[op64Index++]]; break;
+                    }
+
+                    dest = read64(addr);
+                    break;
+            }
+
+            switch (op2Type) {
+                case reg:
+                    value1 = registers[operands8[op8Index++]] & 0xFFFFFFFF;
+                    break;
+
+                case imm:
+                    switch (op2Size) {
+                        case 1: value1 = operands8[op8Index++]; break;
+                        case 2: value1 = operands16[op16Index++]; break;
+                        case 4: value1 = operands32[op32Index++]; break;
+                    }
+
+                    break;
+
+                case mem_imm:
+                    switch (op2Size) {
+                        case 1: addr = operands8[op8Index++]; break;
+                        case 2: addr = operands16[op16Index++]; break;
+                        case 4: addr = operands32[op32Index++]; break;
+                        case 8: addr = operands64[op64Index++]; break;
+                    }
+
+                    value1 = read32(addr);
+                    break;
+
+                case mem_reg:
+                    switch (op2Size) {
+                        case 1: addr = registers[operands8[op8Index++]]; break;
+                        case 2: addr = registers[operands16[op16Index++]]; break;
+                        case 4: addr = registers[operands32[op32Index++]]; break;
+                        case 8: addr = registers[operands64[op64Index++]]; break;
+                    }
+
+                    value1 = read32(addr);
+                    break;
+            }
+
+            storage.writebytes32(dest, value1);
+            break;
+
+        case 0x0131:
+            resetOpIndexes();
+            
+            switch (op1Type) {
+                case reg:
+                    dest = registers[operands8[op8Index++]];
+                    break;
+
+                case imm:
+                    switch (op1Size) {
+                        case 1: dest = operands8[op8Index++]; break;
+                        case 2: dest = operands16[op16Index++]; break;
+                        case 4: dest = operands32[op32Index++]; break;
+                        case 8: dest = operands64[op64Index++]; break;
+                    }
+                    break;
+
+                case mem_imm:
+                    switch (op1Size) {
+                        case 1: addr = operands8[op8Index++]; break;
+                        case 2: addr = operands16[op16Index++]; break;
+                        case 4: addr = operands32[op32Index++]; break;
+                        case 8: addr = operands64[op64Index++]; break;
+                    }
+
+                    dest = read64(addr);
+                    break;
+
+                case mem_reg:
+                    switch (op1Size) {
+                        case 1: addr = registers[operands8[op8Index++]]; break;
+                        case 2: addr = registers[operands16[op16Index++]]; break;
+                        case 4: addr = registers[operands32[op32Index++]]; break;
+                        case 8: addr = registers[operands64[op64Index++]]; break;
+                    }
+
+                    dest = read64(addr);
+                    break;
+            }
+
+            switch (op2Type) {
+                case reg:
+                    value1 = registers[operands8[op8Index++]];
+                    break;
+
+                case imm:
+                    switch (op2Size) {
+                        case 1: value1 = operands8[op8Index++]; break;
+                        case 2: value1 = operands16[op16Index++]; break;
+                        case 4: value1 = operands32[op32Index++]; break;
+                        case 8: value1 = operands64[op64Index++]; break;
+                    }
+
+                    break;
+
+                case mem_imm:
+                    switch (op2Size) {
+                        case 1: addr = operands8[op8Index++]; break;
+                        case 2: addr = operands16[op16Index++]; break;
+                        case 4: addr = operands32[op32Index++]; break;
+                        case 8: addr = operands64[op64Index++]; break;
+                    }
+
+                    value1 = read64(addr);
+                    break;
+
+                case mem_reg:
+                    switch (op2Size) {
+                        case 1: addr = registers[operands8[op8Index++]]; break;
+                        case 2: addr = registers[operands16[op16Index++]]; break;
+                        case 4: addr = registers[operands32[op32Index++]]; break;
+                        case 8: addr = registers[operands64[op64Index++]]; break;
+                    }
+
+                    value1 = read64(addr);
+                    break;
+            }
+
+            storage.writebytes64(dest, value1);
+            break;
+        
+        case 0xFD:
+        default:
+            running = false;
             break;
     }
 }

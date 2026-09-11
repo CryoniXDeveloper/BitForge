@@ -151,7 +151,7 @@ std::vector<uint8_t> Assembler::autoSizeBytes(const std::string& valueToken) {
     return bytes;
 }
 
-void Assembler::secondPass(const std::vector<std::string>& lines) {
+void Assembler::secondPass(const std::vector<std::string>& lines, bool collectLabels) {
     size_t lineNumber = 0;
     for (const auto& line : lines) {
         ++lineNumber;
@@ -161,8 +161,10 @@ void Assembler::secondPass(const std::vector<std::string>& lines) {
         if (tokens.empty()) continue;
 
         if (tokens[0][0] == '!') {
-            std::string name = tokens[0].substr(1, tokens[0].size() - 2);
-            labels.push_back({name, (uint32_t)output.size()});
+            if (collectLabels) {
+                std::string name = tokens[0].substr(1, tokens[0].size() - 2);
+                labels.push_back({name, (uint32_t)output.size()});
+            }
             continue;
         }
 
@@ -239,8 +241,10 @@ void Assembler::secondPass(const std::vector<std::string>& lines) {
             if (tokens[2][0] == '!') {
                 std::string name = tokens[2].substr(1);
                 uint64_t addr = 0;
+                bool found = false;
                 for (const auto& l : labels)
-                    if (l.name == name) { addr = l.address; break; }
+                    if (l.name == name) { addr = l.address; found = true; break; }
+                if (!found && !collectLabels) error("ASM00008", "Unknown label: " + name);
                 for (int b = 0; b < 8; b++) output.push_back((addr >> (b * 8)) & 0xFF);
             } else {
                 encodeOperand(tokens[1], tokens[2]);
@@ -288,7 +292,11 @@ int main() {
 
     std::cout << "Assembling...\n";
 
-    assembler.secondPass(lines);
+    assembler.output.clear();
+    assembler.labels.clear();
+    assembler.secondPass(lines, true);
+    assembler.output.clear();
+    assembler.secondPass(lines, false);
     const size_t ROM_SIZE = 32 * 1024;
     while (assembler.output.size() < ROM_SIZE)
         assembler.output.push_back(0x00);

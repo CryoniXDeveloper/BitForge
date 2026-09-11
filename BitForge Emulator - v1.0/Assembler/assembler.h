@@ -124,7 +124,7 @@ struct Assembler {
     std::string trim(const std::string& s);
     std::vector<std::string> split(const std::string& s);
     std::vector<std::string> readFile(const std::string& filename);
-    void secondPass(const std::vector<std::string>& lines);
+    void secondPass(const std::vector<std::string>& lines, bool collectLabels);
     void writeOutput(const std::string& filename);
     void error(const std::string& type, const std::string& info) const;
     std::vector<std::string> parseDescriptor(const std::string& desc);

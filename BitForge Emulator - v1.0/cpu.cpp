@@ -15,6 +15,7 @@
 
 void CPU::start() {
     stackPointer = STACK_END;
+    finished.store(false, std::memory_order_relaxed);
     running = true;
 
     for (int i = 0; i < 1000; i++) {
@@ -34,6 +35,7 @@ void CPU::start() {
     }
     
     CPURunTime = timer.end();
+    finished.store(true, std::memory_order_release);
 
     std::cout << std::fixed << std::setprecision(10)
           << "CPU Finished in " << cycles
@@ -60,6 +62,8 @@ void CPU::start() {
             << registers[i]
             << std::dec << "\n";
     }
+
+    if (!interactiveMemoryDump) return;
 
     std::cout << "\nEnter memory start address (hex like 0x100 or decimal): ";
     std::string addrStr;

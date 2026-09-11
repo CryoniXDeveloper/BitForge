@@ -10,11 +10,15 @@ extern ROM rom;
 class Motherboard {
 public:
     CPU* cpu;
-    
+
     static constexpr size_t RAM_SIZE = 128ull * 1024 * 1024;
     static constexpr size_t ROM_SIZE = 32ull * 1024;
     static constexpr size_t STACK_SIZE = 1024ull * 1024;
     static constexpr size_t IVT_SIZE = 2048ull;
+
+    static constexpr size_t FB_WIDTH = 960;
+    static constexpr size_t FB_HEIGHT = 540;
+    static constexpr size_t FRAMEBUFFER_SIZE = FB_WIDTH * FB_HEIGHT * 4;
 
     static constexpr uint64_t ROM_START = 0x00000000;
     static constexpr uint64_t ROM_END   = ROM_START + ROM_SIZE - 1;
@@ -28,11 +32,14 @@ public:
     static constexpr uint64_t IVT_END   = STACK_END - 1;
     static constexpr uint64_t IVT_START = IVT_END - IVT_SIZE + 1;
 
-    static constexpr size_t RAM_RESERVED = STACK_SIZE + IVT_SIZE;
+    static constexpr uint64_t FRAMEBUFFER_END   = IVT_START - 1;
+    static constexpr uint64_t FRAMEBUFFER_START = FRAMEBUFFER_END - FRAMEBUFFER_SIZE + 1;
+
+    static constexpr size_t RAM_RESERVED = STACK_SIZE + IVT_SIZE + FRAMEBUFFER_SIZE;
     static constexpr size_t RAM_USABLE   = RAM_SIZE - RAM_RESERVED;
 
     static constexpr uint64_t RAM_USABLE_START = RAM_START;
-    static constexpr uint64_t RAM_USABLE_END   = IVT_START - 1;
+    static constexpr uint64_t RAM_USABLE_END   = FRAMEBUFFER_START - 1;
 
     static constexpr uint32_t IO_PORT_COUNT = 65536;
     uint8_t ioPorts[IO_PORT_COUNT]{};

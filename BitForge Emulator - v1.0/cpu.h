@@ -9,6 +9,7 @@
 #include <Windows.h>
 #include <unordered_map>
 #include <atomic>
+#include "motherboard.h"
 
 class Motherboard;
 class ROM;
@@ -30,7 +31,9 @@ struct CPU {
     uint64_t registers[64]{};
     uint8_t flags = 0;
 
-    bool running = false;
+    std::atomic_bool running = false;
+    std::atomic_bool finished = false;
+    bool interactiveMemoryDump = false;
     uint64_t cycles = 0;
     double CPURunTime = 0.0;
     volatile uint8_t warmup = 0;

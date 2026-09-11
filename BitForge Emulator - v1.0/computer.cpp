@@ -1,7 +1,7 @@
 #include "motherboard.h"
 #include "cpu.h"
 #include "ram.h"
-#include "Display/display.h"
+#include "display.h"
 
 #include <chrono>
 #include <cstdint>
